@@ -189,6 +189,9 @@ def _check_usage(item):
         raise pytest.UsageError('--base-url must be specified.')
 
     item.sauce_labs = item.sauce_labs_username or item.sauce_labs_api_key
+
+    if item.sauce_labs:
+        _check_sauce_usage(item)
     
     if item.api == 'webdriver':
         if not item.browser_name:
@@ -198,14 +201,10 @@ def _check_usage(item):
         if not item.platform:
             raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
     else:
-        if item.sauce_labs:
-            _check_sauce_usage(item)
-        else:
-            if not(item.browser or item.environment):
-                raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
+        if not(item.browser or item.environment):
+            raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
 
-    if item.sauce_labs:
-        _check_sauce_usage(item)
+    
 
 def _setup_webdriver(item):
     if item.sauce_labs_username:
