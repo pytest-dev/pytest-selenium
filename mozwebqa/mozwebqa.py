@@ -63,26 +63,12 @@ def pytest_runtest_setup(item):
     _check_usage(item)
 
     if not 'skip_selenium' in item.keywords:
-        TestSetup.skip_selenium = False
-
-        if item.api == 'webdriver':
-            _setup_webdriver(item)
-        else:
-            _setup_selenium(item) 
+        _start_selenium(item)
 
 
 def pytest_runtest_teardown(item):
     if hasattr(TestSetup, 'selenium') and not TestSetup.skip_selenium:
-        if item.api == 'webdriver':
-            TestSetup.selenium.quit()
-        else:
-            if item.config.option.capture_network:
-                traffic = TestSetup.selenium.captureNetworkTraffic('json')
-                filename = item.keywords.keys()[0]
-                f = open('%s.json' % filename, 'w')
-                f.write(traffic)
-                f.close()
-            TestSetup.selenium.stop()
+        _stop_selenium(item)
 
 
 def pytest_funcarg__mozwebqa(request):
@@ -189,11 +175,9 @@ def _check_usage(item):
     if TestSetup.base_url is None:
         raise pytest.UsageError('--base-url must be specified.')
 
-    item.sauce_labs = item.sauce_labs_username or item.sauce_labs_api_key
-
-    if item.sauce_labs:
+    if item.sauce_labs_username or item.sauce_labs_api_key:
         _check_sauce_usage(item)
-    
+
     if item.api == 'webdriver':
         if not item.browser_name:
             raise pytest.UsageError("--browser-name must be specified when using the 'webdriver' api.")
@@ -205,9 +189,15 @@ def _check_usage(item):
         if not(item.browser or item.environment):
             raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
 
-    
+def _start_selenium(item):
+    TestSetup.skip_selenium = False
 
-def _setup_webdriver(item):
+    if item.api == 'webdriver':
+       _start_webdriver_client(item)
+    else:
+        _start_rc_client(item) 
+
+def _start_webdriver_client(item):
     if item.sauce_labs_username:
         capabilities = {
                     'platform': item.platform,
@@ -230,7 +220,7 @@ def _setup_webdriver(item):
             valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
             raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
 
-def _setup_selenium(item):
+def _start_rc_client(item):
     if item.sauce_labs_username:
         TestSetup.selenium = selenium('ondemand.saucelabs.com', '80',
                                       json.dumps({
@@ -252,6 +242,18 @@ def _setup_selenium(item):
         TestSetup.selenium.start()
 
     TestSetup.selenium.set_timeout(TestSetup.timeout)
+
+def _stop_selenium(item):
+    if item.api == 'webdriver':
+        TestSetup.selenium.quit()
+    else:
+        if item.config.option.capture_network:
+            traffic = TestSetup.selenium.captureNetworkTraffic('json')
+            filename = item.keywords.keys()[0]
+            f = open('%s.json' % filename, 'w')
+            f.write(traffic)
+            f.close()
+        TestSetup.selenium.stop()
 
 
 class TestSetup:
