@@ -57,17 +57,14 @@ def pytest_runtest_setup(item):
     item.sauce_labs_username = item.config.option.sauce_labs_username
     item.sauce_labs_api_key = item.config.option.sauce_labs_api_key
     TestSetup.credentials = item.config.option.credentials_file
-    
-    TestSetup.skip_selenium = True
-
-    _check_usage(item)
 
     if not 'skip_selenium' in item.keywords:
+        _check_selenium_usage(item)
         _start_selenium(item)
 
 
 def pytest_runtest_teardown(item):
-    if hasattr(TestSetup, 'selenium') and not TestSetup.skip_selenium:
+    if not 'skip_selenium' in item.keywords:
         _stop_selenium(item)
 
 
@@ -160,7 +157,7 @@ def _check_sauce_usage(item):
         raise pytest.UsageError('--sauce-user must be specified.')
     if not item.sauce_labs_api_key:
         raise pytest.UsageError('--sauce-key must be specified.')
-    if item.api is "rc":
+    if item.api == "rc":
         if not item.browser_name:
             raise pytest.UsageError("--browser-name must be specified when using the 'rc' api with sauce labs.")
         if not item.browser_version:
@@ -168,7 +165,7 @@ def _check_sauce_usage(item):
         if not item.platform:
             raise pytest.UsageError("--platform must be specified when using the 'rc' api with sauce labs.")
 
-def _check_usage(item):
+def _check_selenium_usage(item):
     '''
         Check that the usage parameters are correct. If wrong throws the appropriate error
     '''
@@ -190,10 +187,8 @@ def _check_usage(item):
             raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
 
 def _start_selenium(item):
-    TestSetup.skip_selenium = False
-
     if item.api == 'webdriver':
-       _start_webdriver_client(item)
+        _start_webdriver_client(item)
     else:
         _start_rc_client(item) 
 
@@ -245,7 +240,10 @@ def _start_rc_client(item):
 
 def _stop_selenium(item):
     if item.api == 'webdriver':
-        TestSetup.selenium.quit()
+        try:
+            TestSetup.selenium.quit()
+        except:
+            pass
     else:
         if item.config.option.capture_network:
             traffic = TestSetup.selenium.captureNetworkTraffic('json')
@@ -253,7 +251,10 @@ def _stop_selenium(item):
             f = open('%s.json' % filename, 'w')
             f.write(traffic)
             f.close()
-        TestSetup.selenium.stop()
+        try:
+            TestSetup.selenium.stop()
+        except:
+            pass
 
 
 class TestSetup:
