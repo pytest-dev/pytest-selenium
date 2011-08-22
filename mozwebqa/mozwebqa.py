@@ -59,6 +59,7 @@ def pytest_runtest_setup(item):
     item.platform = item.config.option.platform
     TestSetup.base_url = item.config.option.base_url
     TestSetup.timeout = item.config.option.timeout
+    TestSetup.default_implicit_wait = 10
     item.sauce_labs_credentials_file = item.config.option.sauce_labs_credentials_file
     if item.sauce_labs_credentials_file:
         item.sauce_labs_credentials = _credentials(item.config.option.sauce_labs_credentials_file)
@@ -101,7 +102,7 @@ def pytest_addoption(parser):
     group._addoption('--driver',
                      action = 'store',
                      dest = 'driver',
-                     default = 'RemoteDriver',
+                     default = 'Remote',
                      metavar = 'str',
                      help = 'webdriver implementation.')
     group._addoption('--chrome-path',
@@ -257,6 +258,7 @@ def _start_webdriver_client(item):
             TestSetup.selenium = webdriver.Ie()
         else:
             getattr(webdriver, item.driver)()
+    TestSetup.selenium.implicitly_wait(TestSetup.default_implicit_wait)
 
 
 def _start_rc_client(item):
