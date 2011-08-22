@@ -39,6 +39,7 @@ import json
 import pytest
 import py
 
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import selenium
 from selenium import webdriver
 import yaml
@@ -48,6 +49,9 @@ def pytest_runtest_setup(item):
     item.api = item.config.option.api
     item.host = item.config.option.host
     item.port = item.config.option.port
+    item.driver = item.config.option.driver
+    item.chrome_path = item.config.option.chrome_path
+    item.firefox_path = item.config.option.firefox_path
     item.browser = item.config.option.browser
     item.environment = item.config.option.environment
     item.browser_name = item.config.option.browser_name
@@ -94,6 +98,22 @@ def pytest_addoption(parser):
                      default = 4444,
                      metavar = 'num',
                      help = 'port that selenium server is listening on.')
+    group._addoption('--driver',
+                     action = 'store',
+                     dest = 'driver',
+                     default = 'RemoteDriver',
+                     metavar = 'str',
+                     help = 'webdriver implementation.')
+    group._addoption('--chrome-path',
+                     action = 'store',
+                     dest = 'chrome_path',
+                     metavar = 'path',
+                     help = 'path to the google chrome driver executable.')
+    group._addoption('--firefox-path',
+                     action = 'store',
+                     dest = 'firefox_path',
+                     metavar = 'path',
+                     help = 'path to the target firefox binary.')
     group._addoption('--browser',
                      action = 'store',
                      dest = 'browser',
@@ -181,12 +201,13 @@ def _check_selenium_usage(item):
         _check_sauce_usage(item)
 
     if item.api == 'webdriver':
-        if not item.browser_name:
-            raise pytest.UsageError("--browser-name must be specified when using the 'webdriver' api.")
-        if not item.browser_version:
-            raise pytest.UsageError("--browser-ver must be specified when using the 'webdriver' api.")
-        if not item.platform:
-            raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
+        if item.driver.upper() == 'REMOTE':
+            if not item.browser_name:
+                raise pytest.UsageError("--browser-name must be specified when using the 'webdriver' api.")
+            if not item.browser_version:
+                raise pytest.UsageError("--browser-ver must be specified when using the 'webdriver' api.")
+            if not item.platform:
+                raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
     else:
         if not(item.browser or item.environment):
             raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
@@ -211,16 +232,31 @@ def _start_webdriver_client(item):
         TestSetup.selenium = webdriver.Remote(command_executor = executor,
                                                       desired_capabilities = capabilities)
     else:
-        capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
-        capabilities['version'] = item.browser_version
-        capabilities['platform'] = item.platform.upper()
-        executor = 'http://%s:%s/wd/hub' % (item.host, item.port)
-        try:
-            TestSetup.selenium = webdriver.Remote(command_executor = executor,
-                                                        desired_capabilities = capabilities)
-        except AttributeError:
-            valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
-            raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
+        if item.driver.upper() == 'REMOTE':
+            capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
+            capabilities['version'] = item.browser_version
+            capabilities['platform'] = item.platform.upper()
+            executor = 'http://%s:%s/wd/hub' % (item.host, item.port)
+            try:
+                TestSetup.selenium = webdriver.Remote(command_executor = executor,
+                                                            desired_capabilities = capabilities)
+            except AttributeError:
+                valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
+                raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
+        elif item.driver.upper() == 'CHROME':
+            if hasattr(item, 'chrome_path'):
+                TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path)
+            else:
+                TestSetup.selenium = webdriver.Chrome()
+        elif item.driver.upper() == 'FIREFOX':
+            if hasattr(item, 'firefox_path'):
+                TestSetup.selenium = webdriver.Firefox(firefox_binary=FirefoxBinary(item.firefox_path))
+            else:
+                TestSetup.selenium = webdriver.Firefox()
+        elif item.driver.upper() == 'IE':
+            TestSetup.selenium = webdriver.Ie()
+        else:
+            getattr(webdriver, item.driver)()
 
 
 def _start_rc_client(item):
@@ -228,7 +264,7 @@ def _start_rc_client(item):
         TestSetup.selenium = selenium('ondemand.saucelabs.com', '80',
                                       json.dumps({
                                       'username': item.sauce_labs_credentials['username'],
-                                      'access-key':  item.sauce_labs_credentials['api-key'],
+                                      'access-key': item.sauce_labs_credentials['api-key'],
                                       'os': item.platform,
                                       'browser': item.browser_name,
                                       'browser-version': item.browser_version,
