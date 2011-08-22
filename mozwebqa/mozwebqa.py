@@ -41,6 +41,7 @@ import py
 
 from selenium import selenium
 from selenium import webdriver
+import yaml
 
 
 def pytest_runtest_setup(item):
@@ -54,9 +55,12 @@ def pytest_runtest_setup(item):
     item.platform = item.config.option.platform
     TestSetup.base_url = item.config.option.base_url
     TestSetup.timeout = item.config.option.timeout
-    item.sauce_labs_username = item.config.option.sauce_labs_username
-    item.sauce_labs_api_key = item.config.option.sauce_labs_api_key
-    TestSetup.credentials = item.config.option.credentials_file
+    item.sauce_labs_credentials_file = item.config.option.sauce_labs_credentials_file
+    if item.sauce_labs_credentials_file:
+        item.sauce_labs_credentials = _credentials(item.config.option.sauce_labs_credentials_file)
+    item.credentials_file = item.config.option.credentials_file
+    if item.credentials_file:
+        TestSetup.credentials = _credentials(item.credentials_file)
 
     if not 'skip_selenium' in item.keywords:
         _check_selenium_usage(item)
@@ -130,32 +134,32 @@ def pytest_addoption(parser):
                      default=False,
                      help = 'capture network traffic to test_method_name.json (selenium rc). (disabled by default).')
 
-    group = parser.getgroup('sauce labs', 'sauce labs')
-    group._addoption('--sauce-user',
-                     action = 'store',
-                     dest = 'sauce_labs_username',
-                     metavar = 'str',
-                     help = 'sauce labs username.')
-    group._addoption('--sauce-key',
-                     action = 'store',
-                     dest = 'sauce_labs_api_key',
-                     metavar = 'str',
-                     help = 'sauce labs api key.')
-
-    parser.addoption("--credentials",
+    group = parser.getgroup('credentials', 'credentials')
+    group._addoption("--credentials",
                      action="store",
                      dest = 'credentials_file',
-                     default="credentials.yaml",
                      metavar = 'path',
                      help="location of yaml file containing user credentials.")
+    group._addoption('--sauce-labs',
+                     action = 'store',
+                     dest = 'sauce_labs_credentials_file',
+                     metavar = 'path',
+                     help = 'credendials file containing sauce labs username and api key.')
+
+
+def _credentials(credentials_file):
+    stream = file(credentials_file, 'r')
+    credentials = yaml.load(stream)
+    return credentials
+
 
 def _check_sauce_usage(item):
     '''
-        If this is for SauceLabs usage, we need to check a few details
+        If this is for Sauce Labs usage, we need to check a few details
     '''
-    if not item.sauce_labs_username:
+    if not item.sauce_labs_credentials['username']:
         raise pytest.UsageError('--sauce-user must be specified.')
-    if not item.sauce_labs_api_key:
+    if not item.sauce_labs_credentials['api-key']:
         raise pytest.UsageError('--sauce-key must be specified.')
     if item.api == "rc":
         if not item.browser_name:
@@ -165,6 +169,7 @@ def _check_sauce_usage(item):
         if not item.platform:
             raise pytest.UsageError("--platform must be specified when using the 'rc' api with sauce labs.")
 
+
 def _check_selenium_usage(item):
     '''
         Check that the usage parameters are correct. If wrong throws the appropriate error
@@ -172,7 +177,7 @@ def _check_selenium_usage(item):
     if TestSetup.base_url is None:
         raise pytest.UsageError('--base-url must be specified.')
 
-    if item.sauce_labs_username or item.sauce_labs_api_key:
+    if item.sauce_labs_credentials_file:
         _check_sauce_usage(item)
 
     if item.api == 'webdriver':
@@ -186,21 +191,23 @@ def _check_selenium_usage(item):
         if not(item.browser or item.environment):
             raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
 
+
 def _start_selenium(item):
     if item.api == 'webdriver':
         _start_webdriver_client(item)
     else:
         _start_rc_client(item) 
 
+
 def _start_webdriver_client(item):
-    if item.sauce_labs_username:
+    if item.sauce_labs_credentials_file:
         capabilities = {
                     'platform': item.platform,
                     'browserName': item.browser_name,
                     'version': item.browser_version,
                     'name': item.keywords.keys()[0],
                     'public': False}
-        executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_username, item.sauce_labs_api_key)
+        executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor = executor,
                                                       desired_capabilities = capabilities)
     else:
@@ -215,12 +222,13 @@ def _start_webdriver_client(item):
             valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
             raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
 
+
 def _start_rc_client(item):
-    if item.sauce_labs_username:
+    if item.sauce_labs_credentials_file:
         TestSetup.selenium = selenium('ondemand.saucelabs.com', '80',
                                       json.dumps({
-                                      'username': item.sauce_labs_username,
-                                      'access-key':  item.sauce_labs_api_key,
+                                      'username': item.sauce_labs_credentials['username'],
+                                      'access-key':  item.sauce_labs_credentials['api-key'],
                                       'os': item.platform,
                                       'browser': item.browser_name,
                                       'browser-version': item.browser_version,
@@ -237,6 +245,7 @@ def _start_rc_client(item):
         TestSetup.selenium.start()
 
     TestSetup.selenium.set_timeout(TestSetup.timeout)
+
 
 def _stop_selenium(item):
     if item.api == 'webdriver':

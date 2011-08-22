@@ -59,7 +59,7 @@ class TestUsage:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == '''UsageError: --browser-name must be specified when using the 'webdriver' api.'''
+        assert out == "UsageError: --browser-name must be specified when using the 'webdriver' api."
 
     def testShouldFailWithoutBrowserVersionWhenUsingWebDriverAPI(self, testdir):
         file_test = testdir.makepyfile("""
@@ -70,7 +70,7 @@ class TestUsage:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == '''UsageError: --browser-ver must be specified when using the 'webdriver' api.'''
+        assert out == "UsageError: --browser-ver must be specified when using the 'webdriver' api."
 
     def testShouldFailWithoutPlatformWhenUsingWebDriverAPI(self, testdir):
         file_test = testdir.makepyfile("""
@@ -81,62 +81,110 @@ class TestUsage:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == '''UsageError: --platform must be specified when using the 'webdriver' api.'''
+        assert out == "UsageError: --platform must be specified when using the 'webdriver' api."
 
-    def testShouldFailWithOnlySauceLabsUser(self, testdir):
+    def testShouldFailWithoutSauceLabsUser(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--sauce-user=username', file_test)
+        sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
+            api-key: api-key
+        """)
+        reprec = testdir.inline_run('--base-url=http://localhost/', '--sauce-labs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == 'UsageError: --sauce-key must be specified.'
+        assert out == "KeyError: 'username'"
 
-    def testShouldFailWithOnlySauceLabsKey(self, testdir):
+    def testShouldFailWithoutSauceLabsKey(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--sauce-key=key', file_test)
+        sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
+            username: username
+        """)
+        reprec = testdir.inline_run('--base-url=http://localhost/', '--sauce-labs=%s' % sauce_labs_credentials, file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(failed) == 1
+        out = failed[0].longrepr.reprcrash.message
+        assert out == "KeyError: 'api-key'"
+
+    def testShouldFailWithBlankSauceLabsUser(self, testdir):
+        file_test = testdir.makepyfile("""
+            def test_selenium(mozwebqa):
+                assert True
+        """)
+        sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
+            username: 
+            api-key: api-key
+        """)
+        reprec = testdir.inline_run('--base-url=http://localhost/', '--sauce-labs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
         assert out == 'UsageError: --sauce-user must be specified.'
+
+    def testShouldFailWithBlankSauceLabsKey(self, testdir):
+        file_test = testdir.makepyfile("""
+            def test_selenium(mozwebqa):
+                assert True
+        """)
+        sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
+            username: username
+            api-key: 
+        """)
+        reprec = testdir.inline_run('--base-url=http://localhost/', '--sauce-labs=%s' % sauce_labs_credentials, file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(failed) == 1
+        out = failed[0].longrepr.reprcrash.message
+        assert out == 'UsageError: --sauce-key must be specified.'
 
     def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--sauce-user=user', '--sauce-key=key', file_test)
+        sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
+            username: username
+            api-key: api-key
+        """)
+        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--sauce-labs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == '''UsageError: --browser-name must be specified when using the 'rc' api with sauce labs.'''
+        assert out == "UsageError: --browser-name must be specified when using the 'rc' api with sauce labs."
 
     def testShouldFailWithoutBrowserVersionWhenUsingSauceWithRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--sauce-user=user', '--sauce-key=key', '--browser-name=firefox', file_test)
+        sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
+            username: username
+            api-key: api-key
+        """)
+        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--sauce-labs=%s' % sauce_labs_credentials, '--browser-name=firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == '''UsageError: --browser-ver must be specified when using the 'rc' api with sauce labs.'''
+        assert out == "UsageError: --browser-ver must be specified when using the 'rc' api with sauce labs."
 
     def testShouldFailWithoutPlatformWhenUsingSauceWithRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--sauce-user=user', '--sauce-key=key', '--browser-name=firefox', '--browser-ver=6', file_test)
+        sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
+            username: username
+            api-key: api-key
+        """)
+        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--sauce-labs=%s' % sauce_labs_credentials, '--browser-name=firefox', '--browser-ver=6', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == '''UsageError: --platform must be specified when using the 'rc' api with sauce labs.'''
+        assert out == "UsageError: --platform must be specified when using the 'rc' api with sauce labs."
 
     def testShouldFailWithoutBrowserOrEnvironmentWhenUsingRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
@@ -147,4 +195,4 @@ class TestUsage:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == '''UsageError: --browser or --environment must be specified when using the 'rc' api.'''
+        assert out == "UsageError: --browser or --environment must be specified when using the 'rc' api."
