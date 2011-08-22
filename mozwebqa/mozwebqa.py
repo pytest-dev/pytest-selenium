@@ -35,15 +35,28 @@
 #
 # ***** END LICENSE BLOCK *****
 
+import httplib
 import json
 import pytest
 import py
+from urlparse import urlparse
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import selenium
 from selenium import webdriver
 import yaml
 
+def _get_status_code(host, path="/"):
+    try:
+        conn = httplib.HTTPConnection(host)
+        conn.request("HEAD", path)
+        return conn.getresponse().status
+    except StandardError:
+        return None
+
+def pytest_configure(config):
+    base_url = urlparse(config.option.base_url)
+    assert _get_status_code(base_url.hostname, base_url.path) == 200
 
 def pytest_runtest_setup(item):
     item.api = item.config.option.api
