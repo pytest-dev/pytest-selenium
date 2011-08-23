@@ -55,8 +55,9 @@ def _get_status_code(host, path="/"):
         return None
 
 def pytest_configure(config):
-    base_url = urlparse(config.option.base_url)
-    assert _get_status_code(base_url.hostname, base_url.path) == 200
+    if config.option.base_url:
+        base_url = urlparse(config.option.base_url)
+        assert _get_status_code(base_url.hostname, base_url.path) == 200
 
 def pytest_runtest_setup(item):
     item.api = item.config.option.api
