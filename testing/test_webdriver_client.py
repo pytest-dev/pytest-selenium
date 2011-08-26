@@ -36,15 +36,25 @@
 
 import pytest
 
+from webserver import SimpleWebServer
+
+def setup_module(module):
+    webserver = SimpleWebServer()
+    webserver.start()
+    TestWebDriverClient.webserver = webserver
+
+def teardown_module(module):
+    TestWebDriverClient.webserver.stop()
+
 @pytest.mark.skip_selenium
 class TestWebDriverClient:
 
     def testStartWebDriverClient(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
-                mozwebqa.selenium.get("http://mozilla.com")
-                assert 'mozilla.com' in mozwebqa.selenium.current_url
-        """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=webdriver', '--browser-name=firefox', '--browser-ver=6', '--platform=mac', file_test)
+                mozwebqa.selenium.get('http://localhost:%s/')
+                assert mozwebqa.selenium.find_element_by_tag_name('h1').text == 'Success!'
+        """ % self.webserver.port)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=webdriver', '--browsername=firefox', '--browserver=6', '--platform=mac', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1

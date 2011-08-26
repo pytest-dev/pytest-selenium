@@ -36,12 +36,12 @@
 # ***** END LICENSE BLOCK *****
 
 import base64
-import httplib
 import json
 import os
 import pytest
 import py
 import time
+import urllib2
 from urlparse import urlparse
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -49,18 +49,18 @@ from selenium import selenium
 from selenium import webdriver
 import yaml
 
-def _get_status_code(host, path="/"):
+def _get_status_code(url):
     try:
-        conn = httplib.HTTPConnection(host)
-        conn.request("HEAD", path)
-        return conn.getresponse().status
-    except StandardError:
-        return None
+        connection = urllib2.urlopen(url)
+        status_code = connection.getcode()
+        connection.close()
+        return status_code
+    except urllib2.URLError, e:
+        print 'Unable to connect to: %s' % url
 
 def pytest_configure(config):
     if config.option.base_url:
-        base_url = urlparse(config.option.base_url)
-        assert _get_status_code(base_url.hostname, base_url.path) == 200
+        assert _get_status_code(config.option.base_url) == 200
 
     report_path = config.option.webqa_report_path
     if report_path:
@@ -136,12 +136,12 @@ def pytest_addoption(parser):
                      default = 'Remote',
                      metavar = 'str',
                      help = 'webdriver implementation.')
-    group._addoption('--chrome-path',
+    group._addoption('--chromepath',
                      action = 'store',
                      dest = 'chrome_path',
                      metavar = 'path',
                      help = 'path to the google chrome driver executable.')
-    group._addoption('--firefox-path',
+    group._addoption('--firefoxpath',
                      action = 'store',
                      dest = 'firefox_path',
                      metavar = 'path',
@@ -156,12 +156,12 @@ def pytest_addoption(parser):
                      dest = 'environment',
                      metavar = 'str',
                      help = 'target environment (grid rc).')
-    group._addoption('--browser-name',
+    group._addoption('--browsername',
                      action = 'store',
                      dest = 'browser_name',
                      metavar = 'str',
                      help = 'target browser name (webdriver).')
-    group._addoption('--browser-ver',
+    group._addoption('--browserver',
                      action = 'store',
                      dest = 'browser_version',
                      metavar = 'str',
@@ -170,7 +170,7 @@ def pytest_addoption(parser):
                      action = 'store',
                      metavar = 'str',
                      help = 'target platform (webdriver).')
-    group._addoption('--base-url',
+    group._addoption('--baseurl',
                      action = 'store',
                      dest = 'base_url',
                      metavar = 'url',
@@ -181,8 +181,9 @@ def pytest_addoption(parser):
                      default = 60000,
                      metavar = 'num',
                      help = 'timeout for page loads, etc (selenium rc).')
-    group._addoption('--capture-network',
+    group._addoption('--capturenetwork',
                      action = 'store_true',
+                     dest = 'capture_network',
                      default=False,
                      help = 'capture network traffic to test_method_name.json (selenium rc). (disabled by default).')
 
@@ -192,7 +193,7 @@ def pytest_addoption(parser):
                      dest = 'credentials_file',
                      metavar = 'path',
                      help="location of yaml file containing user credentials.")
-    group._addoption('--sauce-labs',
+    group._addoption('--saucelabs',
                      action = 'store',
                      dest = 'sauce_labs_credentials_file',
                      metavar = 'path',
@@ -223,9 +224,9 @@ def _check_sauce_usage(item):
         raise pytest.UsageError('--sauce-key must be specified.')
     if item.api == "rc":
         if not item.browser_name:
-            raise pytest.UsageError("--browser-name must be specified when using the 'rc' api with sauce labs.")
+            raise pytest.UsageError("--browsername must be specified when using the 'rc' api with sauce labs.")
         if not item.browser_version:
-            raise pytest.UsageError("--browser-ver must be specified when using the 'rc' api with sauce labs.")
+            raise pytest.UsageError("--browserver must be specified when using the 'rc' api with sauce labs.")
         if not item.platform:
             raise pytest.UsageError("--platform must be specified when using the 'rc' api with sauce labs.")
 
@@ -235,7 +236,7 @@ def _check_selenium_usage(item):
         Check that the usage parameters are correct. If wrong throws the appropriate error
     '''
     if TestSetup.base_url is None:
-        raise pytest.UsageError('--base-url must be specified.')
+        raise pytest.UsageError('--baseurl must be specified.')
 
     if item.sauce_labs_credentials_file:
         _check_sauce_usage(item)
@@ -243,9 +244,9 @@ def _check_selenium_usage(item):
     if item.api == 'webdriver':
         if item.driver.upper() == 'REMOTE':
             if not item.browser_name:
-                raise pytest.UsageError("--browser-name must be specified when using the 'webdriver' api.")
+                raise pytest.UsageError("--browsername must be specified when using the 'webdriver' api.")
             if not item.browser_version:
-                raise pytest.UsageError("--browser-ver must be specified when using the 'webdriver' api.")
+                raise pytest.UsageError("--browserver must be specified when using the 'webdriver' api.")
             if not item.platform:
                 raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
     else:

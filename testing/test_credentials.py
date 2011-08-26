@@ -36,6 +36,16 @@
 
 import pytest
 
+from webserver import SimpleWebServer
+
+def setup_module(module):
+    webserver = SimpleWebServer()
+    webserver.start()
+    TestCredentials.webserver = webserver
+
+def teardown_module(module):
+    TestCredentials.webserver.stop()
+
 @pytest.mark.skip_selenium
 class TestCredentials:
 
@@ -52,7 +62,7 @@ class TestCredentials:
                 username: aUsername
                 password: aPassword
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--credentials=%s' % credentials, '--browser-name=firefox', '--browser-ver=6', '--platform=mac', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--browsername=firefox', '--browserver=6', '--platform=mac', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
@@ -67,7 +77,7 @@ class TestCredentials:
             default:
                 username: aUsername
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--credentials=%s' % credentials, '--browser-name=firefox', '--browser-ver=6', '--platform=mac', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--browsername=firefox', '--browserver=6', '--platform=mac', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
