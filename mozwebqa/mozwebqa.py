@@ -35,10 +35,10 @@
 #
 # ***** END LICENSE BLOCK *****
 
-import httplib
 import json
 import pytest
 import py
+import urllib2
 from urlparse import urlparse
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -46,18 +46,18 @@ from selenium import selenium
 from selenium import webdriver
 import yaml
 
-def _get_status_code(host, path="/"):
+def _get_status_code(url):
     try:
-        conn = httplib.HTTPConnection(host)
-        conn.request("HEAD", path)
-        return conn.getresponse().status
-    except StandardError:
-        return None
+        connection = urllib2.urlopen(url)
+        status_code = connection.getcode()
+        connection.close()
+        return status_code
+    except urllib2.URLError, e:
+        print 'Unable to connect to: %s' % url
 
 def pytest_configure(config):
     if config.option.base_url:
-        base_url = urlparse(config.option.base_url)
-        assert _get_status_code(base_url.hostname, base_url.path) == 200
+        assert _get_status_code(config.option.base_url) == 200
 
 def pytest_runtest_setup(item):
     item.api = item.config.option.api
@@ -84,6 +84,8 @@ def pytest_runtest_setup(item):
     if not 'skip_selenium' in item.keywords:
         _check_selenium_usage(item)
         _start_selenium(item)
+    else:
+        TestSetup.selenium = None
 
 
 def pytest_runtest_teardown(item):

@@ -37,7 +37,16 @@
 import os
 import pytest
 import json
-from pprint import pprint
+
+from webserver import SimpleWebServer
+
+def setup_module(module):
+    webserver = SimpleWebServer()
+    webserver.start()
+    TestRCClient.webserver = webserver
+
+def teardown_module(module):
+    TestRCClient.webserver.stop()
 
 @pytest.mark.skip_selenium
 class TestRCClient:
@@ -45,30 +54,30 @@ class TestRCClient:
     def testStartRCClientUsingEnvironment(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
-                mozwebqa.selenium.open("http://mozilla.org")
-                assert 'mozilla.org' in mozwebqa.selenium.get_location()
+                mozwebqa.selenium.open('/')
+                assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--environment=Firefox Beta on Mac OS X', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--environment=Firefox Beta on Mac OS X', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
     def testStartRCClientUsingBrowser(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
-                mozwebqa.selenium.open("http://mozilla.org")
-                assert 'mozilla.org' in mozwebqa.selenium.get_location()
+                mozwebqa.selenium.open('/')
+                assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--browser=Firefox Beta on Mac OS X', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
     def testStartRCClientAndCaptureNetworkTraffic(self, testdir):
         file_test = testdir.makepyfile("""
             def test_capture_network_traffic(mozwebqa):
-                mozwebqa.selenium.open("http://mozilla.org")
-                assert 'mozilla.org' in mozwebqa.selenium.get_location()
+                mozwebqa.selenium.open('/')
+                assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capturenetwork', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capturenetwork', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
         filename = os.path.sep.join([str(testdir.tmpdir), 'test_capture_network_traffic.json'])

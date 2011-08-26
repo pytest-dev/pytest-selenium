@@ -36,6 +36,16 @@
 
 import pytest
 
+from webserver import SimpleWebServer
+
+def setup_module(module):
+    webserver = SimpleWebServer()
+    webserver.start()
+    TestUsage.webserver = webserver
+
+def teardown_module(module):
+    TestUsage.webserver.stop()
+
 @pytest.mark.skip_selenium
 class TestUsage:
 
@@ -55,7 +65,7 @@ class TestUsage:
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -66,7 +76,7 @@ class TestUsage:
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--browsername=firefox', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--browsername=firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -77,7 +87,7 @@ class TestUsage:
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--browsername=firefox', '--browserver=beta', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--browsername=firefox', '--browserver=beta', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -91,7 +101,7 @@ class TestUsage:
         sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
             api-key: api-key
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--saucelabs=%s' % sauce_labs_credentials, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--saucelabs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -105,7 +115,7 @@ class TestUsage:
         sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
             username: username
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--saucelabs=%s' % sauce_labs_credentials, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--saucelabs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -120,7 +130,7 @@ class TestUsage:
             username: 
             api-key: api-key
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--saucelabs=%s' % sauce_labs_credentials, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--saucelabs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -135,7 +145,7 @@ class TestUsage:
             username: username
             api-key: 
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--saucelabs=%s' % sauce_labs_credentials, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--saucelabs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -150,7 +160,7 @@ class TestUsage:
             username: username
             api-key: api-key
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--saucelabs=%s' % sauce_labs_credentials, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--saucelabs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -165,7 +175,7 @@ class TestUsage:
             username: username
             api-key: api-key
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--saucelabs=%s' % sauce_labs_credentials, '--browsername=firefox', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--saucelabs=%s' % sauce_labs_credentials, '--browsername=firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -180,7 +190,7 @@ class TestUsage:
             username: username
             api-key: api-key
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--saucelabs=%s' % sauce_labs_credentials, '--browsername=firefox', '--browserver=6', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--saucelabs=%s' % sauce_labs_credentials, '--browsername=firefox', '--browserver=6', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
@@ -191,7 +201,7 @@ class TestUsage:
             def test_selenium(mozwebqa):
                 assert True
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
