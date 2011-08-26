@@ -35,10 +35,13 @@
 #
 # ***** END LICENSE BLOCK *****
 
+import base64
 import httplib
 import json
+import os
 import pytest
 import py
+import time
 from urlparse import urlparse
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -58,6 +61,17 @@ def pytest_configure(config):
     if config.option.base_url:
         base_url = urlparse(config.option.base_url)
         assert _get_status_code(base_url.hostname, base_url.path) == 200
+
+    report_path = config.option.webqa_report_path
+    if report_path:
+        config._html = LogHTML(report_path, config)
+        config.pluginmanager.register(config._html)
+
+def pytest_unconfigure(config):
+    html = getattr(config, '_html', None)
+    if html:
+        del config._html
+        config.pluginmanager.unregister(html)
 
 def pytest_runtest_setup(item):
     item.api = item.config.option.api
@@ -84,10 +98,13 @@ def pytest_runtest_setup(item):
     if not 'skip_selenium' in item.keywords:
         _check_selenium_usage(item)
         _start_selenium(item)
+    else:
+        TestSetup.selenium = None
 
 
 def pytest_runtest_teardown(item):
     if not 'skip_selenium' in item.keywords:
+        _capture_debug(item)
         _stop_selenium(item)
 
 
@@ -180,6 +197,14 @@ def pytest_addoption(parser):
                      dest = 'sauce_labs_credentials_file',
                      metavar = 'path',
                      help = 'credendials file containing sauce labs username and api key.')
+    
+    group = parser.getgroup("terminal reporting")
+    group.addoption('--webqareport',
+                    action="store",
+                    dest="webqa_report_path",
+                    metavar="path",
+                    default=None,
+                    help="create mozilla webqa custom report file at given path.")
 
 
 def _credentials(credentials_file):
@@ -298,6 +323,41 @@ def _start_rc_client(item):
 
     TestSetup.selenium.set_timeout(TestSetup.timeout)
 
+def _capture_debug(item):
+    filename = _generate_filename(*_split_class_and_test_names(item.nodeid))
+    _capture_screenshot(item, filename)
+    _capture_html(item, filename)
+
+def _generate_filename(classname, testname):
+    return '%s_%s' % (classname.replace('.', '_'), testname)
+
+def _split_class_and_test_names(nodeid):
+    names = nodeid.split("::")
+    names[0] = names[0].replace("/", '.')
+    names = tuple(names)
+    names = [x.replace(".py", "") for x in names if x != "()"]
+    classnames = names[:-1]
+    classname = ".".join(classnames)
+    name = names[-1]
+    return (classname, name)
+
+def _capture_screenshot(item, filename):
+    f = open("%s.png" % filename, 'wb')
+    if item.api.upper() == 'WEBDRIVER':
+        f.write(base64.decodestring(TestSetup.selenium.get_screenshot_as_base64()))
+    else:
+        f.write(base64.decodestring(TestSetup.selenium.capture_entire_page_screenshot_to_string('')))
+    f.close()
+
+
+def _capture_html(item, filename):
+    f = open("%s.html" % filename, 'wb')
+    if item.api.upper() == 'WEBDRIVER':
+        f.write(TestSetup.selenium.page_source.encode('utf-8'))
+    else:
+        f.write(TestSetup.selenium.get_html_source().encode('utf-8'))
+    f.close()
+
 
 def _stop_selenium(item):
     if item.api == 'webdriver':
@@ -316,6 +376,134 @@ def _stop_selenium(item):
             TestSetup.selenium.stop()
         except:
             pass
+
+
+class LogHTML(object):
+
+    def __init__(self, logfile, config):
+        logfile = os.path.expanduser(os.path.expandvars(logfile))
+        self.logfile = os.path.normpath(logfile)
+        self.config = config
+        self.test_logs = []
+        self.passed = self.skipped = 0
+        self.failed = self.errors = 0
+        self.xfailed = self.xpassed = 0
+        self._durations = {}
+
+    def _appendrow(self, result, report):
+        (classname, testname) = _split_class_and_test_names(report.nodeid)
+        filename = _generate_filename(classname, testname)
+        time = self._durations.pop(report.nodeid, 0.0)
+        self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
+        self.test_logs.append('<td><a href="%s.html">HTML</a>, <a href="%s.png">Screenshot</a></td>' % (filename, filename))
+        self.test_logs.append('\n<tr class="additional"><td></td><td colspan="4">')
+        self.test_logs.append('\n<div class="screenshot"><a href="%s.png"><img src="%s.png" /></a></div>' % (filename, filename))
+        self.test_logs.append('\n</td></tr>')
+
+    def appendlog(self, format, *args):
+        self.test_logs.append(format % args)
+
+    def append_pass(self, report):
+        self.passed += 1
+        self._appendrow('Passed', report)
+
+    def append_failure(self, report):
+        if "xfail" in report.keywords:
+            self._appendrow('XPassed', report)
+            self.xpassed += 1
+        else:
+            self._appendrow('Failed', report)
+            self.failed += 1
+
+    def append_error(self, report):
+        self._appendrow('Error', report)
+        self.errors += 1
+
+    def append_skipped(self, report):
+        if "xfail" in report.keywords:
+            self._appendrow('XFailed', report)
+            self.xfailed += 1
+        else:
+            self._appendrow('Skipped', report)
+            self.skipped += 1
+
+    def pytest_runtest_logreport(self, report):
+        if report.passed:
+            self.append_pass(report)
+        elif report.failed:
+            if report.when != "call":
+                self.append_error(report)
+            else:
+                self.append_failure(report)
+        elif report.skipped:
+            self.append_skipped(report)
+
+    def pytest_runtest_call(self, item, __multicall__):
+        start = time.time()
+        try:
+            return __multicall__.execute()
+        finally:
+            self._durations[item.nodeid] = time.time() - start
+
+    def pytest_sessionstart(self, session):
+        self.suite_start_time = time.time()
+
+    def pytest_sessionfinish(self, session, exitstatus, __multicall__):
+        logfile = py.std.codecs.open(self.logfile, 'w', encoding='utf-8')
+
+        suite_stop_time = time.time()
+        suite_time_delta = suite_stop_time - self.suite_start_time
+        numtests = self.passed + self.failed + self.xpassed + self.xfailed
+        logfile.write('<html><head><title>Test Report</title><style>')
+        logfile.write('\nbody {font-family: Helvetica, Arial, sans-serif; font-size: 12px}')
+        logfile.write('\na {color: #999}')
+        logfile.write('\nh2 {font-size: 16px}')
+        logfile.write('\ntable {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}')
+        logfile.write('\n#configuration tr:nth-child(odd) {background-color: #f6f6f6}')
+        logfile.write('\nth, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}')
+        logfile.write('\nth {font-weight: bold}')
+        logfile.write('\ntr.passed, tr.skipped, tr.xfailed, tr.error, tr.failed, tr.xpassed {color: inherit}')
+        logfile.write('\ntr.passed + tr.additional {display: none}')
+        logfile.write('\n.passed {color: green}')
+        logfile.write('\n.skipped, .xfailed {color: orange}')
+        logfile.write('\n.error, .failed, .xpassed {color: red}')
+        logfile.write('\n.screenshot {float:left; margin-right: 5px; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
+        logfile.write('\n.screenshot img {width: 320px}')
+        logfile.write('\n</style></head><body>')
+        logfile.write('\n<h2>Configuration</h2>')
+        logfile.write('\n<table id="configuration"><tr><th>Base URL</th><td>%s</td></tr>' % self.config.option.base_url)
+        logfile.write('\n<tr><th>Selenium API</th><td>%s</td></tr>' % self.config.option.api)
+        if not self.config.option.driver.upper() == 'REMOTE':
+            logfile.write('\n<tr><th>Driver</th><td>%s</td></tr>' % self.config.option.driver)
+            if self.config.option.firefox_path:
+                logfile.write('\n<tr><th>Firefox Path</th><td>%s</td></tr>' % self.config.option.firefox_path)
+            elif self.config.option.chrome_path:
+                logfile.write('\n<tr><th>Google Chrome Path</th><td>%s</td></tr>' % self.config.option.chrome_path)
+        else:
+            logfile.write('\n<tr><th>Selenium Server</th><td>http://%s:%s</td></tr>' % (self.config.option.host, self.config.option.port))
+            if self.config.option.api.upper() == 'WEBDRIVER':
+                logfile.write('\n<tr><th>Browser</th><td>%s %s on %s</td></tr>' % (self.config.option.browser_name, self.config.option.browser_version, self.config.option.platform.title()))
+            else:
+                logfile.write('\n<tr><th>Browser</th><td>%s</td></tr>' % self.config.option.environment or self.config.option.browser)
+                logfile.write('\n<tr><th>Timeout</th><td>%s</td></tr>' % self.config.option.timeout)
+        if self.config.option.credentials_file:
+            logfile.write('\n<tr><th>Credentials</th><td>%s</td></tr>' % self.config.option.credentials_file)
+        if self.config.option.sauce_labs_credentials_file:
+            logfile.write('\n<tr><th>Sauce Labs Credentials</th><td>%s</td></tr>' % self.config.option.sauce_labs_credentials_file)
+        logfile.write('\n</table>')
+        logfile.write('\n<h2>Summary</h2>')
+        logfile.write('\n<p>%i tests ran in %i seconds.<br />' % (numtests, suite_time_delta))
+        logfile.write('\n<span class="passed">%i passed</span>, ' % self.passed)
+        logfile.write('<span class="skipped">%i skipped</span>, ' % self.skipped)
+        logfile.write('<span class="failed">%i failed</span>.<br />' % self.failed)
+        logfile.write('\n<span class="skipped">%i expected failures</span>, ' % self.xfailed)
+        logfile.write('<span class="failed">%i unexpected passes</span>.</p>' % self.xpassed)
+        logfile.write('\n<h2>Results</h2>')
+        logfile.write('\n<table id="results">')
+        logfile.write('\n<tr><th>Result</th><th>Class</th><th>Name</th><th>Duration</th><th>Links</th></tr>')
+        logfile.writelines(self.test_logs)
+        logfile.write('\n</table></body></html>')
+        logfile.close()
 
 
 class TestSetup:
