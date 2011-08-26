@@ -42,9 +42,9 @@ class TestWebDriverClient:
     def testStartWebDriverClient(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
-                mozwebqa.selenium.get("http://mozilla.com")
-                assert 'mozilla.com' in mozwebqa.selenium.current_url
+                mozwebqa.selenium.get("http://mozilla.org")
+                assert 'mozilla.org' in mozwebqa.selenium.current_url
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=webdriver', '--browser-name=firefox', '--browser-ver=6', '--platform=mac', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=webdriver', '--browsername=firefox', '--browserver=6', '--platform=mac', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1

@@ -45,30 +45,30 @@ class TestRCClient:
     def testStartRCClientUsingEnvironment(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
-                mozwebqa.selenium.open("http://mozilla.com")
-                assert 'mozilla.com' in mozwebqa.selenium.get_location()
+                mozwebqa.selenium.open("http://mozilla.org")
+                assert 'mozilla.org' in mozwebqa.selenium.get_location()
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--environment=Firefox Beta on Mac OS X', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--environment=Firefox Beta on Mac OS X', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
     def testStartRCClientUsingBrowser(self, testdir):
         file_test = testdir.makepyfile("""
             def test_selenium(mozwebqa):
-                mozwebqa.selenium.open("http://mozilla.com")
-                assert 'mozilla.com' in mozwebqa.selenium.get_location()
+                mozwebqa.selenium.open("http://mozilla.org")
+                assert 'mozilla.org' in mozwebqa.selenium.get_location()
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--browser=Firefox Beta on Mac OS X', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--browser=Firefox Beta on Mac OS X', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
     def testStartRCClientAndCaptureNetworkTraffic(self, testdir):
         file_test = testdir.makepyfile("""
             def test_capture_network_traffic(mozwebqa):
-                mozwebqa.selenium.open("http://mozilla.com")
-                assert 'mozilla.com' in mozwebqa.selenium.get_location()
+                mozwebqa.selenium.open("http://mozilla.org")
+                assert 'mozilla.org' in mozwebqa.selenium.get_location()
         """)
-        reprec = testdir.inline_run('--base-url=http://localhost/', '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capture-network', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost/', '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capturenetwork', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
         filename = os.path.sep.join([str(testdir.tmpdir), 'test_capture_network_traffic.json'])
