@@ -39,7 +39,6 @@ import json
 import pytest
 import py
 import urllib2
-from urlparse import urlparse
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import selenium
