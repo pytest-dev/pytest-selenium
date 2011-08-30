@@ -49,7 +49,7 @@ Run tests against a standalone RC server using Firefox in the default location:
 
     $ py.test --api=rc --baseurl=http://example.com --browser="*firefox"
 
-Run tests against a grid server with an RC node environment named 'Firefox Beta on Mac OS X':
+Run tests against a grid server with an RC node environment named 'Firefox 5 on Mac OS X':
 
     $ py.test --api=rc --baseurl=http://example.com --environment="Firefox 5 on Mac OS X"
 
