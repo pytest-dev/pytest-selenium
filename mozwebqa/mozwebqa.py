@@ -218,9 +218,9 @@ def _check_sauce_usage(item):
         If this is for Sauce Labs usage, we need to check a few details
     '''
     if not item.sauce_labs_credentials['username']:
-        raise pytest.UsageError('--sauce-user must be specified.')
+        raise pytest.UsageError('username must be specified in the sauce labs credentials file.')
     if not item.sauce_labs_credentials['api-key']:
-        raise pytest.UsageError('--sauce-key must be specified.')
+        raise pytest.UsageError('api-key must be specified in the sauce labs credentials file.')
     if item.api == "rc":
         if not item.browser_name:
             raise pytest.UsageError("--browsername must be specified when using the 'rc' api with sauce labs.")

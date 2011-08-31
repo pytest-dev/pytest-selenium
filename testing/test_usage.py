@@ -134,7 +134,7 @@ class TestUsage:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == 'UsageError: --sauce-user must be specified.'
+        assert out == 'UsageError: username must be specified in the sauce labs credentials file.'
 
     def testShouldFailWithBlankSauceLabsKey(self, testdir):
         file_test = testdir.makepyfile("""
@@ -149,7 +149,7 @@ class TestUsage:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
-        assert out == 'UsageError: --sauce-key must be specified.'
+        assert out == 'UsageError: api-key must be specified in the sauce labs credentials file.'
 
     def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
