@@ -301,6 +301,7 @@ def _start_webdriver_client(item):
 
 
 def _start_rc_client(item):
+    test_name = ".".join(_split_class_and_test_names(item.nodeid))
     if item.sauce_labs_credentials_file:
         TestSetup.selenium = selenium('ondemand.saucelabs.com', '80',
                                       json.dumps({
@@ -309,7 +310,7 @@ def _start_rc_client(item):
                                       'os': item.platform,
                                       'browser': item.browser_name,
                                       'browser-version': item.browser_version,
-                                      'name': ".".join(_split_class_and_test_names(item.nodeid)),
+                                      'name': test_name,
                                       'tags': item.keywords.keys()[:-1],
                                       'public': False}),
                                       TestSetup.base_url)
@@ -323,6 +324,7 @@ def _start_rc_client(item):
         TestSetup.selenium.start()
 
     TestSetup.selenium.set_timeout(TestSetup.timeout)
+    TestSetup.selenium.set_context(test_name)
 
 def _capture_debug(item):
     filename = _generate_filename(*_split_class_and_test_names(item.nodeid))
