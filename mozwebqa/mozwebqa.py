@@ -226,7 +226,7 @@ def _check_selenium_usage(item):
             if not item.platform:
                 raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
     else:
-        if not(item.browser or item.environment):
+        if not item.sauce_labs_credentials_file and not(item.browser or item.environment):
             raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
 
 
