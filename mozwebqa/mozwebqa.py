@@ -327,7 +327,10 @@ def _start_rc_client(item):
     TestSetup.selenium.set_context(test_name)
 
 def _capture_debug(item):
-    filename = _generate_filename(*_split_class_and_test_names(item.nodeid))
+    debug_path = "debug"
+    if not os.path.exists(debug_path):
+        os.makedirs(debug_path)
+    filename = os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
     _capture_screenshot(item, filename)
     _capture_html(item, filename)
 
@@ -395,7 +398,7 @@ class LogHTML(object):
 
     def _appendrow(self, result, report):
         (classname, testname) = _split_class_and_test_names(report.nodeid)
-        filename = _generate_filename(classname, testname)
+        filename = os.path.sep.join(["debug", _generate_filename(classname, testname)])
         time = self._durations.pop(report.nodeid, 0.0)
         self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
         self.test_logs.append('<td><a href="%s.html">HTML</a>, <a href="%s.png">Screenshot</a></td>' % (filename, filename))
