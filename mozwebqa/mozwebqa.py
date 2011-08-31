@@ -309,7 +309,7 @@ def _start_rc_client(item):
                                       'os': item.platform,
                                       'browser': item.browser_name,
                                       'browser-version': item.browser_version,
-                                      'name': item.keywords.keys()[0],
+                                      'name': ".".join(_split_class_and_test_names(item.nodeid)),
                                       'public': False}),
                                       TestSetup.base_url)
     else:
