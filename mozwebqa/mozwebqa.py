@@ -486,7 +486,7 @@ class LogHTML(object):
         logfile.write('\n.screenshot img {width: 320px}')
         logfile.write('\n</style></head><body>')
         logfile.write('\n<h2>Configuration</h2>')
-        logfile.write('\n<table id="configuration"><tr><th>Base URL</th><td>%s</td></tr>' % self.config.option.base_url)
+        logfile.write('\n<table id="configuration"><tr><th>Base URL</th><td><a href="%s">%s</td></tr>' % (self.config.option.base_url, self.config.option.base_url))
         logfile.write('\n<tr><th>Selenium API</th><td>%s</td></tr>' % self.config.option.api)
         if not self.config.option.driver.upper() == 'REMOTE':
             logfile.write('\n<tr><th>Driver</th><td>%s</td></tr>' % self.config.option.driver)
