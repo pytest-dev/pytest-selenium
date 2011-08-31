@@ -400,10 +400,19 @@ class LogHTML(object):
         (classname, testname) = _split_class_and_test_names(report.nodeid)
         filename = os.path.sep.join(["debug", _generate_filename(classname, testname)])
         time = self._durations.pop(report.nodeid, 0.0)
+        links = {'HTML': '%s.html' % filename,
+                 'Screenshot': '%s.png' % filename}
+        links_html = []
         self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
-        self.test_logs.append('<td><a href="%s.html">HTML</a>, <a href="%s.png">Screenshot</a></td>' % (filename, filename))
+        self.test_logs.append('<td>')
+        for name, path in links.iteritems():
+            if os.path.exists(path):
+                links_html.append('<a href="%s">%s</a>' % (path, name))
+        self.test_logs.append(', '.join(links_html))
+        self.test_logs.append('</td>')
         self.test_logs.append('\n<tr class="additional"><td></td><td colspan="4">')
-        self.test_logs.append('\n<div class="screenshot"><a href="%s.png"><img src="%s.png" /></a></div>' % (filename, filename))
+        if os.path.exists(links['Screenshot']):
+            self.test_logs.append('\n<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
         self.test_logs.append('\n</td></tr>')
 
     def appendlog(self, format, *args):
