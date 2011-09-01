@@ -60,11 +60,13 @@ def pytest_configure(config):
         config._html = LogHTML(report_path, config)
         config.pluginmanager.register(config._html)
 
+
 def pytest_unconfigure(config):
     html = getattr(config, '_html', None)
     if html:
         del config._html
         config.pluginmanager.unregister(html)
+
 
 def pytest_runtest_setup(item):
     item.api = item.config.option.api
@@ -108,90 +110,90 @@ def pytest_funcarg__mozwebqa(request):
 def pytest_addoption(parser):
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--baseurl',
-                     action = 'store',
-                     dest = 'base_url',
-                     metavar = 'url',
-                     help = 'base url for the application under test.')
+                     action='store',
+                     dest='base_url',
+                     metavar='url',
+                     help='base url for the application under test.')
     group._addoption('--api',
-                     action = 'store',
-                     default = 'webdriver',
-                     metavar = 'api',
-                     help = "version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver (the default).")
+                     action='store',
+                     default='webdriver',
+                     metavar='api',
+                     help="version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver (the default).")
     group._addoption('--host',
-                     action = 'store',
-                     default = 'localhost',
-                     metavar = 'str',
-                     help = 'host that selenium server is listening on.')
+                     action='store',
+                     default='localhost',
+                     metavar='str',
+                     help='host that selenium server is listening on.')
     group._addoption('--port',
-                     action = 'store',
-                     type = 'int',
-                     default = 4444,
-                     metavar = 'num',
-                     help = 'port that selenium server is listening on.')
+                     action='store',
+                     type='int',
+                     default=4444,
+                     metavar='num',
+                     help='port that selenium server is listening on.')
     group._addoption('--driver',
-                     action = 'store',
-                     dest = 'driver',
-                     default = 'Remote',
-                     metavar = 'str',
-                     help = 'webdriver implementation.')
+                     action='store',
+                     dest='driver',
+                     default='Remote',
+                     metavar='str',
+                     help='webdriver implementation.')
     group._addoption('--chromepath',
-                     action = 'store',
-                     dest = 'chrome_path',
-                     metavar = 'path',
-                     help = 'path to the google chrome driver executable.')
+                     action='store',
+                     dest='chrome_path',
+                     metavar='path',
+                     help='path to the google chrome driver executable.')
     group._addoption('--firefoxpath',
-                     action = 'store',
-                     dest = 'firefox_path',
-                     metavar = 'path',
-                     help = 'path to the target firefox binary.')
+                     action='store',
+                     dest='firefox_path',
+                     metavar='path',
+                     help='path to the target firefox binary.')
     group._addoption('--browser',
-                     action = 'store',
-                     dest = 'browser',
-                     metavar = 'str',
-                     help = 'target browser (standalone rc server).')
+                     action='store',
+                     dest='browser',
+                     metavar='str',
+                     help='target browser (standalone rc server).')
     group._addoption('--environment',
-                     action = 'store',
-                     dest = 'environment',
-                     metavar = 'str',
-                     help = 'target environment (grid rc).')
+                     action='store',
+                     dest='environment',
+                     metavar='str',
+                     help='target environment (grid rc).')
     group._addoption('--browsername',
-                     action = 'store',
-                     dest = 'browser_name',
-                     metavar = 'str',
-                     help = 'target browser name (webdriver).')
+                     action='store',
+                     dest='browser_name',
+                     metavar='str',
+                     help='target browser name (webdriver).')
     group._addoption('--browserver',
-                     action = 'store',
-                     dest = 'browser_version',
-                     metavar = 'str',
-                     help = 'target browser version (webdriver).')
+                     action='store',
+                     dest='browser_version',
+                     metavar='str',
+                     help='target browser version (webdriver).')
     group._addoption('--platform',
-                     action = 'store',
-                     metavar = 'str',
-                     help = 'target platform (webdriver).')
+                     action='store',
+                     metavar='str',
+                     help='target platform (webdriver).')
     group._addoption('--timeout',
-                     action = 'store',
-                     type = 'int',
-                     default = 60000,
-                     metavar = 'num',
-                     help = 'timeout for page loads, etc (selenium rc).')
+                     action='store',
+                     type='int',
+                     default=60000,
+                     metavar='num',
+                     help='timeout for page loads, etc (selenium rc).')
     group._addoption('--capturenetwork',
-                     action = 'store_true',
-                     dest = 'capture_network',
+                     action='store_true',
+                     dest='capture_network',
                      default=False,
-                     help = 'capture network traffic to test_method_name.json (selenium rc). (disabled by default).')
+                     help='capture network traffic to test_method_name.json (selenium rc). (disabled by default).')
 
     group = parser.getgroup('credentials', 'credentials')
     group._addoption("--credentials",
                      action="store",
-                     dest = 'credentials_file',
-                     metavar = 'path',
+                     dest='credentials_file',
+                     metavar='path',
                      help="location of yaml file containing user credentials.")
     group._addoption('--saucelabs',
-                     action = 'store',
-                     dest = 'sauce_labs_credentials_file',
-                     metavar = 'path',
-                     help = 'credendials file containing sauce labs username and api key.')
-    
+                     action='store',
+                     dest='sauce_labs_credentials_file',
+                     metavar='path',
+                     help='credendials file containing sauce labs username and api key.')
+
     group = parser.getgroup("terminal reporting")
     group.addoption('--webqareport',
                     action="store",
@@ -199,6 +201,7 @@ def pytest_addoption(parser):
                     metavar="path",
                     default=None,
                     help="create mozilla webqa custom report file at given path.")
+
 
 def _get_status_code(url):
     try:
@@ -211,10 +214,12 @@ def _get_status_code(url):
     except urllib2.URLError, e:
         print 'Unable to connect to: %s' % url
 
+
 def _credentials(credentials_file):
     stream = file(credentials_file, 'r')
     credentials = yaml.load(stream)
     return credentials
+
 
 def _check_sauce_usage(item):
     '''
@@ -273,8 +278,8 @@ def _start_webdriver_client(item):
                     'tags': item.keywords.keys()[:-1],
                     'public': False}
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
-        TestSetup.selenium = webdriver.Remote(command_executor = executor,
-                                              desired_capabilities = capabilities)
+        TestSetup.selenium = webdriver.Remote(command_executor=executor,
+                                              desired_capabilities=capabilities)
     else:
         if item.driver.upper() == 'REMOTE':
             capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
@@ -282,8 +287,8 @@ def _start_webdriver_client(item):
             capabilities['platform'] = item.platform.upper()
             executor = 'http://%s:%s/wd/hub' % (item.host, item.port)
             try:
-                TestSetup.selenium = webdriver.Remote(command_executor = executor,
-                                                      desired_capabilities = capabilities)
+                TestSetup.selenium = webdriver.Remote(command_executor=executor,
+                                                      desired_capabilities=capabilities)
             except AttributeError:
                 valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
                 raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
@@ -333,11 +338,13 @@ def _start_rc_client(item):
     TestSetup.selenium.set_timeout(TestSetup.timeout)
     TestSetup.selenium.set_context(test_name)
 
+
 def _debug_path(item):
     debug_path = "debug"
     if not os.path.exists(debug_path):
         os.makedirs(debug_path)
     return os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
+
 
 def _capture_debug(item):
     filename = _debug_path(item)
@@ -347,8 +354,10 @@ def _capture_debug(item):
     if item.config.option.capture_network:
         _capture_network(filename)
 
+
 def _generate_filename(classname, testname):
     return '%s_%s' % (classname.replace('.', '_'), testname)
+
 
 def _split_class_and_test_names(nodeid):
     names = nodeid.split("::")
@@ -360,10 +369,12 @@ def _split_class_and_test_names(nodeid):
     name = names[-1]
     return (classname, name)
 
+
 def _capture_session_id(filename):
     f = open("%s.session" % filename, 'wb')
     f.write(TestSetup.selenium.get_eval('selenium.sessionId'))
     f.close()
+
 
 def _capture_screenshot(item, filename):
     f = open("%s.png" % filename, 'wb')
@@ -373,6 +384,7 @@ def _capture_screenshot(item, filename):
         f.write(base64.decodestring(TestSetup.selenium.capture_entire_page_screenshot_to_string('')))
     f.close()
 
+
 def _capture_html(item, filename):
     f = open("%s.html" % filename, 'wb')
     if item.api.upper() == 'WEBDRIVER':
@@ -381,16 +393,19 @@ def _capture_html(item, filename):
         f.write(TestSetup.selenium.get_html_source().encode('utf-8'))
     f.close()
 
+
 def _capture_log(item, filename):
     if item.api.upper() == 'RC':
         f = open("%s.log" % filename, 'wb')
         f.write(TestSetup.selenium.get_log().encode('utf-8'))
         f.close()
 
+
 def _capture_network(filename):
     f = open('%s.json' % filename, 'w')
     f.write(TestSetup.selenium.captureNetworkTraffic('json'))
     f.close()
+
 
 def _stop_selenium(item):
     if item.api == 'webdriver':
@@ -441,10 +456,10 @@ class LogHTML(object):
             links_html.append('<a href="%s">%s</a>' % (path, name))
         self.test_logs.append(', '.join(links_html))
         self.test_logs.append('</td>')
-        
+
         if not result == 'Passed':
             self.test_logs.append('\n<tr class="additional"><td colspan="5">')
-    
+
             if report.longrepr:
                 self.test_logs.append('\n<div class="log">')
                 for line in str(report.longrepr).splitlines():
@@ -459,7 +474,7 @@ class LogHTML(object):
                             self.test_logs.append(cgi.escape(line))
                     self.test_logs.append('<br />')
                 self.test_logs.append('\n</div>')
-    
+
             self.test_logs.append('\n<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
             if session_id:
                 self.test_logs.append('\n<div id="player%s" class="video">' % session_id)
