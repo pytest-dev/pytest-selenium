@@ -35,6 +35,7 @@
 #
 # ***** END LICENSE BLOCK *****
 
+import cgi
 import base64
 import json
 import os
@@ -257,7 +258,7 @@ def _start_selenium(item):
     if item.api == 'webdriver':
         _start_webdriver_client(item)
     else:
-        _start_rc_client(item) 
+        _start_rc_client(item)
 
 
 def _start_webdriver_client(item):
@@ -271,7 +272,7 @@ def _start_webdriver_client(item):
                     'public': False}
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor = executor,
-                                                      desired_capabilities = capabilities)
+                                              desired_capabilities = capabilities)
     else:
         if item.driver.upper() == 'REMOTE':
             capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
@@ -280,7 +281,7 @@ def _start_webdriver_client(item):
             executor = 'http://%s:%s/wd/hub' % (item.host, item.port)
             try:
                 TestSetup.selenium = webdriver.Remote(command_executor = executor,
-                                                            desired_capabilities = capabilities)
+                                                      desired_capabilities = capabilities)
             except AttributeError:
                 valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
                 raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
@@ -324,19 +325,25 @@ def _start_rc_client(item):
     else:
         TestSetup.selenium.start()
 
+    if item.sauce_labs_credentials_file:
+        _capture_session_id(_debug_path(item))
+
     TestSetup.selenium.set_timeout(TestSetup.timeout)
     TestSetup.selenium.set_context(test_name)
 
-def _capture_debug(item):
+def _debug_path(item):
     debug_path = "debug"
     if not os.path.exists(debug_path):
         os.makedirs(debug_path)
-    filename = os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
+    return os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
+
+def _capture_debug(item):
+    filename = _debug_path(item)
     _capture_screenshot(item, filename)
     _capture_html(item, filename)
     #_capture_log(item, filename)  # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
     if item.config.option.capture_network:
-        _capture_network(item, filename)
+        _capture_network(filename)
 
 def _generate_filename(classname, testname):
     return '%s_%s' % (classname.replace('.', '_'), testname)
@@ -351,6 +358,11 @@ def _split_class_and_test_names(nodeid):
     name = names[-1]
     return (classname, name)
 
+def _capture_session_id(filename):
+    f = open("%s.session" % filename, 'wb')
+    f.write(TestSetup.selenium.get_eval('selenium.sessionId'))
+    f.close()
+
 def _capture_screenshot(item, filename):
     f = open("%s.png" % filename, 'wb')
     if item.api.upper() == 'WEBDRIVER':
@@ -358,7 +370,6 @@ def _capture_screenshot(item, filename):
     else:
         f.write(base64.decodestring(TestSetup.selenium.capture_entire_page_screenshot_to_string('')))
     f.close()
-
 
 def _capture_html(item, filename):
     f = open("%s.html" % filename, 'wb')
@@ -368,19 +379,16 @@ def _capture_html(item, filename):
         f.write(TestSetup.selenium.get_html_source().encode('utf-8'))
     f.close()
 
-
 def _capture_log(item, filename):
     if item.api.upper() == 'RC':
         f = open("%s.log" % filename, 'wb')
         f.write(TestSetup.selenium.get_log().encode('utf-8'))
         f.close()
-    
 
-def _capture_network(item, filename):
+def _capture_network(filename):
     f = open('%s.json' % filename, 'w')
     f.write(TestSetup.selenium.captureNetworkTraffic('json'))
     f.close()
-
 
 def _stop_selenium(item):
     if item.api == 'webdriver':
@@ -411,10 +419,16 @@ class LogHTML(object):
         (classname, testname) = _split_class_and_test_names(report.nodeid)
         filename = os.path.sep.join(["debug", _generate_filename(classname, testname)])
         time = self._durations.pop(report.nodeid, 0.0)
+        try:
+            session_id = open('%s.session' % filename, 'r').readline()
+        except:
+            session_id = None
         links = {'HTML': '%s.html' % filename,
                  'Screenshot': '%s.png' % filename}
         if self.config.option.capture_network:
             links['Network'] = '%s.json' % filename
+        if session_id:
+            links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % session_id
         # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
         #if self.config.option.api.upper() == 'RC':
         #    links['Log'] = '%s.log' % filename
@@ -438,13 +452,42 @@ class LogHTML(object):
                     else:
                         exception = line.startswith("E   ")
                         if exception:
-                            self.test_logs.append('<span class="error">%s</span>' % line)
+                            self.test_logs.append('<span class="error">%s</span>' % cgi.escape(line))
                         else:
-                            self.test_logs.append(line)
+                            self.test_logs.append(cgi.escape(line))
                     self.test_logs.append('<br />')
                 self.test_logs.append('\n</div>')
     
             self.test_logs.append('\n<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
+            if session_id:
+                self.test_logs.append('\n<div id="player%s" class="video">' % session_id)
+                self.test_logs.append('\n<object width="100%" height="100%" type="application/x-shockwave-flash" data="http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729" name="player_api" id="player_api">')
+                self.test_logs.append('\n<param value="true" name="allowfullscreen">')
+                self.test_logs.append('\n<param value="always" name="allowscriptaccess">')
+                self.test_logs.append('\n<param value="high" name="quality">')
+                self.test_logs.append('\n<param value="true" name="cachebusting">')
+                self.test_logs.append('\n<param value="#000000" name="bgcolor">')
+                flash_vars = 'config={\
+                    &quot;clip&quot;:{\
+                        &quot;url&quot;:&quot;http%%3A//saucelabs.com/jobs/%s/video.flv&quot;,\
+                        &quot;provider&quot;:&quot;streamer&quot;,\
+                        &quot;autoPlay&quot;:false,\
+                        &quot;autoBuffering&quot;:true},\
+                    &quot;plugins&quot;:{\
+                        &quot;streamer&quot;:{\
+                            &quot;url&quot;:&quot;http://saucelabs.com/flowplayer/flowplayer.pseudostreaming-3.2.5.swf&quot;},\
+                        &quot;controls&quot;:{\
+                            &quot;mute&quot;:false,\
+                            &quot;volume&quot;:false,\
+                            &quot;backgroundColor&quot;:&quot;rgba(0, 0, 0, 0.7)&quot;}},\
+                    &quot;playerId&quot;:&quot;player%s&quot;,\
+                    &quot;playlist&quot;:[{\
+                        &quot;url&quot;:&quot;http%%3A//saucelabs.com/jobs/%s/video.flv&quot;,\
+                        &quot;provider&quot;:&quot;streamer&quot;,\
+                        &quot;autoPlay&quot;:false,\
+                        &quot;autoBuffering&quot;:true}]}' % (session_id, session_id, session_id)
+                self.test_logs.append('\n<param value="%s" name="flashvars">' % flash_vars.replace(' ', ''))
+                self.test_logs.append('\n</object></div>')
             self.test_logs.append('\n</td></tr>')
 
     def append_pass(self, report):
@@ -514,6 +557,7 @@ class LogHTML(object):
         logfile.write('\n.log {display: inline-block; width: 800px; height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space: pre}')
         logfile.write('\n.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
         logfile.write('\n.screenshot img {width: 320px}')
+        logfile.write('\n.video {display: inline-block; width: 320px; height: 240px}')
         logfile.write('\n</style></head><body>')
         logfile.write('\n<h2>Configuration</h2>')
         logfile.write('\n<table id="configuration"><tr><th>Base URL</th><td><a href="%s">%s</td></tr>' % (self.config.option.base_url, self.config.option.base_url))
