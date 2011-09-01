@@ -266,7 +266,8 @@ def _start_webdriver_client(item):
                     'platform': item.platform,
                     'browserName': item.browser_name,
                     'version': item.browser_version,
-                    'name': item.keywords.keys()[0],
+                    'name': ".".join(_split_class_and_test_names(item.nodeid)),
+                    'tags': item.keywords.keys()[:-1],
                     'public': False}
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor = executor,
