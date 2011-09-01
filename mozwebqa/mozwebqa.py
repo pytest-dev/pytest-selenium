@@ -514,11 +514,13 @@ class LogHTML(object):
             elif self.config.option.chrome_path:
                 logfile.write('\n<tr><th>Google Chrome Path</th><td>%s</td></tr>' % self.config.option.chrome_path)
         else:
-            logfile.write('\n<tr><th>Selenium Server</th><td>http://%s:%s</td></tr>' % (self.config.option.host, self.config.option.port))
-            if self.config.option.api.upper() == 'WEBDRIVER':
-                logfile.write('\n<tr><th>Browser</th><td>%s %s on %s</td></tr>' % (self.config.option.browser_name, self.config.option.browser_version, self.config.option.platform.title()))
+            selenium_server = self.config.option.sauce_labs_credentials_file and 'Sauce Labs' or 'http://%s:%s' % (self.config.option.host, self.config.option.port)
+            logfile.write('\n<tr><th>Selenium Server</th><td>%s</td></tr>' % selenium_server)
+            if self.config.option.api.upper() == 'WEBDRIVER' or self.config.option.sauce_labs_credentials_file:
+                logfile.write('\n<tr><th>Browser</th><td>%s %s on %s</td></tr>' % (self.config.option.browser_name.title(), self.config.option.browser_version, self.config.option.platform.title()))
             else:
                 logfile.write('\n<tr><th>Browser</th><td>%s</td></tr>' % self.config.option.environment or self.config.option.browser)
+            if self.config.option.api.upper() == 'RC':
                 logfile.write('\n<tr><th>Timeout</th><td>%s</td></tr>' % self.config.option.timeout)
         logfile.write('\n<tr><th>Capture Network Traffic</th><td>%s</td></tr>' % self.config.option.capture_network)
         if self.config.option.credentials_file:
