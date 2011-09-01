@@ -107,6 +107,11 @@ def pytest_funcarg__mozwebqa(request):
 
 def pytest_addoption(parser):
     group = parser.getgroup('selenium', 'selenium')
+    group._addoption('--baseurl',
+                     action = 'store',
+                     dest = 'base_url',
+                     metavar = 'url',
+                     help = 'base url for the application under test.')
     group._addoption('--api',
                      action = 'store',
                      default = 'webdriver',
@@ -163,11 +168,6 @@ def pytest_addoption(parser):
                      action = 'store',
                      metavar = 'str',
                      help = 'target platform (webdriver).')
-    group._addoption('--baseurl',
-                     action = 'store',
-                     dest = 'base_url',
-                     metavar = 'url',
-                     help = 'base url for the application under test.')
     group._addoption('--timeout',
                      action = 'store',
                      type = 'int',

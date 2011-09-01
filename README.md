@@ -22,6 +22,7 @@ For full usage details run the following command:
     $ py.test --help
 
     selenium:
+      --baseurl=url       base url for the application under test.
       --api=api           version of selenium api to use. 'rc' uses selenium rc.
                           'webdriver' uses selenium webdriver (the default).
       --host=str          host that selenium server is listening on.
@@ -34,7 +35,6 @@ For full usage details run the following command:
       --browsername=str   target browser name (webdriver).
       --browserver=str    target browser version (webdriver).
       --platform=str      target platform (webdriver).
-      --baseurl=url       base url for the application under test.
       --timeout=num       timeout for page loads, etc (selenium rc).
       --capturenetwork    capture network traffic to test_method_name.json
                           (selenium rc). (disabled by default).
@@ -47,11 +47,11 @@ For full usage details run the following command:
 
 Run tests against a standalone RC server using Firefox in the default location:
 
-    $ py.test --api=rc --baseurl=http://example.com --browser="*firefox"
+    $ py.test --baseurl=http://example.com --api=rc --browser="*firefox"
 
 Run tests against a grid server with an RC node environment named 'Firefox 5 on Mac OS X':
 
-    $ py.test --api=rc --baseurl=http://example.com --environment="Firefox 5 on Mac OS X"
+    $ py.test --baseurl=http://example.com --api=rc --environment="Firefox 5 on Mac OS X"
 
 Run tests against a local webdriver using Firefox:
 
@@ -67,7 +67,7 @@ Run tests against a remote webdriver server either directly or via grid:
 
 Run tests against Sauce Labs using RC API using Firefox 5 on Windows 2003:
 
-    $ py.test --api=rc --baseurl=http://example.com --browsername=firefox --browserver=5.0 --platform="Windows 2003" --saucelabs=sauce_labs.yaml
+    $ py.test --baseurl=http://example.com --api=rc --browsername=firefox --browserver=5.0 --platform="Windows 2003" --saucelabs=sauce_labs.yaml
 
 Run tests against Sauce Labs using webdriver API using Firefox 5 on Windows:
 
