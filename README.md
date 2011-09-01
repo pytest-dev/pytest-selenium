@@ -21,23 +21,26 @@ For full usage details run the following command:
 
     $ py.test --help
 
+    reporting:
+       --webqareport=path  create mozilla webqa custom report file at given path.
+
     selenium:
-      --baseurl=url       base url for the application under test.
-      --api=api           version of selenium api to use. 'rc' uses selenium rc.
-                          'webdriver' uses selenium webdriver (the default).
-      --host=str          host that selenium server is listening on.
-      --port=num          port that selenium server is listening on.
-      --driver=str        webdriver implementation.
-      --chromepath=path   path to the google chrome driver executable.
-      --firefoxpath=path  path to the target firefox binary.
-      --browser=str       target browser (standalone rc server).
-      --environment=str   target environment (grid rc).
-      --browsername=str   target browser name (webdriver).
-      --browserver=str    target browser version (webdriver).
-      --platform=str      target platform (webdriver).
-      --timeout=num       timeout for page loads, etc (selenium rc).
-      --capturenetwork    capture network traffic to test_method_name.json
-                          (selenium rc). (disabled by default).
+      --baseurl=url        base url for the application under test.
+      --api=api            version of selenium api to use. 'rc' uses selenium rc.
+                           'webdriver' uses selenium webdriver (the default).
+      --host=str           host that selenium server is listening on.
+      --port=num           port that selenium server is listening on.
+      --driver=str         webdriver implementation.
+      --chromepath=path    path to the google chrome driver executable.
+      --firefoxpath=path   path to the target firefox binary.
+      --browser=str        target browser (standalone rc server).
+      --environment=str    target environment (grid rc).
+      --browsername=str    target browser name (webdriver).
+      --browserver=str     target browser version (webdriver).
+      --platform=str       target platform (webdriver).
+      --timeout=num        timeout for page loads, etc (selenium rc).
+      --capturenetwork     capture network traffic to test_method_name.json
+                           (selenium rc). (disabled by default).
 
     credentials:
       --credentials=path  location of yaml file containing user credentials.
@@ -100,3 +103,8 @@ The credentials files use YAML syntax, and the usage will vary depending on the 
     #   email: admin@example.com
     #   username: admin
     #   password: password
+
+Custom report
+-------------
+
+If you specify the --webqareport command line option with a path then a custom HTML report will be generated at that location.
