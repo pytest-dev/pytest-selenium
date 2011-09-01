@@ -49,18 +49,11 @@ from selenium import selenium
 from selenium import webdriver
 import yaml
 
-def _get_status_code(url):
-    try:
-        connection = urllib2.urlopen(url)
-        status_code = connection.getcode()
-        connection.close()
-        return status_code
-    except urllib2.URLError, e:
-        print 'Unable to connect to: %s' % url
 
 def pytest_configure(config):
     if config.option.base_url:
-        assert _get_status_code(config.option.base_url) == 200
+        status_code = _get_status_code(config.option.base_url)
+        assert status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, status_code)
 
     report_path = config.option.webqa_report_path
     if report_path:
@@ -207,12 +200,21 @@ def pytest_addoption(parser):
                     default=None,
                     help="create mozilla webqa custom report file at given path.")
 
+def _get_status_code(url):
+    try:
+        connection = urllib2.urlopen(url)
+        status_code = connection.getcode()
+        connection.close()
+        return status_code
+    except urllib2.HTTPError, e:
+        return e.getcode()
+    except urllib2.URLError, e:
+        print 'Unable to connect to: %s' % url
 
 def _credentials(credentials_file):
     stream = file(credentials_file, 'r')
     credentials = yaml.load(stream)
     return credentials
-
 
 def _check_sauce_usage(item):
     '''
