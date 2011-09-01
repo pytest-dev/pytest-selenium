@@ -334,7 +334,7 @@ def _capture_debug(item):
     filename = os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
     _capture_screenshot(item, filename)
     _capture_html(item, filename)
-    _capture_log(item, filename)
+    #_capture_log(item, filename)  # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
     if item.config.option.capture_network:
         _capture_network(item, filename)
 
@@ -415,8 +415,9 @@ class LogHTML(object):
                  'Screenshot': '%s.png' % filename}
         if self.config.option.capture_network:
             links['Network'] = '%s.json' % filename
-        if self.config.option.api.upper() == 'RC':
-            links['Log'] = '%s.log' % filename
+        # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
+        #if self.config.option.api.upper() == 'RC':
+        #    links['Log'] = '%s.log' % filename
         links_html = []
         self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
         self.test_logs.append('<td>')
