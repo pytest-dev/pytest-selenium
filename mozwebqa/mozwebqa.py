@@ -334,6 +334,8 @@ def _capture_debug(item):
     filename = os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
     _capture_screenshot(item, filename)
     _capture_html(item, filename)
+    if item.config.option.capture_network:
+        _capture_network(item, filename)
 
 def _generate_filename(classname, testname):
     return '%s_%s' % (classname.replace('.', '_'), testname)
@@ -366,6 +368,12 @@ def _capture_html(item, filename):
     f.close()
 
 
+def _capture_network(item, filename):
+    f = open('%s.json' % filename, 'w')
+    f.write(TestSetup.selenium.captureNetworkTraffic('json'))
+    f.close()
+
+
 def _stop_selenium(item):
     if item.api == 'webdriver':
         try:
@@ -373,12 +381,6 @@ def _stop_selenium(item):
         except:
             pass
     else:
-        if item.config.option.capture_network:
-            traffic = TestSetup.selenium.captureNetworkTraffic('json')
-            filename = item.keywords.keys()[0]
-            f = open('%s.json' % filename, 'w')
-            f.write(traffic)
-            f.close()
         try:
             TestSetup.selenium.stop()
         except:
@@ -403,6 +405,8 @@ class LogHTML(object):
         time = self._durations.pop(report.nodeid, 0.0)
         links = {'HTML': '%s.html' % filename,
                  'Screenshot': '%s.png' % filename}
+        if self.config.option.capture_network:
+            links['Network'] = '%s.json' % filename
         links_html = []
         self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
         self.test_logs.append('<td>')
@@ -516,6 +520,7 @@ class LogHTML(object):
             else:
                 logfile.write('\n<tr><th>Browser</th><td>%s</td></tr>' % self.config.option.environment or self.config.option.browser)
                 logfile.write('\n<tr><th>Timeout</th><td>%s</td></tr>' % self.config.option.timeout)
+        logfile.write('\n<tr><th>Capture Network Traffic</th><td>%s</td></tr>' % self.config.option.capture_network)
         if self.config.option.credentials_file:
             logfile.write('\n<tr><th>Credentials</th><td>%s</td></tr>' % self.config.option.credentials_file)
         if self.config.option.sauce_labs_credentials_file:
