@@ -406,17 +406,30 @@ class LogHTML(object):
         self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
         self.test_logs.append('<td>')
         for name, path in links.iteritems():
-            if os.path.exists(path):
-                links_html.append('<a href="%s">%s</a>' % (path, name))
+            links_html.append('<a href="%s">%s</a>' % (path, name))
         self.test_logs.append(', '.join(links_html))
         self.test_logs.append('</td>')
-        self.test_logs.append('\n<tr class="additional"><td></td><td colspan="4">')
-        if os.path.exists(links['Screenshot']):
+        
+        if not result == 'Passed':
+            self.test_logs.append('\n<tr class="additional"><td colspan="5">')
+    
+            if report.longrepr:
+                self.test_logs.append('\n<div class="log">')
+                for line in str(report.longrepr).splitlines():
+                    separator = line.startswith('_ ' * 10)
+                    if separator:
+                        self.test_logs.append(line[:80])
+                    else:
+                        exception = line.startswith("E   ")
+                        if exception:
+                            self.test_logs.append('<span class="error">%s</span>' % line)
+                        else:
+                            self.test_logs.append(line)
+                    self.test_logs.append('<br />')
+                self.test_logs.append('\n</div>')
+    
             self.test_logs.append('\n<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
-        self.test_logs.append('\n</td></tr>')
-
-    def appendlog(self, format, *args):
-        self.test_logs.append(format % args)
+            self.test_logs.append('\n</td></tr>')
 
     def append_pass(self, report):
         self.passed += 1
@@ -482,7 +495,8 @@ class LogHTML(object):
         logfile.write('\n.passed {color: green}')
         logfile.write('\n.skipped, .xfailed {color: orange}')
         logfile.write('\n.error, .failed, .xpassed {color: red}')
-        logfile.write('\n.screenshot {float:left; margin-right: 5px; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
+        logfile.write('\n.log {display: inline-block; width: 800px; height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space: pre}')
+        logfile.write('\n.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
         logfile.write('\n.screenshot img {width: 320px}')
         logfile.write('\n</style></head><body>')
         logfile.write('\n<h2>Configuration</h2>')
