@@ -461,7 +461,7 @@ class LogHTML(object):
         self.test_logs.append(', '.join(links_html))
         self.test_logs.append('</td>')
 
-        if not result == 'Passed':
+        if not 'Passed' in result:
             self.test_logs.append('\n<tr class="additional"><td colspan="5">')
 
             if report.longrepr:
