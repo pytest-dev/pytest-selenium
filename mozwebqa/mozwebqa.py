@@ -280,6 +280,7 @@ def _start_webdriver_client(item):
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor=executor,
                                               desired_capabilities=capabilities)
+        _capture_session_id(item, _debug_path(item))
     else:
         if item.driver.upper() == 'REMOTE':
             capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
@@ -333,7 +334,7 @@ def _start_rc_client(item):
         TestSetup.selenium.start()
 
     if item.sauce_labs_credentials_file:
-        _capture_session_id(_debug_path(item))
+        _capture_session_id(item, _debug_path(item))
 
     TestSetup.selenium.set_timeout(TestSetup.timeout)
     TestSetup.selenium.set_context(test_name)
@@ -370,9 +371,12 @@ def _split_class_and_test_names(nodeid):
     return (classname, name)
 
 
-def _capture_session_id(filename):
+def _capture_session_id(item, filename):
     f = open("%s.session" % filename, 'wb')
-    f.write(TestSetup.selenium.get_eval('selenium.sessionId'))
+    if item.api.upper() == 'WEBDRIVER':
+        f.write(TestSetup.selenium.session_id)
+    else:
+        f.write(TestSetup.selenium.get_eval('selenium.sessionId'))
     f.close()
 
 
