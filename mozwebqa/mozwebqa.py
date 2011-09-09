@@ -196,11 +196,11 @@ def pytest_addoption(parser):
 
     group = parser.getgroup("terminal reporting")
     group.addoption('--webqareport',
-                    action="store",
-                    dest="webqa_report_path",
-                    metavar="path",
-                    default=None,
-                    help="create mozilla webqa custom report file at given path.")
+                    action='store',
+                    dest='webqa_report_path',
+                    metavar='path',
+                    default='results.html',
+                    help="create mozilla webqa custom report file at given path. default is 'results.html'")
 
 
 def _get_status_code(url):
