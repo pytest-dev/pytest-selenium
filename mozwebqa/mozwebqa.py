@@ -341,7 +341,8 @@ def _start_rc_client(item):
 
 
 def _debug_path(item):
-    debug_path = "debug"
+    report_path = os.path.dirname(os.path.normpath(os.path.expanduser(os.path.expandvars(item.config.option.webqa_report_path))))
+    debug_path = report_path and os.path.sep.join([report_path, 'debug']) or 'debug'
     if not os.path.exists(debug_path):
         os.makedirs(debug_path)
     return os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
@@ -557,6 +558,9 @@ class LogHTML(object):
         self.suite_start_time = time.time()
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
+        logfile_dirname = os.path.dirname(self.logfile)
+        if logfile_dirname and not os.path.exists(logfile_dirname):
+            os.makedirs(logfile_dirname)
         logfile = py.std.codecs.open(self.logfile, 'w', encoding='utf-8')
 
         suite_stop_time = time.time()
