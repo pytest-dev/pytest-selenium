@@ -80,7 +80,8 @@ class TestRCClient:
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capturenetwork', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
-        filename = os.path.sep.join([str(testdir.tmpdir), 'test_capture_network_traffic.json'])
+        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
+        filename = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_capture_network_traffic.json')][0]])
         json_data = open(filename)
         data = json.load(json_data)
         json_data.close()
