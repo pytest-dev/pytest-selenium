@@ -98,7 +98,7 @@ def pytest_runtest_setup(item):
 
 
 def pytest_runtest_teardown(item):
-    if not 'skip_selenium' in item.keywords:
+    if TestSetup.selenium and not 'skip_selenium' in item.keywords:
         _capture_debug(item)
         _stop_selenium(item)
 
@@ -341,8 +341,11 @@ def _start_rc_client(item):
 
 
 def _debug_path(item):
-    report_path = os.path.dirname(os.path.normpath(os.path.expanduser(os.path.expandvars(item.config.option.webqa_report_path))))
-    debug_path = report_path and os.path.sep.join([report_path, 'debug']) or 'debug'
+    report_path = item.config.option.webqa_report_path
+    debug_path = report_path and \
+                 os.path.dirname(report_path) and \
+                 os.path.sep.join([os.path.dirname(report_path), 'debug']) or 'debug'
+    debug_path = os.path.normpath(os.path.expanduser(os.path.expandvars(debug_path)))
     if not os.path.exists(debug_path):
         os.makedirs(debug_path)
     return os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
