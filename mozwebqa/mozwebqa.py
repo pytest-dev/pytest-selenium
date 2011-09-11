@@ -45,14 +45,6 @@ from selenium import selenium
 from selenium import webdriver
 import yaml
 
-def _get_status_code(url):
-    try:
-        connection = urllib2.urlopen(url)
-        status_code = connection.getcode()
-        connection.close()
-        return status_code
-    except urllib2.URLError, e:
-        print 'Unable to connect to: %s' % url
 
 def pytest_configure(config):
     if config.option.base_url:
@@ -74,9 +66,12 @@ def pytest_runtest_setup(item):
     TestSetup.timeout = item.config.option.timeout
     TestSetup.default_implicit_wait = 10
     item.sauce_labs_credentials_file = item.config.option.sauce_labs_credentials_file
+
     if item.sauce_labs_credentials_file:
         item.sauce_labs_credentials = _credentials(item.config.option.sauce_labs_credentials_file)
+
     item.credentials_file = item.config.option.credentials_file
+
     if item.credentials_file:
         TestSetup.credentials = _credentials(item.credentials_file)
 
@@ -183,6 +178,16 @@ def pytest_addoption(parser):
                      metavar = 'path',
                      help = 'credendials file containing sauce labs username and api key.')
 
+def _get_status_code(url):
+    try:
+        connection = urllib2.urlopen(url)
+        status_code = connection.getcode()
+        connection.close()
+        return status_code
+    except urllib2.URLError, e:
+        print 'Unable to connect to: %s' % url
+        raise
+
 
 def _credentials(credentials_file):
     stream = file(credentials_file, 'r')
@@ -196,13 +201,17 @@ def _check_sauce_usage(item):
     '''
     if not item.sauce_labs_credentials['username']:
         raise pytest.UsageError('username must be specified in the sauce labs credentials file.')
+
     if not item.sauce_labs_credentials['api-key']:
         raise pytest.UsageError('api-key must be specified in the sauce labs credentials file.')
+
     if item.api == "rc":
         if not item.browser_name:
             raise pytest.UsageError("--browsername must be specified when using the 'rc' api with sauce labs.")
+
         if not item.browser_version:
             raise pytest.UsageError("--browserver must be specified when using the 'rc' api with sauce labs.")
+
         if not item.platform:
             raise pytest.UsageError("--platform must be specified when using the 'rc' api with sauce labs.")
 
@@ -221,8 +230,10 @@ def _check_selenium_usage(item):
         if item.driver.upper() == 'REMOTE':
             if not item.browser_name:
                 raise pytest.UsageError("--browsername must be specified when using the 'webdriver' api.")
+
             if not item.browser_version:
                 raise pytest.UsageError("--browserver must be specified when using the 'webdriver' api.")
+
             if not item.platform:
                 raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
     else:
@@ -260,20 +271,24 @@ def _start_webdriver_client(item):
             except AttributeError:
                 valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
                 raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
+
         elif item.driver.upper() == 'CHROME':
             if hasattr(item, 'chrome_path'):
                 TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path)
             else:
                 TestSetup.selenium = webdriver.Chrome()
+
         elif item.driver.upper() == 'FIREFOX':
             if hasattr(item, 'firefox_path'):
                 TestSetup.selenium = webdriver.Firefox(firefox_binary=FirefoxBinary(item.firefox_path))
             else:
                 TestSetup.selenium = webdriver.Firefox()
+
         elif item.driver.upper() == 'IE':
             TestSetup.selenium = webdriver.Ie()
         else:
             getattr(webdriver, item.driver)()
+
     TestSetup.selenium.implicitly_wait(TestSetup.default_implicit_wait)
 
 
