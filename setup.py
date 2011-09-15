@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name = 'pytest-mozwebqa',
-    version = '0.1',
+    version = '0.2',
     description='Mozilla WebQA plugin for py.test.',
     author = 'Dave Hunt',
     author_email = 'dhunt@mozilla.com',
@@ -16,7 +16,7 @@ setup(
         ]
     },
     classifiers = [
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
         'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
         'Operating System :: POSIX',
