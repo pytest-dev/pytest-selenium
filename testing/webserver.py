@@ -26,8 +26,10 @@ LOGGER = logging.getLogger(__name__)
 
 DEFAULT_PORT = 8000
 
+
 class HtmlOnlyHandler(BaseHTTPRequestHandler):
     """Http handler."""
+
     def do_GET(self):
         """GET method handler."""
         self.send_response(200)
@@ -39,8 +41,10 @@ class HtmlOnlyHandler(BaseHTTPRequestHandler):
         """Override default to avoid trashing stderr"""
         pass
 
+
 class SimpleWebServer(object):
     """A very basic web server."""
+
     def __init__(self, port=DEFAULT_PORT):
         self.stop_serving = False
         port = port
@@ -78,6 +82,7 @@ class SimpleWebServer(object):
             pass
         LOGGER.info("Shutting down the webserver")
         self.thread.join()
+
 
 def main(argv=None):
     from optparse import OptionParser

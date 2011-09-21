@@ -40,13 +40,16 @@ import json
 
 from webserver import SimpleWebServer
 
+
 def setup_module(module):
     webserver = SimpleWebServer()
     webserver.start()
     TestRCClient.webserver = webserver
 
+
 def teardown_module(module):
     TestRCClient.webserver.stop()
+
 
 @pytest.mark.skip_selenium
 class TestRCClient:

@@ -38,13 +38,16 @@ import pytest
 
 from webserver import SimpleWebServer
 
+
 def setup_module(module):
     webserver = SimpleWebServer()
     webserver.start()
     TestCredentials.webserver = webserver
 
+
 def teardown_module(module):
     TestCredentials.webserver.stop()
+
 
 @pytest.mark.skip_selenium
 class TestCredentials:
