@@ -451,8 +451,9 @@ class LogHTML(object):
         self.logfile = os.path.normpath(logfile)
         self.config = config
         self.test_logs = []
+        self.errors = self.errors = 0
         self.passed = self.skipped = 0
-        self.failed = self.errors = 0
+        self.failed = self.failed = 0
         self.xfailed = self.xpassed = 0
         self._durations = {}
 
@@ -631,7 +632,8 @@ class LogHTML(object):
         logfile.write('\n<p>%i tests ran in %i seconds.<br />' % (numtests, suite_time_delta))
         logfile.write('\n<span class="passed">%i passed</span>, ' % self.passed)
         logfile.write('<span class="skipped">%i skipped</span>, ' % self.skipped)
-        logfile.write('<span class="failed">%i failed</span>.<br />' % self.failed)
+        logfile.write('<span class="failed">%i failed</span>, ' % self.failed)
+        logfile.write('<span class="error">%i errors</span>.<br />' % self.errors)
         logfile.write('\n<span class="skipped">%i expected failures</span>, ' % self.xfailed)
         logfile.write('<span class="failed">%i unexpected passes</span>.</p>' % self.xpassed)
         logfile.write('\n<h2>Results</h2>')
