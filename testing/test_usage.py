@@ -38,13 +38,16 @@ import pytest
 
 from webserver import SimpleWebServer
 
+
 def setup_module(module):
     webserver = SimpleWebServer()
     webserver.start()
     TestUsage.webserver = webserver
 
+
 def teardown_module(module):
     TestUsage.webserver.stop()
+
 
 @pytest.mark.skip_selenium
 class TestUsage:
@@ -127,7 +130,7 @@ class TestUsage:
                 assert True
         """)
         sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
-            username: 
+            username:
             api-key: api-key
         """)
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--saucelabs=%s' % sauce_labs_credentials, file_test)
@@ -143,7 +146,7 @@ class TestUsage:
         """)
         sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
             username: username
-            api-key: 
+            api-key:
         """)
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--saucelabs=%s' % sauce_labs_credentials, file_test)
         passed, skipped, failed = reprec.listoutcomes()

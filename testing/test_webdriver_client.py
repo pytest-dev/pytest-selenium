@@ -38,13 +38,16 @@ import pytest
 
 from webserver import SimpleWebServer
 
+
 def setup_module(module):
     webserver = SimpleWebServer()
     webserver.start()
     TestWebDriverClient.webserver = webserver
 
+
 def teardown_module(module):
     TestWebDriverClient.webserver.stop()
+
 
 @pytest.mark.skip_selenium
 class TestWebDriverClient:
