@@ -398,12 +398,15 @@ def _capture_session_id(item, filename):
 
 
 def _capture_screenshot(item, filename):
-    f = open("%s.png" % filename, 'wb')
-    if item.api.upper() == 'WEBDRIVER':
-        f.write(base64.decodestring(TestSetup.selenium.get_screenshot_as_base64()))
-    else:
-        f.write(base64.decodestring(TestSetup.selenium.capture_entire_page_screenshot_to_string('')))
-    f.close()
+    try:
+        f = open("%s.png" % filename, 'wb')
+        if item.api.upper() == 'WEBDRIVER':
+            f.write(base64.decodestring(TestSetup.selenium.get_screenshot_as_base64()))
+        else:
+            f.write(base64.decodestring(TestSetup.selenium.capture_entire_page_screenshot_to_string('')))
+        f.close()
+    except:
+        pass
 
 
 def _capture_html(item, filename):
