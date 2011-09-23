@@ -46,6 +46,17 @@ For full usage details run the following command:
       --credentials=path  location of yaml file containing user credentials.
       --saucelabs=path    credendials file containing sauce labs username and api key.
 
+### Configuration
+
+You can also create a `mozwebqa.cfg` file that will be used to set defaults.
+This is so that projects can keep this alongside the tests to simplify running
+them via the command line. The options are currently limited to those that could
+be project specific.
+
+    [DEFAULT]
+    baseurl: 'http://www.example.com'
+    api: 'rc'
+
 ### Examples
 
 Run tests against a standalone RC server using Firefox in the default location:

@@ -43,6 +43,7 @@ import pytest
 import py
 import time
 import urllib2
+import ConfigParser
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import selenium
@@ -111,15 +112,22 @@ def pytest_funcarg__mozwebqa(request):
 
 
 def pytest_addoption(parser):
+    config = ConfigParser.ConfigParser(defaults={
+        'baseurl': '',
+        'api': 'webdriver'
+    })
+    config.read('mozwebqa.cfg')
+
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--baseurl',
                      action='store',
                      dest='base_url',
+                     default=config.get('DEFAULT', 'baseurl'),
                      metavar='url',
                      help='base url for the application under test.')
     group._addoption('--api',
                      action='store',
-                     default='webdriver',
+                     default=config.get('DEFAULT', 'api'),
                      metavar='api',
                      help="version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver (the default).")
     group._addoption('--host',
