@@ -278,7 +278,7 @@ def _start_selenium(item):
 
 
 def _start_webdriver_client(item):
-    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test_')]
+    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test')]
     if item.sauce_labs_credentials_file:
         capabilities = {
                     'platform': item.platform,
@@ -326,7 +326,7 @@ def _start_webdriver_client(item):
 
 def _start_rc_client(item):
     test_name = ".".join(_split_class_and_test_names(item.nodeid))
-    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test_')]
+    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test')]
     if item.sauce_labs_credentials_file:
         TestSetup.selenium = selenium('ondemand.saucelabs.com', '80',
                                       json.dumps({
