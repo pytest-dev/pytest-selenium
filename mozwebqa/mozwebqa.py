@@ -278,6 +278,16 @@ def _check_selenium_usage(item):
             raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
 
 
+def _get_common_sauce_settings(item):
+    config = ConfigParser.ConfigParser(defaults={'tags': ''})
+    config.read('mozwebqa.cfg')
+    tags = config.get('DEFAULT', 'tags').split(',')
+    tags.extend([mark for mark in item.keywords.keys() if not mark.startswith('test')])
+    return {'name': ".".join(_split_class_and_test_names(item.nodeid)),
+            'tags': tags,
+            'public': False}
+
+
 def _start_selenium(item):
     if item.api == 'webdriver':
         _start_webdriver_client(item)
@@ -286,15 +296,11 @@ def _start_selenium(item):
 
 
 def _start_webdriver_client(item):
-    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test')]
     if item.sauce_labs_credentials_file:
-        capabilities = {
-                    'platform': item.platform,
-                    'browserName': item.browser_name,
-                    'version': item.browser_version,
-                    'name': ".".join(_split_class_and_test_names(item.nodeid)),
-                    'tags': marks,
-                    'public': False}
+        capabilities = _get_common_sauce_settings(item)
+        capabilities.update({'platform': item.platform,
+                         'browserName': item.browser_name,
+                         'version': item.browser_version})
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor=executor,
                                               desired_capabilities=capabilities)
@@ -333,19 +339,15 @@ def _start_webdriver_client(item):
 
 
 def _start_rc_client(item):
-    test_name = ".".join(_split_class_and_test_names(item.nodeid))
-    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test')]
     if item.sauce_labs_credentials_file:
+        settings = _get_common_sauce_settings(item)
+        settings.update({'username': item.sauce_labs_credentials['username'],
+                         'access-key': item.sauce_labs_credentials['api-key'],
+                         'os': item.platform,
+                         'browser': item.browser_name,
+                         'browser-version': item.browser_version})
         TestSetup.selenium = selenium('ondemand.saucelabs.com', '80',
-                                      json.dumps({
-                                      'username': item.sauce_labs_credentials['username'],
-                                      'access-key': item.sauce_labs_credentials['api-key'],
-                                      'os': item.platform,
-                                      'browser': item.browser_name,
-                                      'browser-version': item.browser_version,
-                                      'name': test_name,
-                                      'tags': marks,
-                                      'public': False}),
+                                      json.dumps(settings),
                                       TestSetup.base_url)
     else:
         browser = item.environment or item.browser
@@ -360,7 +362,7 @@ def _start_rc_client(item):
         _capture_session_id(item, _debug_path(item))
 
     TestSetup.selenium.set_timeout(TestSetup.timeout)
-    TestSetup.selenium.set_context(test_name)
+    TestSetup.selenium.set_context(".".join(_split_class_and_test_names(item.nodeid)))
 
 
 def _debug_path(item):

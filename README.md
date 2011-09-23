@@ -56,6 +56,11 @@ be project specific.
     [DEFAULT]
     baseurl: 'http://www.example.com'
     api: 'rc'
+    tags: 'tag1, tag2'
+
+The `tags` entry is an optional comma separated list of tags that are set when
+using Sauce Labs. This is useful for filtering the list of jobs based on the
+application under test or similar.
 
 ### Examples
 
