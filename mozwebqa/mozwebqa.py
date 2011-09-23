@@ -278,13 +278,14 @@ def _start_selenium(item):
 
 
 def _start_webdriver_client(item):
+    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test_')]
     if item.sauce_labs_credentials_file:
         capabilities = {
                     'platform': item.platform,
                     'browserName': item.browser_name,
                     'version': item.browser_version,
                     'name': ".".join(_split_class_and_test_names(item.nodeid)),
-                    'tags': item.keywords.keys()[:-1],
+                    'tags': marks,
                     'public': False}
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor=executor,
@@ -325,6 +326,7 @@ def _start_webdriver_client(item):
 
 def _start_rc_client(item):
     test_name = ".".join(_split_class_and_test_names(item.nodeid))
+    marks = [mark for mark in item.keywords.keys() if not mark.startswith('test_')]
     if item.sauce_labs_credentials_file:
         TestSetup.selenium = selenium('ondemand.saucelabs.com', '80',
                                       json.dumps({
@@ -334,7 +336,7 @@ def _start_rc_client(item):
                                       'browser': item.browser_name,
                                       'browser-version': item.browser_version,
                                       'name': test_name,
-                                      'tags': item.keywords.keys()[:-1],
+                                      'tags': marks,
                                       'public': False}),
                                       TestSetup.base_url)
     else:
