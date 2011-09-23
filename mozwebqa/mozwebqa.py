@@ -101,7 +101,7 @@ def pytest_runtest_setup(item):
 
 
 def pytest_runtest_teardown(item):
-    if TestSetup.selenium and not 'skip_selenium' in item.keywords:
+    if hasattr(TestSetup, 'selenium') and TestSetup.selenium and not 'skip_selenium' in item.keywords:
         _capture_debug(item)
         _stop_selenium(item)
 
@@ -619,7 +619,7 @@ class LogHTML(object):
             selenium_server = self.config.option.sauce_labs_credentials_file and 'Sauce Labs' or 'http://%s:%s' % (self.config.option.host, self.config.option.port)
             logfile.write('\n<tr><th>Selenium Server</th><td>%s</td></tr>' % selenium_server)
             if self.config.option.api.upper() == 'WEBDRIVER' or self.config.option.sauce_labs_credentials_file:
-                logfile.write('\n<tr><th>Browser</th><td>%s %s on %s</td></tr>' % (self.config.option.browser_name.title(), self.config.option.browser_version, self.config.option.platform.title()))
+                logfile.write('\n<tr><th>Browser</th><td>%s %s on %s</td></tr>' % (str(self.config.option.browser_name).title(), self.config.option.browser_version, str(self.config.option.platform).title()))
             else:
                 logfile.write('\n<tr><th>Browser</th><td>%s</td></tr>' % self.config.option.environment or self.config.option.browser)
             if self.config.option.api.upper() == 'RC':
