@@ -43,6 +43,7 @@ import pytest
 import py
 import time
 import urllib2
+import httplib
 import ConfigParser
 
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -471,16 +472,12 @@ class LogHTML(object):
 
     def _appendrow(self, result, report):
         (classname, testname) = _split_class_and_test_names(report.nodeid)
-        filename = os.path.sep.join(["debug", _generate_filename(classname, testname)])
         time = self._durations.pop(report.nodeid, 0.0)
-        try:
-            session_id = open('%s.session' % filename, 'r').readline()
-        except:
-            session_id = None
-        links = {'HTML': '%s.html' % filename,
-                 'Screenshot': '%s.png' % filename}
+        session_id = self._get_session_id(report)
+        links = {'HTML': self._get_debug_filename(report, 'html'),
+                 'Screenshot': self._get_debug_filename(report, 'png')}
         if self.config.option.capture_network:
-            links['Network'] = '%s.json' % filename
+            links['Network'] = self._get_debug_filename(report, 'json')
         if session_id:
             links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % session_id
         # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
@@ -544,6 +541,35 @@ class LogHTML(object):
                 self.test_logs.append('\n</object></div>')
             self.test_logs.append('\n</td></tr>')
 
+    def _get_debug_filename(self, report, extension):
+        filename = os.path.sep.join(["debug", _generate_filename(*_split_class_and_test_names(report.nodeid))])
+        return '%s.%s' % (filename, extension)
+
+    def _get_session_id(self, report):
+        try:
+            session_id = open(self._get_debug_filename(report, 'session'), 'r').readline()
+        except:
+            session_id = None
+        return session_id
+
+    def _send_result_to_sauce(self, report):
+        session_id = self._get_session_id(report)
+
+        if session_id:
+            try:
+                result = {'passed': report.passed or (report.failed and 'xfail' in report.keywords)}
+                credentials = _credentials(self.config.option.sauce_labs_credentials_file)
+                basic_authentication = ('%s:%s' % (credentials['username'], credentials['api-key'])).encode('base64')[:-1]
+                connection = httplib.HTTPConnection('saucelabs.com')
+                connection.request('PUT', '/rest/v1/%s/jobs/%s' % (credentials['username'], session_id),
+                                   json.dumps(result),
+                                   headers = {
+                                       'Authorization': 'Basic %s' % basic_authentication,
+                                       'Content-Type': 'text/json'})
+                connection.getresponse()
+            except:
+                pass
+
     def append_pass(self, report):
         self.passed += 1
         self._appendrow('Passed', report)
@@ -569,6 +595,9 @@ class LogHTML(object):
             self.skipped += 1
 
     def pytest_runtest_logreport(self, report):
+        if self.config.option.sauce_labs_credentials_file:
+            self._send_result_to_sauce(report)
+
         if report.passed:
             self.append_pass(report)
         elif report.failed:
