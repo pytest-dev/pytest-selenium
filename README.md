@@ -22,7 +22,7 @@ For full usage details run the following command:
     $ py.test --help
 
     reporting:
-       --webqareport=path  create mozilla webqa custom report file at given path. default is 'results.html'
+       --webqareport=path  create mozilla webqa custom report file at given path. default is 'results/index.html'
 
     selenium:
       --baseurl=url        base url for the application under test.
@@ -123,4 +123,4 @@ The credentials files use YAML syntax, and the usage will vary depending on the 
 Custom report
 -------------
 
-By default a custom HTML report will be written to results.html. If you wish this to be located elsewhere, or have a different filename, you can specify the --webqareport command line option.
+By default a custom HTML report will be written to results/index.html. If you wish this to be located elsewhere, or have a different filename, you can specify the --webqareport command line option.

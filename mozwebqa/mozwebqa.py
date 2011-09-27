@@ -211,8 +211,8 @@ def pytest_addoption(parser):
                     action='store',
                     dest='webqa_report_path',
                     metavar='path',
-                    default='results.html',
-                    help="create mozilla webqa custom report file at given path. default is 'results.html'")
+                    default='results/index.html',
+                    help="create mozilla webqa custom report file at given path. default is 'results/index.html'")
 
 
 def _get_status_code(url):
@@ -542,15 +542,22 @@ class LogHTML(object):
             self.test_logs.append('\n</td></tr>')
 
     def _get_debug_filename(self, report, extension):
-        filename = os.path.sep.join(["debug", _generate_filename(*_split_class_and_test_names(report.nodeid))])
+        filename = os.path.join('debug', _generate_filename(*_split_class_and_test_names(report.nodeid)))
         return '%s.%s' % (filename, extension)
 
     def _get_session_id(self, report):
+        report_dir = self._make_report_dir()
         try:
-            session_id = open(self._get_debug_filename(report, 'session'), 'r').readline()
+            session_id = open(os.path.join(report_dir, self._get_debug_filename(report, 'session')), 'r').readline()
         except:
             session_id = None
         return session_id
+
+    def _make_report_dir(self):
+        logfile_dirname = os.path.dirname(self.logfile)
+        if logfile_dirname and not os.path.exists(logfile_dirname):
+            os.makedirs(logfile_dirname)
+        return logfile_dirname
 
     def _send_result_to_sauce(self, report):
         session_id = self._get_session_id(report)
@@ -619,9 +626,7 @@ class LogHTML(object):
         self.suite_start_time = time.time()
 
     def pytest_sessionfinish(self, session, exitstatus, __multicall__):
-        logfile_dirname = os.path.dirname(self.logfile)
-        if logfile_dirname and not os.path.exists(logfile_dirname):
-            os.makedirs(logfile_dirname)
+        self._make_report_dir()
         logfile = py.std.codecs.open(self.logfile, 'w', encoding='utf-8')
 
         suite_stop_time = time.time()
