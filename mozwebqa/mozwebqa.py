@@ -193,6 +193,11 @@ def pytest_addoption(parser):
                      dest='capture_network',
                      default=False,
                      help='capture network traffic to test_method_name.json (selenium rc). (disabled by default).')
+    group._addoption('--build',
+                     action='store',
+                     dest='build',
+                     metavar='str',
+                     help='build identifier (for continuous integration).')
 
     group = parser.getgroup('credentials', 'credentials')
     group._addoption("--credentials",
@@ -284,7 +289,8 @@ def _get_common_sauce_settings(item):
     config.read('mozwebqa.cfg')
     tags = config.get('DEFAULT', 'tags').split(',')
     tags.extend([mark for mark in item.keywords.keys() if not mark.startswith('test')])
-    return {'name': ".".join(_split_class_and_test_names(item.nodeid)),
+    return {'build': item.config.option.build or None,
+            'name': '.'.join(_split_class_and_test_names(item.nodeid)),
             'tags': tags,
             'public': False}
 
@@ -652,6 +658,8 @@ class LogHTML(object):
         logfile.write('\n</style></head><body>')
         logfile.write('\n<h2>Configuration</h2>')
         logfile.write('\n<table id="configuration"><tr><th>Base URL</th><td><a href="%s">%s</td></tr>' % (self.config.option.base_url, self.config.option.base_url))
+        if self.config.option.build:
+            logfile.write('\n<tr><th>Build</th><td>%s</td></tr>' % self.config.option.build)
         logfile.write('\n<tr><th>Selenium API</th><td>%s</td></tr>' % self.config.option.api)
         if not self.config.option.driver.upper() == 'REMOTE':
             logfile.write('\n<tr><th>Driver</th><td>%s</td></tr>' % self.config.option.driver)
