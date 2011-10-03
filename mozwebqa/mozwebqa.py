@@ -474,11 +474,10 @@ class LogHTML(object):
         self.passed = self.skipped = 0
         self.failed = self.failed = 0
         self.xfailed = self.xpassed = 0
-        self._durations = {}
 
     def _appendrow(self, result, report):
         (classname, testname) = _split_class_and_test_names(report.nodeid)
-        time = self._durations.pop(report.nodeid, 0.0)
+        time = getattr(report, 'duration', 0.0)
         session_id = self._get_session_id(report)
         links = {'HTML': self._get_debug_filename(report, 'html'),
                  'Screenshot': self._get_debug_filename(report, 'png')}
@@ -620,13 +619,6 @@ class LogHTML(object):
                 self.append_failure(report)
         elif report.skipped:
             self.append_skipped(report)
-
-    def pytest_runtest_call(self, item, __multicall__):
-        start = time.time()
-        try:
-            return __multicall__.execute()
-        finally:
-            self._durations[item.nodeid] = time.time() - start
 
     def pytest_sessionstart(self, session):
         self.suite_start_time = time.time()
