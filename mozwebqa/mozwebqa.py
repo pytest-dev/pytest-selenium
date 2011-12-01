@@ -53,14 +53,16 @@ import yaml
 
 
 def pytest_configure(config):
-    if config.option.base_url:
-        status_code = _get_status_code(config.option.base_url)
-        assert status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, status_code)
+    if not hasattr(config, 'slaveinput'):
 
-    report_path = config.option.webqa_report_path
-    if report_path:
-        config._html = LogHTML(report_path, config)
-        config.pluginmanager.register(config._html)
+        if config.option.base_url:
+            status_code = _get_status_code(config.option.base_url)
+            assert status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, status_code)
+    
+        report_path = config.option.webqa_report_path
+        if report_path:
+            config._html = LogHTML(report_path, config)
+            config.pluginmanager.register(config._html)
 
 
 def pytest_unconfigure(config):
