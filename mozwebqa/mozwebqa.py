@@ -294,7 +294,8 @@ def _get_common_sauce_settings(item):
     return {'build': item.config.option.build or None,
             'name': '.'.join(_split_class_and_test_names(item.nodeid)),
             'tags': tags,
-            'public': False}
+            'public': True,
+            'restricted-public-info': True}
 
 
 def _start_selenium(item):
