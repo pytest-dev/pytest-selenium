@@ -58,10 +58,9 @@ def pytest_configure(config):
         if config.option.base_url:
             status_code = _get_status_code(config.option.base_url)
             assert status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, status_code)
-    
-        report_path = config.option.webqa_report_path
-        if report_path:
-            config._html = LogHTML(report_path, config)
+
+        if config.option.webqa_report_path:
+            config._html = LogHTML(config)
             config.pluginmanager.register(config._html)
 
 
@@ -73,6 +72,7 @@ def pytest_unconfigure(config):
 
 
 def pytest_runtest_setup(item):
+    item.debug = {}
     item.api = item.config.option.api
     item.host = item.config.option.host
     item.port = item.config.option.port
@@ -106,8 +106,20 @@ def pytest_runtest_setup(item):
 
 def pytest_runtest_teardown(item):
     if hasattr(TestSetup, 'selenium') and TestSetup.selenium and not 'skip_selenium' in item.keywords:
-        _capture_debug(item)
         _stop_selenium(item)
+
+
+def pytest_runtest_makereport(__multicall__, item, call):
+    report = __multicall__.execute()
+    if report.when == 'call':
+        if hasattr(TestSetup, 'selenium') and TestSetup.selenium and not 'skip_selenium' in item.keywords:
+            if report.skipped and 'xfail' in report.keywords or report.failed and 'xfail' not in report.keywords:
+                _capture_screenshot(item)
+                _capture_html(item)
+                _capture_log(item)
+            _capture_network_traffic(item)
+            report.debug = item.debug
+    return report
 
 
 def pytest_funcarg__mozwebqa(request):
@@ -303,6 +315,7 @@ def _start_selenium(item):
         _start_webdriver_client(item)
     else:
         _start_rc_client(item)
+    _capture_session_id(item)
 
 
 def _start_webdriver_client(item):
@@ -314,7 +327,6 @@ def _start_webdriver_client(item):
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor=executor,
                                               desired_capabilities=capabilities)
-        _capture_session_id(item, _debug_path(item))
     else:
         if item.driver.upper() == 'REMOTE':
             capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
@@ -368,31 +380,8 @@ def _start_rc_client(item):
     else:
         TestSetup.selenium.start()
 
-    if item.sauce_labs_credentials_file:
-        _capture_session_id(item, _debug_path(item))
-
     TestSetup.selenium.set_timeout(TestSetup.timeout)
     TestSetup.selenium.set_context(".".join(_split_class_and_test_names(item.nodeid)))
-
-
-def _debug_path(item):
-    report_path = item.config.option.webqa_report_path
-    debug_path = report_path and \
-                 os.path.dirname(report_path) and \
-                 os.path.sep.join([os.path.dirname(report_path), 'debug']) or 'debug'
-    debug_path = os.path.normpath(os.path.expanduser(os.path.expandvars(debug_path)))
-    if not os.path.exists(debug_path):
-        os.makedirs(debug_path)
-    return os.path.sep.join([debug_path, _generate_filename(*_split_class_and_test_names(item.nodeid))])
-
-
-def _capture_debug(item):
-    filename = _debug_path(item)
-    _capture_screenshot(item, filename)
-    _capture_html(item, filename)
-    #_capture_log(item, filename)  # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
-    if item.config.option.capture_network:
-        _capture_network(filename)
 
 
 def _generate_filename(classname, testname):
@@ -410,47 +399,40 @@ def _split_class_and_test_names(nodeid):
     return (classname, name)
 
 
-def _capture_session_id(item, filename):
-    f = open("%s.session" % filename, 'wb')
+def _capture_session_id(item):
     if item.api.upper() == 'WEBDRIVER':
-        f.write(TestSetup.selenium.session_id)
+        session_id = TestSetup.selenium.session_id
     else:
-        f.write(TestSetup.selenium.get_eval('selenium.sessionId'))
-    f.close()
+        session_id = TestSetup.selenium.get_eval('selenium.sessionId')
+    item.debug.setdefault('session_id', session_id)
 
 
-def _capture_screenshot(item, filename):
-    try:
-        f = open("%s.png" % filename, 'wb')
-        if item.api.upper() == 'WEBDRIVER':
-            f.write(base64.decodestring(TestSetup.selenium.get_screenshot_as_base64()))
-        else:
-            f.write(base64.decodestring(TestSetup.selenium.capture_entire_page_screenshot_to_string('')))
-        f.close()
-    except:
-        pass
-
-
-def _capture_html(item, filename):
-    f = open("%s.html" % filename, 'wb')
+def _capture_screenshot(item):
     if item.api.upper() == 'WEBDRIVER':
-        f.write(TestSetup.selenium.page_source.encode('utf-8'))
+        screenshot = TestSetup.selenium.get_screenshot_as_base64()
     else:
-        f.write(TestSetup.selenium.get_html_source().encode('utf-8'))
-    f.close()
+        screenshot = TestSetup.selenium.capture_entire_page_screenshot_to_string('')
+    item.debug.setdefault('screenshot', []).extend([screenshot])
 
 
-def _capture_log(item, filename):
+def _capture_html(item):
+    if item.api.upper() == 'WEBDRIVER':
+        html = TestSetup.selenium.page_source.encode('utf-8')
+    else:
+        html = TestSetup.selenium.get_html_source().encode('utf-8')
+    item.debug.setdefault('html', []).extend([html])
+
+
+def _capture_log(item):
     if item.api.upper() == 'RC':
-        f = open("%s.log" % filename, 'wb')
-        f.write(TestSetup.selenium.get_log().encode('utf-8'))
-        f.close()
+        log = TestSetup.selenium.get_log().encode('utf-8')
+        item.debug.setdefault('log', []).extend([log])
 
 
-def _capture_network(filename):
-    f = open('%s.json' % filename, 'w')
-    f.write(TestSetup.selenium.captureNetworkTraffic('json'))
-    f.close()
+def _capture_network_traffic(item):
+    if item.api.upper() == 'RC' and item.config.option.capture_network:
+        network_traffic = TestSetup.selenium.captureNetworkTraffic('json')
+        item.debug.setdefault('network_traffic', []).extend([network_traffic])
 
 
 def _stop_selenium(item):
@@ -468,9 +450,10 @@ def _stop_selenium(item):
 
 class LogHTML(object):
 
-    def __init__(self, logfile, config):
-        logfile = os.path.expanduser(os.path.expandvars(logfile))
+    def __init__(self, config):
+        logfile = os.path.expanduser(os.path.expandvars(config.option.webqa_report_path))
         self.logfile = os.path.normpath(logfile)
+        self._debug_path = 'debug'
         self.config = config
         self.test_logs = []
         self.errors = self.errors = 0
@@ -478,19 +461,52 @@ class LogHTML(object):
         self.failed = self.failed = 0
         self.xfailed = self.xpassed = 0
 
+    def _debug_filename(self, report):
+        if not os.path.exists(self._absolute_debug_path):
+            os.makedirs(self._absolute_debug_path)
+        return _generate_filename(*_split_class_and_test_names(report.nodeid))
+
+    @property
+    def _absolute_debug_path(self):
+        path = os.path.join(os.path.dirname(self.logfile), self._debug_path)
+        return os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
+
     def _appendrow(self, result, report):
         (classname, testname) = _split_class_and_test_names(report.nodeid)
         time = getattr(report, 'duration', 0.0)
-        session_id = self._get_session_id(report)
-        links = {'HTML': self._get_debug_filename(report, 'html'),
-                 'Screenshot': self._get_debug_filename(report, 'png')}
-        if self.config.option.capture_network:
-            links['Network'] = self._get_debug_filename(report, 'json')
-        if session_id:
-            links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % session_id
-        # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
-        #if self.config.option.api.upper() == 'RC':
-        #    links['Log'] = '%s.log' % filename
+
+        links = {}
+        if hasattr(report, 'debug'):
+            debug_filename = self._debug_filename(report)
+
+            if 'screenshot' in report.debug:
+                extension = 'png'
+                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                f.write(base64.decodestring(report.debug['screenshot'][-1]))
+                links.update({'Screenshot': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+
+            if 'html' in report.debug:
+                extension = 'html'
+                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                f.write(report.debug['html'][-1])
+                links.update({'HTML': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+
+            # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
+            # if 'log' in report.debug:
+            #     extension = 'log'
+            #     f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+            #     f.write(report.debug['log'][-1])
+            #     links.update({'Log': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+
+            if 'network_traffic' in report.debug:
+                extension = 'json'
+                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                f.write(report.debug['network_traffic'][-1])
+                links.update({'Network Traffic': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+
+        if self.config.option.sauce_labs_credentials_file and 'session_id' in report.debug:
+            links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % report.debug['session_id']
+
         links_html = []
         self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
         self.test_logs.append('<td>')
@@ -517,9 +533,11 @@ class LogHTML(object):
                     self.test_logs.append('<br />')
                 self.test_logs.append('\n</div>')
 
-            self.test_logs.append('\n<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
-            if session_id:
-                self.test_logs.append('\n<div id="player%s" class="video">' % session_id)
+            if 'Screenshot' in links:
+                self.test_logs.append('\n<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
+
+            if self.config.option.sauce_labs_credentials_file and 'session_id' in report.debug:
+                self.test_logs.append('\n<div id="player%s" class="video">' % report.debug['session_id'])
                 self.test_logs.append('\n<object width="100%" height="100%" type="application/x-shockwave-flash" data="http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729" name="player_api" id="player_api">')
                 self.test_logs.append('\n<param value="true" name="allowfullscreen">')
                 self.test_logs.append('\n<param value="always" name="allowscriptaccess">')
@@ -553,14 +571,6 @@ class LogHTML(object):
         filename = os.path.join('debug', _generate_filename(*_split_class_and_test_names(report.nodeid)))
         return '%s.%s' % (filename, extension)
 
-    def _get_session_id(self, report):
-        report_dir = self._make_report_dir()
-        try:
-            session_id = open(os.path.join(report_dir, self._get_debug_filename(report, 'session')), 'r').readline()
-        except:
-            session_id = None
-        return session_id
-
     def _make_report_dir(self):
         logfile_dirname = os.path.dirname(self.logfile)
         if logfile_dirname and not os.path.exists(logfile_dirname):
@@ -578,9 +588,8 @@ class LogHTML(object):
                 connection = httplib.HTTPConnection('saucelabs.com')
                 connection.request('PUT', '/rest/v1/%s/jobs/%s' % (credentials['username'], session_id),
                                    json.dumps(result),
-                                   headers = {
-                                       'Authorization': 'Basic %s' % basic_authentication,
-                                       'Content-Type': 'text/json'})
+                                   headers={'Authorization': 'Basic %s' % basic_authentication,
+                                            'Content-Type': 'text/json'})
                 connection.getresponse()
             except:
                 pass
@@ -614,7 +623,8 @@ class LogHTML(object):
             self._send_result_to_sauce(report)
 
         if report.passed:
-            self.append_pass(report)
+            if report.when == 'call':
+                self.append_pass(report)
         elif report.failed:
             if report.when != "call":
                 self.append_error(report)
