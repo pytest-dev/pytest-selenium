@@ -114,12 +114,22 @@ def pytest_runtest_makereport(__multicall__, item, call):
     if report.when == 'call':
         if hasattr(TestSetup, 'selenium') and TestSetup.selenium and not 'skip_selenium' in item.keywords:
             if report.skipped and 'xfail' in report.keywords or report.failed and 'xfail' not in report.keywords:
+                _capture_url(item)
                 _capture_screenshot(item)
                 _capture_html(item)
                 _capture_log(item)
             _capture_network_traffic(item)
             report.debug = item.debug
     return report
+
+
+def pytest_terminal_summary(terminalreporter):
+    tr = terminalreporter
+    for replist in tr.stats.values():
+        for rep in replist:
+            if hasattr(rep, 'debug'):
+                if 'url' in rep.debug:
+                    tr.write_line('Failing URL: %s' % (rep.debug['url'][-1]))
 
 
 def pytest_funcarg__mozwebqa(request):
@@ -433,6 +443,14 @@ def _capture_network_traffic(item):
     if item.api.upper() == 'RC' and item.config.option.capture_network:
         network_traffic = TestSetup.selenium.captureNetworkTraffic('json')
         item.debug.setdefault('network_traffic', []).extend([network_traffic])
+
+
+def _capture_url(item):
+    if item.api.upper() == 'WEBDRIVER':
+        url = TestSetup.selenium.current_url
+    else:
+        url = TestSetup.selenium.get_location()
+    item.debug.setdefault('url', []).extend([url])
 
 
 def _stop_selenium(item):
