@@ -50,6 +50,9 @@ def teardown_module(module):
 @pytest.mark.skip_selenium
 class TestDebug:
 
+    failure_files = ('screenshot.png', 'html.txt')
+    log_file = 'log.txt'
+
     def testDebugOnFail(self, testdir):
         file_test = testdir.makepyfile("""
             def test_debug(mozwebqa):
@@ -59,11 +62,10 @@ class TestDebug:
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
-        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
-        for file_extension in ['png', 'html']:
-            debug_file = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.%s' % file_extension)][0]])
-            assert os.path.exists(debug_file)
-            assert os.path.isfile(debug_file)
+        path = self._test_debug_path(str(testdir.tmpdir))
+        for file in self.failure_files:
+            assert os.path.exists(os.path.join(path, file))
+            assert os.path.isfile(os.path.join(path, file))
 
     def testDebugOnXFail(self, testdir):
         file_test = testdir.makepyfile("""
@@ -76,11 +78,10 @@ class TestDebug:
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(skipped) == 1
-        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
-        for file_extension in ['png', 'html']:
-            debug_file = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.%s' % file_extension)][0]])
-            assert os.path.exists(debug_file)
-            assert os.path.isfile(debug_file)
+        path = self._test_debug_path(str(testdir.tmpdir))
+        for file in self.failure_files:
+            assert os.path.exists(os.path.join(path, file))
+            assert os.path.isfile(os.path.join(path, file))
 
     def testNoDebugOnPass(self, testdir):
         file_test = testdir.makepyfile("""
@@ -132,13 +133,12 @@ class TestDebug:
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=%s/result.html' % report_subdirectory, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
-        debug_path = os.path.sep.join([str(testdir.tmpdir), report_subdirectory, 'debug'])
-        for file_extension in ['png', 'html']:
-            debug_file = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.%s' % file_extension)][0]])
-            assert os.path.exists(debug_file)
-            assert os.path.isfile(debug_file)
+        path = self._test_debug_path(os.path.join(str(testdir.tmpdir), report_subdirectory))
+        for file in self.failure_files:
+            assert os.path.exists(os.path.join(path, file))
+            assert os.path.isfile(os.path.join(path, file))
 
-    def testNoLogWhenPublic(self, testdir):
+    def testLogWhenPublic(self, testdir):
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.public
@@ -149,10 +149,9 @@ class TestDebug:
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
-        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
-        log_file = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.log')][0]])
-        assert os.path.exists(log_file)
-        assert os.path.isfile(log_file)
+        path = self._test_debug_path(str(testdir.tmpdir))
+        assert os.path.exists(os.path.join(path, self.log_file))
+        assert os.path.isfile(os.path.join(path, self.log_file))
 
     def testNoLogWhenNotPublic(self, testdir):
         file_test = testdir.makepyfile("""
@@ -163,5 +162,25 @@ class TestDebug:
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
-        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
-        assert not [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.log')]
+        path = self._test_debug_path(str(testdir.tmpdir))
+        assert not os.path.exists(os.path.join(path, self.log_file))
+
+    def testNoLogWhenPrivate(self, testdir):
+        file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.private
+            def test_debug(mozwebqa):
+                mozwebqa.selenium.open('/')
+                assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(failed) == 1
+        path = self._test_debug_path(str(testdir.tmpdir))
+        assert not os.path.exists(os.path.join(path, self.log_file))
+
+    def _test_debug_path(self, root_path):
+        debug_path = os.path.join(root_path, 'debug')
+        for i in range(2):
+            debug_path = os.path.join(debug_path, os.listdir(debug_path)[0])
+        return debug_path
