@@ -662,15 +662,8 @@ class LogHTML(object):
         suite_time_delta = suite_stop_time - self.suite_start_time
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
 
-        configuration = {}
-        configuration.setdefault('Base URL', self.config.option.base_url)
-        configuration.setdefault('Build', self.config.option.build)
-        configuration.setdefault('Selenium API', self.config.option.api)
-        configuration.setdefault('Driver', self.config.option.driver)
-        configuration.setdefault('Firefox Path', self.config.option.firefox_path)
-        configuration.setdefault('Google Chrome Path', self.config.option.chrome_path)
-        configuration.setdefault('Selenium Server', self.config.option.sauce_labs_credentials_file and \
-                              'Sauce Labs' or 'http://%s:%s' % (self.config.option.host, self.config.option.port))
+        server = self.config.option.sauce_labs_credentials_file and \
+                 'Sauce Labs' or 'http://%s:%s' % (self.config.option.host, self.config.option.port)
         browser = self.config.option.browser_name and \
                   self.config.option.browser_version and \
                   self.config.option.platform and \
@@ -679,11 +672,20 @@ class LogHTML(object):
                                    str(self.config.option.platform).title()) or \
                   self.config.option.environment or \
                   self.config.option.browser
-        configuration.setdefault('Browser', browser)
-        configuration.setdefault('Timeout', self.config.option.timeout)
-        configuration.setdefault('Capture Network Traffic', self.config.option.capture_network)
-        configuration.setdefault('Credentials', self.config.option.credentials_file)
-        configuration.setdefault('Sauce Labs Credentials', self.config.option.sauce_labs_credentials_file)
+
+        configuration = {
+            'Base URL': self.config.option.base_url,
+            'Build': self.config.option.build,
+            'Selenium API': self.config.option.api,
+            'Driver': self.config.option.driver,
+            'Firefox Path': self.config.option.firefox_path,
+            'Google Chrome Path': self.config.option.chrome_path,
+            'Selenium Server': server,
+            'Browser': browser,
+            'Timeout': self.config.option.timeout,
+            'Capture Network Traffic': self.config.option.capture_network,
+            'Credentials': self.config.option.credentials_file,
+            'Sauce Labs Credentials': self.config.option.sauce_labs_credentials_file}
 
         html = []
         html.append('<html><head><title>Test Report</title><style>')
