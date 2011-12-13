@@ -124,3 +124,26 @@ Custom report
 -------------
 
 By default a custom HTML report will be written to results/index.html. If you wish this to be located elsewhere, or have a different filename, you can specify the --webqareport command line option.
+
+Privacy
+-------
+
+By default log files are not captured as these may contain confidential data such as user credentials. If you are confident that a test does not contain such data, you can explicitly set the test as public:
+
+### Example
+
+    import pytest
+    
+    @pytest.mark.public
+    def test_public(self, mozwebqa):
+        home_pg = home_page.HomePage(mozwebqa)
+
+You can also explicitly mark the test as private, which sets the test appopriately in Sauce Labs jobs.
+
+### Example
+
+    import pytest
+    
+    @pytest.mark.private
+    def test_private(self, mozwebqa):
+        home_pg = home_page.HomePage(mozwebqa)
