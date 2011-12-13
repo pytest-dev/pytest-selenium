@@ -73,19 +73,3 @@ class TestRCClient:
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
-
-    def testStartRCClientAndCaptureNetworkTraffic(self, testdir):
-        file_test = testdir.makepyfile("""
-            def test_capture_network_traffic(mozwebqa):
-                mozwebqa.selenium.open('/')
-                assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
-        """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capturenetwork', '--webqareport=index.html', file_test)
-        passed, skipped, failed = reprec.listoutcomes()
-        assert len(passed) == 1
-        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
-        filename = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_capture_network_traffic.json')][0]])
-        json_data = open(filename)
-        data = json.load(json_data)
-        json_data.close()
-        assert len(data) > 0

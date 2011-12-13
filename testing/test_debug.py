@@ -35,6 +35,7 @@
 # ***** END LICENSE BLOCK *****
 
 import os
+import json
 import pytest
 
 from webserver import SimpleWebServer
@@ -52,6 +53,7 @@ class TestDebug:
 
     failure_files = ('screenshot.png', 'html.txt')
     log_file = 'log.txt'
+    network_traffic_file = 'networktraffic.json'
 
     def testDebugOnFail(self, testdir):
         file_test = testdir.makepyfile("""
@@ -178,6 +180,21 @@ class TestDebug:
         assert len(failed) == 1
         path = self._test_debug_path(str(testdir.tmpdir))
         assert not os.path.exists(os.path.join(path, self.log_file))
+
+    def testCaptureNetworkTraffic(self, testdir):
+        file_test = testdir.makepyfile("""
+            def test_capture_network_traffic(mozwebqa):
+                mozwebqa.selenium.open('/')
+                assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capturenetwork', '--webqareport=index.html', file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(passed) == 1
+        path = self._test_debug_path(str(testdir.tmpdir))
+        json_data = open(os.path.join(path, self.network_traffic_file))
+        data = json.load(json_data)
+        json_data.close()
+        assert len(data) > 0
 
     def _test_debug_path(self, root_path):
         debug_path = os.path.join(root_path, 'debug')
