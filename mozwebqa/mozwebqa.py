@@ -526,7 +526,7 @@ class LogHTML(object):
             links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % report.debug['session_id']
 
         links_html = []
-        self.test_logs.append('\n<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
+        self.test_logs.append('<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
         self.test_logs.append('<td>')
         for name, path in links.iteritems():
             links_html.append('<a href="%s">%s</a>' % (path, name))
@@ -534,10 +534,10 @@ class LogHTML(object):
         self.test_logs.append('</td>')
 
         if not 'Passed' in result:
-            self.test_logs.append('\n<tr class="additional"><td colspan="5">')
+            self.test_logs.append('<tr class="additional"><td colspan="5">')
 
             if report.longrepr:
-                self.test_logs.append('\n<div class="log">')
+                self.test_logs.append('<div class="log">')
                 for line in str(report.longrepr).splitlines():
                     separator = line.startswith('_ ' * 10)
                     if separator:
@@ -549,19 +549,19 @@ class LogHTML(object):
                         else:
                             self.test_logs.append(cgi.escape(line))
                     self.test_logs.append('<br />')
-                self.test_logs.append('\n</div>')
+                self.test_logs.append('</div>')
 
             if 'Screenshot' in links:
-                self.test_logs.append('\n<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
+                self.test_logs.append('<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
 
             if self.config.option.sauce_labs_credentials_file and 'session_id' in report.debug:
-                self.test_logs.append('\n<div id="player%s" class="video">' % report.debug['session_id'])
-                self.test_logs.append('\n<object width="100%" height="100%" type="application/x-shockwave-flash" data="http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729" name="player_api" id="player_api">')
-                self.test_logs.append('\n<param value="true" name="allowfullscreen">')
-                self.test_logs.append('\n<param value="always" name="allowscriptaccess">')
-                self.test_logs.append('\n<param value="high" name="quality">')
-                self.test_logs.append('\n<param value="true" name="cachebusting">')
-                self.test_logs.append('\n<param value="#000000" name="bgcolor">')
+                self.test_logs.append('<div id="player%s" class="video">' % report.debug['session_id'])
+                self.test_logs.append('<object width="100%" height="100%" type="application/x-shockwave-flash" data="http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729" name="player_api" id="player_api">')
+                self.test_logs.append('<param value="true" name="allowfullscreen">')
+                self.test_logs.append('<param value="always" name="allowscriptaccess">')
+                self.test_logs.append('<param value="high" name="quality">')
+                self.test_logs.append('<param value="true" name="cachebusting">')
+                self.test_logs.append('<param value="#000000" name="bgcolor">')
                 flash_vars = 'config={\
                     &quot;clip&quot;:{\
                         &quot;url&quot;:&quot;http%%3A//saucelabs.com/jobs/%s/video.flv&quot;,\
@@ -581,9 +581,9 @@ class LogHTML(object):
                         &quot;provider&quot;:&quot;streamer&quot;,\
                         &quot;autoPlay&quot;:false,\
                         &quot;autoBuffering&quot;:true}]}' % (session_id, session_id, session_id)
-                self.test_logs.append('\n<param value="%s" name="flashvars">' % flash_vars.replace(' ', ''))
-                self.test_logs.append('\n</object></div>')
-            self.test_logs.append('\n</td></tr>')
+                self.test_logs.append('<param value="%s" name="flashvars">' % flash_vars.replace(' ', ''))
+                self.test_logs.append('</object></div>')
+            self.test_logs.append('</td></tr>')
 
     def _get_debug_filename(self, report, extension):
         filename = os.path.join('debug', _generate_filename(*_split_class_and_test_names(report.nodeid)))
@@ -661,63 +661,67 @@ class LogHTML(object):
         suite_stop_time = time.time()
         suite_time_delta = suite_stop_time - self.suite_start_time
         numtests = self.passed + self.failed + self.xpassed + self.xfailed
-        logfile.write('<html><head><title>Test Report</title><style>')
-        logfile.write('\nbody {font-family: Helvetica, Arial, sans-serif; font-size: 12px}')
-        logfile.write('\na {color: #999}')
-        logfile.write('\nh2 {font-size: 16px}')
-        logfile.write('\ntable {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}')
-        logfile.write('\n#configuration tr:nth-child(odd) {background-color: #f6f6f6}')
-        logfile.write('\nth, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}')
-        logfile.write('\nth {font-weight: bold}')
-        logfile.write('\ntr.passed, tr.skipped, tr.xfailed, tr.error, tr.failed, tr.xpassed {color: inherit}')
-        logfile.write('\ntr.passed + tr.additional {display: none}')
-        logfile.write('\n.passed {color: green}')
-        logfile.write('\n.skipped, .xfailed {color: orange}')
-        logfile.write('\n.error, .failed, .xpassed {color: red}')
-        logfile.write('\n.log {display: inline-block; width: 800px; height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space: pre}')
-        logfile.write('\n.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
-        logfile.write('\n.screenshot img {width: 320px}')
-        logfile.write('\n.video {display: inline-block; width: 320px; height: 240px}')
-        logfile.write('\n</style></head><body>')
-        logfile.write('\n<h2>Configuration</h2>')
-        logfile.write('\n<table id="configuration"><tr><th>Base URL</th><td><a href="%s">%s</td></tr>' % (self.config.option.base_url, self.config.option.base_url))
-        if self.config.option.build:
-            logfile.write('\n<tr><th>Build</th><td>%s</td></tr>' % self.config.option.build)
-        logfile.write('\n<tr><th>Selenium API</th><td>%s</td></tr>' % self.config.option.api)
-        if not self.config.option.driver.upper() == 'REMOTE':
-            logfile.write('\n<tr><th>Driver</th><td>%s</td></tr>' % self.config.option.driver)
-            if self.config.option.firefox_path:
-                logfile.write('\n<tr><th>Firefox Path</th><td>%s</td></tr>' % self.config.option.firefox_path)
-            elif self.config.option.chrome_path:
-                logfile.write('\n<tr><th>Google Chrome Path</th><td>%s</td></tr>' % self.config.option.chrome_path)
-        else:
-            selenium_server = self.config.option.sauce_labs_credentials_file and 'Sauce Labs' or 'http://%s:%s' % (self.config.option.host, self.config.option.port)
-            logfile.write('\n<tr><th>Selenium Server</th><td>%s</td></tr>' % selenium_server)
-            if self.config.option.api.upper() == 'WEBDRIVER' or self.config.option.sauce_labs_credentials_file:
-                logfile.write('\n<tr><th>Browser</th><td>%s %s on %s</td></tr>' % (str(self.config.option.browser_name).title(), self.config.option.browser_version, str(self.config.option.platform).title()))
-            else:
-                logfile.write('\n<tr><th>Browser</th><td>%s</td></tr>' % self.config.option.environment or self.config.option.browser)
-            if self.config.option.api.upper() == 'RC':
-                logfile.write('\n<tr><th>Timeout</th><td>%s</td></tr>' % self.config.option.timeout)
-        logfile.write('\n<tr><th>Capture Network Traffic</th><td>%s</td></tr>' % self.config.option.capture_network)
-        if self.config.option.credentials_file:
-            logfile.write('\n<tr><th>Credentials</th><td>%s</td></tr>' % self.config.option.credentials_file)
-        if self.config.option.sauce_labs_credentials_file:
-            logfile.write('\n<tr><th>Sauce Labs Credentials</th><td>%s</td></tr>' % self.config.option.sauce_labs_credentials_file)
-        logfile.write('\n</table>')
-        logfile.write('\n<h2>Summary</h2>')
-        logfile.write('\n<p>%i tests ran in %i seconds.<br />' % (numtests, suite_time_delta))
-        logfile.write('\n<span class="passed">%i passed</span>, ' % self.passed)
-        logfile.write('<span class="skipped">%i skipped</span>, ' % self.skipped)
-        logfile.write('<span class="failed">%i failed</span>, ' % self.failed)
-        logfile.write('<span class="error">%i errors</span>.<br />' % self.errors)
-        logfile.write('\n<span class="skipped">%i expected failures</span>, ' % self.xfailed)
-        logfile.write('<span class="failed">%i unexpected passes</span>.</p>' % self.xpassed)
-        logfile.write('\n<h2>Results</h2>')
-        logfile.write('\n<table id="results">')
-        logfile.write('\n<tr><th>Result</th><th>Class</th><th>Name</th><th>Duration</th><th>Links</th></tr>')
-        logfile.writelines(self.test_logs)
-        logfile.write('\n</table></body></html>')
+
+        configuration = {}
+        configuration.setdefault('Base URL', self.config.option.base_url)
+        configuration.setdefault('Build', self.config.option.build)
+        configuration.setdefault('Selenium API', self.config.option.api)
+        configuration.setdefault('Driver', self.config.option.driver)
+        configuration.setdefault('Firefox Path', self.config.option.firefox_path)
+        configuration.setdefault('Google Chrome Path', self.config.option.chrome_path)
+        configuration.setdefault('Selenium Server', self.config.option.sauce_labs_credentials_file and \
+                              'Sauce Labs' or 'http://%s:%s' % (self.config.option.host, self.config.option.port))
+        browser = self.config.option.browser_name and \
+                  self.config.option.browser_version and \
+                  self.config.option.platform and \
+                  '%s %s on %s' % (str(self.config.option.browser_name).title(),
+                                   self.config.option.browser_version,
+                                   str(self.config.option.platform).title()) or \
+                  self.config.option.environment or \
+                  self.config.option.browser
+        configuration.setdefault('Browser', browser)
+        configuration.setdefault('Timeout', self.config.option.timeout)
+        configuration.setdefault('Capture Network Traffic', self.config.option.capture_network)
+        configuration.setdefault('Credentials', self.config.option.credentials_file)
+        configuration.setdefault('Sauce Labs Credentials', self.config.option.sauce_labs_credentials_file)
+
+        html = []
+        html.append('<html><head><title>Test Report</title><style>')
+        html.append('body {font-family: Helvetica, Arial, sans-serif; font-size: 12px}')
+        html.append('a {color: #999}')
+        html.append('h2 {font-size: 16px}')
+        html.append('table {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}')
+        html.append('#configuration tr:nth-child(odd) {background-color: #f6f6f6}')
+        html.append('th, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}')
+        html.append('th {font-weight: bold}')
+        html.append('tr.passed, tr.skipped, tr.xfailed, tr.error, tr.failed, tr.xpassed {color: inherit}')
+        html.append('tr.passed + tr.additional {display: none}')
+        html.append('.passed {color: green}')
+        html.append('.skipped, .xfailed {color: orange}')
+        html.append('.error, .failed, .xpassed {color: red}')
+        html.append('.log {display: inline-block; width: 800px; height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space: pre}')
+        html.append('.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
+        html.append('.screenshot img {width: 320px}')
+        html.append('.video {display: inline-block; width: 320px; height: 240px}')
+        html.append('</style></head><body>')
+        html.append('<h2>Configuration</h2>')
+        html.append('<table id="configuration">')
+        html.append('\n'.join(['<tr><td>%s</td><td>%s</td></tr>' % (k, v) for k, v in configuration.items() if v]))
+        html.append('</table>')
+        html.append('<h2>Summary</h2>')
+        html.append('<p>%i tests ran in %i seconds.<br />' % (numtests, suite_time_delta))
+        html.append('<span class="passed">%i passed</span>, ' % self.passed)
+        html.append('<span class="skipped">%i skipped</span>, ' % self.skipped)
+        html.append('<span class="failed">%i failed</span>, ' % self.failed)
+        html.append('<span class="error">%i errors</span>.<br />' % self.errors)
+        html.append('<span class="skipped">%i expected failures</span>, ' % self.xfailed)
+        html.append('<span class="failed">%i unexpected passes</span>.</p>' % self.xpassed)
+        html.append('<h2>Results</h2>')
+        html.append('<table id="results">')
+        html.append('<tr><th>Result</th><th>Class</th><th>Name</th><th>Duration</th><th>Links</th></tr>')
+        html.append(''.join(self.test_logs))
+        html.append('</table></body></html>')
+        logfile.write('\n'.join(html))
         logfile.close()
 
 
