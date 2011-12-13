@@ -112,6 +112,7 @@ def pytest_runtest_teardown(item):
 def pytest_runtest_makereport(__multicall__, item, call):
     report = __multicall__.execute()
     if report.when == 'call':
+        report.session_id = getattr(item, 'session_id', None)
         if hasattr(TestSetup, 'selenium') and TestSetup.selenium and not 'skip_selenium' in item.keywords:
             if report.skipped and 'xfail' in report.keywords or report.failed and 'xfail' not in report.keywords:
                 _capture_url(item)
@@ -394,10 +395,6 @@ def _start_rc_client(item):
     TestSetup.selenium.set_context(".".join(_split_class_and_test_names(item.nodeid)))
 
 
-def _generate_filename(classname, testname):
-    return '%s_%s' % (classname.replace('.', '_'), testname)
-
-
 def _split_class_and_test_names(nodeid):
     names = nodeid.split("::")
     names[0] = names[0].replace("/", '.')
@@ -414,7 +411,7 @@ def _capture_session_id(item):
         session_id = TestSetup.selenium.session_id
     else:
         session_id = TestSetup.selenium.get_eval('selenium.sessionId')
-    item.debug.setdefault('session_id', session_id)
+    item.session_id = session_id
 
 
 def _capture_screenshot(item):
@@ -479,54 +476,55 @@ class LogHTML(object):
         self.failed = self.failed = 0
         self.xfailed = self.xpassed = 0
 
-    def _debug_filename(self, report):
-        if not os.path.exists(self._absolute_debug_path):
-            os.makedirs(self._absolute_debug_path)
-        return _generate_filename(*_split_class_and_test_names(report.nodeid))
-
-    @property
-    def _absolute_debug_path(self):
-        path = os.path.join(os.path.dirname(self.logfile), self._debug_path)
-        return os.path.normpath(os.path.expanduser(os.path.expandvars(path)))
+    def _debug_paths(self, testclass, testmethod):
+        root_path = os.path.join(os.path.dirname(self.logfile), self._debug_path)
+        root_path = os.path.normpath(os.path.expanduser(os.path.expandvars(root_path)))
+        test_path = os.path.join(testclass.replace('.', '_'), testmethod)
+        full_path = os.path.join(root_path, test_path)
+        if not os.path.exists(full_path):
+            os.makedirs(full_path)
+        relative_path = os.path.join(self._debug_path, test_path)
+        absolute_path = os.path.join(root_path, test_path)
+        return (relative_path, full_path)
 
     def _appendrow(self, result, report):
-        (classname, testname) = _split_class_and_test_names(report.nodeid)
+        (testclass, testmethod) = _split_class_and_test_names(report.nodeid)
         time = getattr(report, 'duration', 0.0)
 
         links = {}
-        if hasattr(report, 'debug'):
-            debug_filename = self._debug_filename(report)
+        if hasattr(report, 'debug') and any(report.debug.values()):
+            (relative_path, full_path) = self._debug_paths(testclass, testmethod)
 
             if 'screenshot' in report.debug:
-                extension = 'png'
-                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                filename = 'screenshot.png'
+                f = open(os.path.join(full_path, filename), 'wb')
                 f.write(base64.decodestring(report.debug['screenshot'][-1]))
-                links.update({'Screenshot': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+                links.update({'Screenshot': os.path.join(relative_path, filename)})
 
             if 'html' in report.debug:
-                extension = 'html'
-                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                filename = 'html.txt'
+                f = open(os.path.join(full_path, filename), 'wb')
                 f.write(report.debug['html'][-1])
-                links.update({'HTML': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+                links.update({'HTML': os.path.join(relative_path, filename)})
 
             # Log may contain passwords, etc so we only capture it for tests marked as public
             if 'log' in report.debug and 'public' in report.keywords:
-                extension = 'log'
-                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                filename = 'log.txt'
+                f = open(os.path.join(full_path, filename), 'wb')
                 f.write(report.debug['log'][-1])
-                links.update({'Log': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+                links.update({'Log': os.path.join(relative_path, filename)})
 
             if 'network_traffic' in report.debug:
-                extension = 'json'
-                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                filename = 'networktraffic.json'
+                f = open(os.path.join(full_path, filename), 'wb')
                 f.write(report.debug['network_traffic'][-1])
-                links.update({'Network Traffic': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+                links.update({'Network Traffic': os.path.join(relative_path, filename)})
 
-        if self.config.option.sauce_labs_credentials_file and 'session_id' in report.debug:
-            links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % report.debug['session_id']
+        if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
+            links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % report.session_id
 
         links_html = []
-        self.test_logs.append('<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, classname, testname, round(time)))
+        self.test_logs.append('<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, testclass, testmethod, round(time)))
         self.test_logs.append('<td>')
         for name, path in links.iteritems():
             links_html.append('<a href="%s">%s</a>' % (path, name))
@@ -554,8 +552,8 @@ class LogHTML(object):
             if 'Screenshot' in links:
                 self.test_logs.append('<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
 
-            if self.config.option.sauce_labs_credentials_file and 'session_id' in report.debug:
-                self.test_logs.append('<div id="player%s" class="video">' % report.debug['session_id'])
+            if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
+                self.test_logs.append('<div id="player%s" class="video">' % report.session_id)
                 self.test_logs.append('<object width="100%" height="100%" type="application/x-shockwave-flash" data="http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729" name="player_api" id="player_api">')
                 self.test_logs.append('<param value="true" name="allowfullscreen">')
                 self.test_logs.append('<param value="always" name="allowscriptaccess">')
@@ -580,14 +578,10 @@ class LogHTML(object):
                         &quot;url&quot;:&quot;http%%3A//saucelabs.com/jobs/%s/video.flv&quot;,\
                         &quot;provider&quot;:&quot;streamer&quot;,\
                         &quot;autoPlay&quot;:false,\
-                        &quot;autoBuffering&quot;:true}]}' % (session_id, session_id, session_id)
+                        &quot;autoBuffering&quot;:true}]}' % (report.session_id, report.session_id, report.session_id)
                 self.test_logs.append('<param value="%s" name="flashvars">' % flash_vars.replace(' ', ''))
                 self.test_logs.append('</object></div>')
             self.test_logs.append('</td></tr>')
-
-    def _get_debug_filename(self, report, extension):
-        filename = os.path.join('debug', _generate_filename(*_split_class_and_test_names(report.nodeid)))
-        return '%s.%s' % (filename, extension)
 
     def _make_report_dir(self):
         logfile_dirname = os.path.dirname(self.logfile)
@@ -596,15 +590,13 @@ class LogHTML(object):
         return logfile_dirname
 
     def _send_result_to_sauce(self, report):
-        session_id = self._get_session_id(report)
-
-        if session_id:
+        if hasattr(report, 'session_id'):
             try:
                 result = {'passed': report.passed or (report.failed and 'xfail' in report.keywords)}
                 credentials = _credentials(self.config.option.sauce_labs_credentials_file)
                 basic_authentication = ('%s:%s' % (credentials['username'], credentials['api-key'])).encode('base64')[:-1]
                 connection = httplib.HTTPConnection('saucelabs.com')
-                connection.request('PUT', '/rest/v1/%s/jobs/%s' % (credentials['username'], session_id),
+                connection.request('PUT', '/rest/v1/%s/jobs/%s' % (credentials['username'], report.session_id),
                                    json.dumps(result),
                                    headers={'Authorization': 'Basic %s' % basic_authentication,
                                             'Content-Type': 'text/json'})
@@ -708,7 +700,7 @@ class LogHTML(object):
         html.append('</style></head><body>')
         html.append('<h2>Configuration</h2>')
         html.append('<table id="configuration">')
-        html.append('\n'.join(['<tr><td>%s</td><td>%s</td></tr>' % (k, v) for k, v in configuration.items() if v]))
+        html.append('\n'.join(['<tr><td>%s</td><td>%s</td></tr>' % (k, v) for k, v in sorted(configuration.items()) if v]))
         html.append('</table>')
         html.append('<h2>Summary</h2>')
         html.append('<p>%i tests ran in %i seconds.<br />' % (numtests, suite_time_delta))
