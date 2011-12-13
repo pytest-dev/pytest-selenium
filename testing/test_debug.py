@@ -137,3 +137,31 @@ class TestDebug:
             debug_file = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.%s' % file_extension)][0]])
             assert os.path.exists(debug_file)
             assert os.path.isfile(debug_file)
+
+    def testNoLogWhenPublic(self, testdir):
+        file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.public
+            def test_debug(mozwebqa):
+                mozwebqa.selenium.open('/')
+                assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(failed) == 1
+        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
+        log_file = os.path.sep.join([debug_path, [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.log')][0]])
+        assert os.path.exists(log_file)
+        assert os.path.isfile(log_file)
+
+    def testNoLogWhenNotPublic(self, testdir):
+        file_test = testdir.makepyfile("""
+            def test_debug(mozwebqa):
+                mozwebqa.selenium.open('/')
+                assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(failed) == 1
+        debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
+        assert not [filename for filename in os.listdir(debug_path) if filename.endswith('test_debug.log')]

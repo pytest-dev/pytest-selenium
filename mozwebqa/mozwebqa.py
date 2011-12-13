@@ -316,8 +316,8 @@ def _get_common_sauce_settings(item):
     return {'build': item.config.option.build or None,
             'name': '.'.join(_split_class_and_test_names(item.nodeid)),
             'tags': tags,
-            'public': True,
-            'restricted-public-info': True}
+            'public': 'private' not in item.keywords,
+            'restricted-public-info': 'public' not in item.keywords}
 
 
 def _start_selenium(item):
@@ -509,12 +509,12 @@ class LogHTML(object):
                 f.write(report.debug['html'][-1])
                 links.update({'HTML': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
 
-            # Log may contain passwords, etc so we shouldn't capture this until we can do so safely
-            # if 'log' in report.debug:
-            #     extension = 'log'
-            #     f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
-            #     f.write(report.debug['log'][-1])
-            #     links.update({'Log': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
+            # Log may contain passwords, etc so we only capture it for tests marked as public
+            if 'log' in report.debug and 'public' in report.keywords:
+                extension = 'log'
+                f = open('%s.%s' % (os.path.join(self._absolute_debug_path, debug_filename), extension), 'wb')
+                f.write(report.debug['log'][-1])
+                links.update({'Log': '%s.%s' % (os.path.join(self._debug_path, debug_filename), extension)})
 
             if 'network_traffic' in report.debug:
                 extension = 'json'
