@@ -79,6 +79,7 @@ def pytest_runtest_setup(item):
     item.driver = item.config.option.driver
     item.chrome_path = item.config.option.chrome_path
     item.firefox_path = item.config.option.firefox_path
+    item.firefox_preferences = item.config.option.firefox_preferences
     item.browser = item.config.option.browser
     item.environment = item.config.option.environment
     item.browser_name = item.config.option.browser_name
@@ -160,6 +161,11 @@ def pytest_addoption(parser):
                      dest='firefox_path',
                      metavar='path',
                      help='path to the target firefox binary.')
+    group._addoption('--firefoxpref',
+                     action='store',
+                     dest='firefox_preferences',
+                     metavar='json',
+                     help='json string of firefox preferences to set (webdriver).')
     group._addoption('--browser',
                      action='store',
                      dest='browser',
@@ -298,6 +304,16 @@ def _get_common_sauce_settings(item):
             'restricted-public-info': True}
 
 
+def _create_firefox_profile(preferences):
+    profile = webdriver.FirefoxProfile()
+    for key, value in json.loads(preferences).items():
+        if isinstance(value, unicode):
+            value = str(value)
+        profile.set_preference(key, value)
+    profile.update_preferences()
+    return profile
+
+
 def _start_selenium(item):
     if item.api == 'webdriver':
         _start_webdriver_client(item)
@@ -316,6 +332,7 @@ def _start_webdriver_client(item):
                                               desired_capabilities=capabilities)
         _capture_session_id(item, _debug_path(item))
     else:
+        profile = hasattr(item, 'firefox_preferences') and _create_firefox_profile(item.firefox_preferences) or None
         if item.driver.upper() == 'REMOTE':
             capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
             capabilities['version'] = item.browser_version
@@ -323,7 +340,8 @@ def _start_webdriver_client(item):
             executor = 'http://%s:%s/wd/hub' % (item.host, item.port)
             try:
                 TestSetup.selenium = webdriver.Remote(command_executor=executor,
-                                                      desired_capabilities=capabilities)
+                                                      desired_capabilities=capabilities,
+                                                      browser_profile=profile)
             except AttributeError:
                 valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
                 raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
@@ -335,11 +353,10 @@ def _start_webdriver_client(item):
                 TestSetup.selenium = webdriver.Chrome()
 
         elif item.driver.upper() == 'FIREFOX':
-            if hasattr(item, 'firefox_path'):
-                TestSetup.selenium = webdriver.Firefox(firefox_binary=FirefoxBinary(item.firefox_path))
-            else:
-                TestSetup.selenium = webdriver.Firefox()
-
+            binary = hasattr(item, 'firefox_path') and FirefoxBinary(item.firefox_path) or None
+            TestSetup.selenium = webdriver.Firefox(
+                firefox_binary=binary,
+                firefox_profile=profile)
         elif item.driver.upper() == 'IE':
             TestSetup.selenium = webdriver.Ie()
         else:
