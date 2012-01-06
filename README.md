@@ -116,7 +116,7 @@ If you're using WebDriver and Firefox it's possible to set custom preferences. T
 
 ### Example (disable addon compatibility checking)
 
-   --firefoxpref='{"extensions.checkCompatibility.nightly":false}'
+    --firefoxpref='{"extensions.checkCompatibility.nightly":false}'
 
 Using credentials files
 -----------------------
