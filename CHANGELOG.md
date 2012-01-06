@@ -1,7 +1,7 @@
 Change Log
 ==========
 
-0.7 (unreleased)
+0.8 (unreleased)
 ----------------
 
  * Added support for privacy markers
@@ -9,6 +9,11 @@ Change Log
  * Capture log on test failures if test is marked as public
  * Capture HTML and screenshot only on test failures
  * Improved the debug gathering
+
+0.7 (beta)
+----------
+
+ * Added support for specifying Firefox preferences - fixes issue #27
 
 0.6 (beta)
 ----------
