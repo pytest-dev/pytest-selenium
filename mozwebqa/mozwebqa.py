@@ -79,7 +79,6 @@ def pytest_runtest_setup(item):
     item.driver = item.config.option.driver
     item.chrome_path = item.config.option.chrome_path
     item.firefox_path = item.config.option.firefox_path
-    item.firefox_preferences = item.config.option.firefox_preferences
     item.browser = item.config.option.browser
     item.environment = item.config.option.environment
     item.browser_name = item.config.option.browser_name
@@ -305,14 +304,16 @@ def _get_common_sauce_settings(item):
 
 
 def _create_firefox_profile(preferences):
-    profile = webdriver.FirefoxProfile()
-    for key, value in json.loads(preferences).items():
-        if isinstance(value, unicode):
-            value = str(value)
-        profile.set_preference(key, value)
-    profile.update_preferences()
-    return profile
-
+    if preferences:
+        profile = webdriver.FirefoxProfile()
+        for key, value in json.loads(preferences).items():
+            if isinstance(value, unicode):
+                value = str(value)
+            profile.set_preference(key, value)
+        profile.update_preferences()
+        return profile
+    else:
+        return None
 
 def _start_selenium(item):
     if item.api == 'webdriver':
@@ -332,7 +333,7 @@ def _start_webdriver_client(item):
                                               desired_capabilities=capabilities)
         _capture_session_id(item, _debug_path(item))
     else:
-        profile = hasattr(item, 'firefox_preferences') and _create_firefox_profile(item.firefox_preferences) or None
+        profile = _create_firefox_profile(item.config.option.firefox_preferences)
         if item.driver.upper() == 'REMOTE':
             capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
             capabilities['version'] = item.browser_version
