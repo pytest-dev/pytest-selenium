@@ -164,7 +164,7 @@ def pytest_addoption(parser):
     group._addoption('--firefoxpref',
                      action='store',
                      dest='firefox_preferences',
-                     metavar='json',
+                     metavar='str',
                      help='json string of firefox preferences to set (webdriver).')
     group._addoption('--browser',
                      action='store',

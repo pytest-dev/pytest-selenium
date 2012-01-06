@@ -33,6 +33,7 @@ For full usage details run the following command:
       --driver=str         webdriver implementation.
       --chromepath=path    path to the google chrome driver executable.
       --firefoxpath=path   path to the target firefox binary.
+      --firefoxpref=str    json string of firefox preferences to set (webdriver).
       --browser=str        target browser (standalone rc server).
       --environment=str    target environment (grid rc).
       --browsername=str    target browser name (webdriver).
@@ -107,6 +108,15 @@ You will need to include the `mozwebqa` in the method signature for your tests, 
         registration_pg = registration_page.RegistrationPage(mozwebqa)
         registration_pg.register_new_user()
         Assert.equal(registration_pg.page_title, "Sign Up Complete!")
+
+Setting Firefox preferences
+---------------------------
+
+If you're using WebDriver and Firefox it's possible to set custom preferences. These are specified using a JSON string:
+
+### Example (disable addon compatibility checking)
+
+   --firefoxpref='{"extensions.checkCompatibility.nightly":false}'
 
 Using credentials files
 -----------------------
