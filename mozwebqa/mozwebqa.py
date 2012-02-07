@@ -347,7 +347,7 @@ def _create_firefox_profile(preferences):
     else:
         return None
 
-def _create_chrome_options(preferences):
+def _create_chrome_options(preferences, to_capabilities=True):
     options = webdriver.ChromeOptions()
     options_from_json = json.loads(preferences)
     if options_from_json.has_key("arguments"):
@@ -361,7 +361,11 @@ def _create_chrome_options(preferences):
     if options_from_json.has_key("binary_location"):
         options.binary_location = options_from_json["binary_location"]
 
-    return options.to_capabilities()
+    if to_capabilities:
+        return options.to_capabilities()
+    else:
+        return options
+
 
 def _start_selenium(item):
     if item.api == 'webdriver':
@@ -401,14 +405,14 @@ def _start_webdriver_client(item):
         elif item.driver.upper() == 'CHROME':
             if hasattr(item, 'chrome_path'):
                 if item.config.option.chromeoptions:
-                    options = _create_chrome_options(item.config.option.chromeoptions)
+                    options = _create_chrome_options(item.config.option.chromeoptions, to_capabilities=False)
                     TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path,
                                                     chrome_options=options)
                 else:
                     TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path)
             else:
                 if item.config.option.chromeoptions:
-                    options = _create_chrome_options(item.config.option.chromeoptions)
+                    options = _create_chrome_options(item.config.option.chromeoptions, to_capabilities=False)
                     TestSetup.selenium = webdriver.Chrome(chrome_options=options)
                 else:
                     TestSetup.selenium = webdriver.Chrome()
