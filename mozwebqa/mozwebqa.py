@@ -72,7 +72,7 @@ def pytest_unconfigure(config):
 
 
 def pytest_runtest_setup(item):
-    item.debug = {}
+    item.debug = Debug()
     item.api = item.config.option.api
     item.host = item.config.option.host
     item.port = item.config.option.port
@@ -123,18 +123,10 @@ def pytest_runtest_makereport(__multicall__, item, call):
                 _capture_screenshot(item)
                 _capture_html(item)
                 _capture_log(item)
+                report.sections.append(('pytest-mozwebqa', item.debug.summary()))
             _capture_network_traffic(item)
             report.debug = item.debug
     return report
-
-
-def pytest_terminal_summary(terminalreporter):
-    tr = terminalreporter
-    for replist in tr.stats.values():
-        for rep in replist:
-            if hasattr(rep, 'debug'):
-                if 'url' in rep.debug:
-                    tr.write_line('Failing URL: %s' % (rep.debug['url'][-1]))
 
 
 def pytest_funcarg__mozwebqa(request):
@@ -441,7 +433,7 @@ def _capture_screenshot(item):
         screenshot = TestSetup.selenium.get_screenshot_as_base64()
     else:
         screenshot = TestSetup.selenium.capture_entire_page_screenshot_to_string('')
-    item.debug.setdefault('screenshot', []).extend([screenshot])
+    item.debug['screenshots'].append(screenshot)
 
 
 def _capture_html(item):
@@ -449,19 +441,19 @@ def _capture_html(item):
         html = TestSetup.selenium.page_source.encode('utf-8')
     else:
         html = TestSetup.selenium.get_html_source().encode('utf-8')
-    item.debug.setdefault('html', []).extend([html])
+    item.debug['html'].append(html)
 
 
 def _capture_log(item):
     if item.api.upper() == 'RC':
         log = TestSetup.selenium.get_log().encode('utf-8')
-        item.debug.setdefault('log', []).extend([log])
+        item.debug['logs'].append(logs)
 
 
 def _capture_network_traffic(item):
     if item.api.upper() == 'RC' and item.config.option.capture_network:
         network_traffic = TestSetup.selenium.captureNetworkTraffic('json')
-        item.debug.setdefault('network_traffic', []).extend([network_traffic])
+        item.debug['network_traffic'].append(network_traffic)
 
 
 def _capture_url(item):
@@ -469,7 +461,7 @@ def _capture_url(item):
         url = TestSetup.selenium.current_url
     else:
         url = TestSetup.selenium.get_location()
-    item.debug.setdefault('url', []).extend([url])
+    item.debug['urls'].append(url)
 
 
 def _stop_selenium(item):
@@ -517,30 +509,33 @@ class LogHTML(object):
         if hasattr(report, 'debug') and any(report.debug.values()):
             (relative_path, full_path) = self._debug_paths(testclass, testmethod)
 
-            if 'screenshot' in report.debug:
+            if report.debug['screenshots']:
                 filename = 'screenshot.png'
                 f = open(os.path.join(full_path, filename), 'wb')
-                f.write(base64.decodestring(report.debug['screenshot'][-1]))
+                f.write(base64.decodestring(report.debug['screenshots'][-1]))
                 links.update({'Screenshot': os.path.join(relative_path, filename)})
 
-            if 'html' in report.debug:
+            if report.debug['html']:
                 filename = 'html.txt'
                 f = open(os.path.join(full_path, filename), 'wb')
                 f.write(report.debug['html'][-1])
                 links.update({'HTML': os.path.join(relative_path, filename)})
 
             # Log may contain passwords, etc so we only capture it for tests marked as public
-            if 'log' in report.debug and 'public' in report.keywords:
+            if report.debug['logs'] and 'public' in report.keywords:
                 filename = 'log.txt'
                 f = open(os.path.join(full_path, filename), 'wb')
-                f.write(report.debug['log'][-1])
+                f.write(report.debug['logs'][-1])
                 links.update({'Log': os.path.join(relative_path, filename)})
 
-            if 'network_traffic' in report.debug:
+            if report.debug['network_traffic']:
                 filename = 'networktraffic.json'
                 f = open(os.path.join(full_path, filename), 'wb')
                 f.write(report.debug['network_traffic'][-1])
                 links.update({'Network Traffic': os.path.join(relative_path, filename)})
+
+            if report.debug['urls']:
+                links.update({'Failing URL': report.debug['urls'][-1]})
 
         if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
             links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % report.session_id
@@ -739,6 +734,22 @@ class LogHTML(object):
         html.append('</table></body></html>')
         logfile.write('\n'.join(html))
         logfile.close()
+
+
+class Debug(dict):
+
+    def __init__(self):
+        self['urls'] = []
+        self['screenshots'] = []
+        self['html'] = []
+        self['logs'] = []
+        self['network_traffic'] = []
+
+    def summary(self):
+        summary = []
+        if self['urls']:
+            summary.append('Failing URL: %s' % self['urls'][-1])
+        return '\n'.join(summary)
 
 
 class TestSetup:
