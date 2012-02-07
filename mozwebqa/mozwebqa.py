@@ -184,6 +184,11 @@ def pytest_addoption(parser):
                      dest='firefox_preferences',
                      metavar='str',
                      help='json string of firefox preferences to set (webdriver).')
+    group._addoption('--chromeopts',
+                     action='store',
+                     dest='chromeoptions',
+                     metavar='str',
+                     help='json string of chrome options that will be passed to ChromeDriver (webdriver).')
     group._addoption('--browser',
                      action='store',
                      dest='browser',
@@ -334,6 +339,26 @@ def _create_firefox_profile(preferences):
     else:
         return None
 
+def _create_chrome_options(preferences, to_capabilities=True):
+    options = webdriver.ChromeOptions()
+    options_from_json = json.loads(preferences)
+    if options_from_json.has_key("arguments"):
+        for args_ in options_from_json["arguments"]:
+            options.add_argument(args_)
+
+    if options_from_json.has_key("extensions"):
+        for ext_ in options_from_json["extensions"]:
+            options.add_extension(ext_)
+
+    if options_from_json.has_key("binary_location"):
+        options.binary_location = options_from_json["binary_location"]
+
+    if to_capabilities:
+        return options.to_capabilities()
+    else:
+        return options
+
+
 def _start_selenium(item):
     if item.api == 'webdriver':
         _start_webdriver_client(item)
@@ -354,7 +379,10 @@ def _start_webdriver_client(item):
     else:
         profile = _create_firefox_profile(item.config.option.firefox_preferences)
         if item.driver.upper() == 'REMOTE':
-            capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
+            if item.config.option.chromeoptions:
+                capabilities = _create_chrome_options(item.config.option.chromeoptions)
+            else: 
+                capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
             capabilities['version'] = item.browser_version
             capabilities['platform'] = item.platform.upper()
             executor = 'http://%s:%s/wd/hub' % (item.host, item.port)
@@ -368,9 +396,18 @@ def _start_webdriver_client(item):
 
         elif item.driver.upper() == 'CHROME':
             if hasattr(item, 'chrome_path'):
-                TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path)
+                if item.config.option.chromeoptions:
+                    options = _create_chrome_options(item.config.option.chromeoptions, to_capabilities=False)
+                    TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path,
+                                                    chrome_options=options)
+                else:
+                    TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path)
             else:
-                TestSetup.selenium = webdriver.Chrome()
+                if item.config.option.chromeoptions:
+                    options = _create_chrome_options(item.config.option.chromeoptions, to_capabilities=False)
+                    TestSetup.selenium = webdriver.Chrome(chrome_options=options)
+                else:
+                    TestSetup.selenium = webdriver.Chrome()
 
         elif item.driver.upper() == 'FIREFOX':
             binary = hasattr(item, 'firefox_path') and FirefoxBinary(item.firefox_path) or None

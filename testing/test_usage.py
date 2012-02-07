@@ -209,3 +209,16 @@ class TestUsage:
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message
         assert out == "UsageError: --browser or --environment must be specified when using the 'rc' api."
+
+    def testShouldErrorThatItCantFindTheChromeBinary(self, testdir):
+        file_test = testdir.makepyfile("""
+            def test_selenium(mozwebqa):
+                assert True
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=webdriver',
+            "--browsername=chrome","--browserver=18", "--platform=mac", "--chromeopts={\"binary_location\": \"foo\"}", file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(failed) == 1
+        assert "Could not find Chrome binary at: foo" in failed[0].longrepr.reprcrash.message 
+
+
