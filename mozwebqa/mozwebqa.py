@@ -188,7 +188,7 @@ def pytest_addoption(parser):
                      dest='firefox_preferences',
                      metavar='str',
                      help='json string of firefox preferences to set (webdriver).')
-    group._addoption('--chromeoptions',
+    group._addoption('--chromeopts',
                      action='store',
                      dest='chromeoptions',
                      metavar='str',
@@ -397,14 +397,14 @@ def _start_webdriver_client(item):
         elif item.driver.upper() == 'CHROME':
             if hasattr(item, 'chrome_path'):
                 if item.config.option.chromeoptions:
-                    options = _create_chrome_options()
+                    options = _create_chrome_options(item.config.option.chromeoptions)
                     TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path,
                                                     chrome_options=options)
                 else:
                     TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path)
             else:
                 if item.config.option.chromeoptions:
-                    options = _create_chrome_options()
+                    options = _create_chrome_options(item.config.option.chromeoptions)
                     TestSetup.selenium = webdriver.Chrome(chrome_options=options)
                 else:
                     TestSetup.selenium = webdriver.Chrome()
