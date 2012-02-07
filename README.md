@@ -32,6 +32,7 @@ For full usage details run the following command:
       --port=num           port that selenium server is listening on.
       --driver=str         webdriver implementation.
       --chromepath=path    path to the google chrome driver executable.
+      --chromeopts         json string of chrome options to set (webdriver).
       --firefoxpath=path   path to the target firefox binary.
       --firefoxpref=str    json string of firefox preferences to set (webdriver).
       --browser=str        target browser (standalone rc server).
