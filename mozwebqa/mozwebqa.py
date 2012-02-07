@@ -85,9 +85,13 @@ def pytest_runtest_setup(item):
     item.browser_version = item.config.option.browser_version
     item.platform = item.config.option.platform
     TestSetup.base_url = item.config.option.base_url
-    TestSetup.timeout = item.config.option.timeout
     TestSetup.default_implicit_wait = 10
     item.sauce_labs_credentials_file = item.config.option.sauce_labs_credentials_file
+
+    if item.config.option.api.upper() == 'RC':
+        TestSetup.timeout = item.config.option.timeout * 1000
+    else:
+        TestSetup.timeout = item.config.option.timeout
 
     if item.sauce_labs_credentials_file:
         item.sauce_labs_credentials = _credentials(item.config.option.sauce_labs_credentials_file)
@@ -220,9 +224,9 @@ def pytest_addoption(parser):
     group._addoption('--timeout',
                      action='store',
                      type='int',
-                     default=60000,
+                     default=60,
                      metavar='num',
-                     help='timeout for page loads, etc (selenium rc).')
+                     help='timeout (in seconds) for page loads, etc.')
     group._addoption('--capturenetwork',
                      action='store_true',
                      dest='capture_network',
