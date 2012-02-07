@@ -39,7 +39,7 @@ For full usage details run the following command:
       --browsername=str    target browser name (webdriver).
       --browserver=str     target browser version (webdriver).
       --platform=str       target platform (webdriver).
-      --timeout=num        timeout for page loads, etc (selenium rc).
+      --timeout=num        timeout (in seconds) for page loads, etc.
       --capturenetwork     capture network traffic to test_method_name.json
                            (selenium rc). (disabled by default).
 

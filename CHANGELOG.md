@@ -9,6 +9,7 @@ Change Log
  * Capture log on test failures if test is marked as public
  * Capture HTML and screenshot only on test failures
  * Improved the debug gathering
+ * Timeout value is now expected in seconds
 
 0.7 (beta)
 ----------
