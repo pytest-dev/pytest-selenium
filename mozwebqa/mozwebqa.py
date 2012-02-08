@@ -72,7 +72,7 @@ def pytest_unconfigure(config):
 
 
 def pytest_runtest_setup(item):
-    item.debug = Debug()
+    item.debug = _create_debug()
     item.api = item.config.option.api
     item.host = item.config.option.host
     item.port = item.config.option.port
@@ -123,7 +123,7 @@ def pytest_runtest_makereport(__multicall__, item, call):
                 _capture_screenshot(item)
                 _capture_html(item)
                 _capture_log(item)
-                report.sections.append(('pytest-mozwebqa', item.debug.summary()))
+                report.sections.append(('pytest-mozwebqa', _debug_summary(item.debug)))
             _capture_network_traffic(item)
             report.debug = item.debug
     return report
@@ -261,6 +261,22 @@ def _get_status_code(url):
         return e.getcode()
     except urllib2.URLError, e:
         print 'Unable to connect to: %s' % url
+
+
+def _create_debug():
+    return {
+        'urls': [],
+        'screenshots': [],
+        'html': [],
+        'logs': [],
+        'network_traffic': []}
+
+
+def _debug_summary(debug):
+    summary = []
+    if debug['urls']:
+        summary.append('Failing URL: %s' % debug['urls'][-1])
+    return '\n'.join(summary)
 
 
 def _credentials(credentials_file):
@@ -770,22 +786,6 @@ class LogHTML(object):
         html.append('</table></body></html>')
         logfile.write('\n'.join(html))
         logfile.close()
-
-
-class Debug(dict):
-
-    def __init__(self):
-        self['urls'] = []
-        self['screenshots'] = []
-        self['html'] = []
-        self['logs'] = []
-        self['network_traffic'] = []
-
-    def summary(self):
-        summary = []
-        if self['urls']:
-            summary.append('Failing URL: %s' % self['urls'][-1])
-        return '\n'.join(summary)
 
 
 class TestSetup:
