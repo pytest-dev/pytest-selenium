@@ -294,7 +294,7 @@ def _check_selenium_usage(item):
     '''
         Check that the usage parameters are correct. If wrong throws the appropriate error
     '''
-    if TestSetup.base_url is None:
+    if not TestSetup.base_url:
         raise pytest.UsageError('--baseurl must be specified.')
 
     if item.sauce_labs_credentials_file:
