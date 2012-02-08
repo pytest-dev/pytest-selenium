@@ -10,6 +10,7 @@ Change Log
  * Capture HTML and screenshot only on test failures
  * Improved the debug gathering
  * Timeout value is now expected in seconds
+ * Added support for specifying Google Chrome options
 
 0.7 (beta)
 ----------
