@@ -483,7 +483,7 @@ def _capture_html(item):
 def _capture_log(item):
     if item.api.upper() == 'RC':
         log = TestSetup.selenium.get_log().encode('utf-8')
-        item.debug['logs'].append(logs)
+        item.debug['logs'].append(log)
 
 
 def _capture_network_traffic(item):
