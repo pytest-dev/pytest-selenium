@@ -58,6 +58,6 @@ class TestWebDriverClient:
                 mozwebqa.selenium.get('http://localhost:%s/')
                 assert mozwebqa.selenium.find_element_by_tag_name('h1').text == 'Success!'
         """ % self.webserver.port)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=webdriver', '--browsername=firefox', '--browserver=6', '--platform=mac', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=webdriver', '--driver=firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1

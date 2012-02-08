@@ -65,7 +65,7 @@ class TestCredentials:
                 username: aUsername
                 password: aPassword
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--browsername=firefox', '--browserver=6', '--platform=mac', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--driver=firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
@@ -80,7 +80,7 @@ class TestCredentials:
             default:
                 username: aUsername
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--browsername=firefox', '--browserver=6', '--platform=mac', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--driver=firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         out = failed[0].longrepr.reprcrash.message

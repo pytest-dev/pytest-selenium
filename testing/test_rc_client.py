@@ -60,7 +60,7 @@ class TestRCClient:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--environment=Firefox Beta on Mac OS X', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
@@ -70,6 +70,6 @@ class TestRCClient:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1

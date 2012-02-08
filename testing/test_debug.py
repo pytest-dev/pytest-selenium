@@ -61,7 +61,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         path = self._test_debug_path(str(testdir.tmpdir))
@@ -77,7 +77,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(skipped) == 1
         path = self._test_debug_path(str(testdir.tmpdir))
@@ -91,7 +91,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
         debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
@@ -105,7 +105,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
@@ -119,7 +119,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(skipped) == 1
         debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
@@ -132,7 +132,7 @@ class TestDebug:
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
         """)
         report_subdirectory = 'report'
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=%s/result.html' % report_subdirectory, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=%s/result.html' % report_subdirectory, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         path = self._test_debug_path(os.path.join(str(testdir.tmpdir), report_subdirectory))
@@ -148,7 +148,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         path = self._test_debug_path(str(testdir.tmpdir))
@@ -161,7 +161,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         path = self._test_debug_path(str(testdir.tmpdir))
@@ -175,7 +175,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=result.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=result.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         path = self._test_debug_path(str(testdir.tmpdir))
@@ -187,7 +187,7 @@ class TestDebug:
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--capturenetwork', '--webqareport=index.html', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--capturenetwork', '--webqareport=index.html', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
         path = self._test_debug_path(str(testdir.tmpdir))

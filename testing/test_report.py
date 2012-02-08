@@ -57,7 +57,7 @@ class TestReport:
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
         report = 'result.html'
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=%s' % report, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=%s' % report, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
         report_file = os.path.sep.join([str(testdir.tmpdir), report])
@@ -71,7 +71,7 @@ class TestReport:
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
         """)
         report = 'report/result.html'
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=Firefox Beta on Mac OS X', '--webqareport=%s' % report, file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=rc', '--browser=*firefox', '--webqareport=%s' % report, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
         report_file = os.path.sep.join([str(testdir.tmpdir), report])
