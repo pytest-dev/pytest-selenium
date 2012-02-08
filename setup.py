@@ -6,7 +6,7 @@ setup(
     description='Mozilla WebQA plugin for py.test.',
     author = 'Dave Hunt',
     author_email = 'dhunt@mozilla.com',
-    install_requires = ['pytest>=2.1.3', 'selenium', 'pyyaml'],
+    install_requires = ['pytest>=2.2.3', 'selenium', 'pyyaml'],
     url = 'https://github.com/davehunt/pytest-mozwebqa',
     packages = ['mozwebqa'],
     # the following makes a plugin available to py.test
