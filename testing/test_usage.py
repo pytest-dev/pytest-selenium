@@ -216,7 +216,7 @@ class TestUsage:
                 assert True
         """)
         reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--api=webdriver',
-            "--browsername=chrome","--browserver=18", "--platform=mac", "--chromeopts={\"binary_location\": \"foo\"}", file_test)
+            '--driver=chrome', '--chromepath=/tmp/chromedriver', '--chromeopts={"binary_location":"foo"}', file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         assert "Could not find Chrome binary at: foo" in failed[0].longrepr.reprcrash.message 

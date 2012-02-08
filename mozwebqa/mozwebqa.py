@@ -186,9 +186,9 @@ def pytest_addoption(parser):
                      help='json string of firefox preferences to set (webdriver).')
     group._addoption('--chromeopts',
                      action='store',
-                     dest='chromeoptions',
+                     dest='chrome_options',
                      metavar='str',
-                     help='json string of chrome options that will be passed to ChromeDriver (webdriver).')
+                     help='json string of google chrome options to set (webdriver).')
     group._addoption('--browser',
                      action='store',
                      dest='browser',
@@ -339,24 +339,23 @@ def _create_firefox_profile(preferences):
     else:
         return None
 
-def _create_chrome_options(preferences, to_capabilities=True):
+
+def _create_chrome_options(preferences):
     options = webdriver.ChromeOptions()
     options_from_json = json.loads(preferences)
-    if options_from_json.has_key("arguments"):
-        for args_ in options_from_json["arguments"]:
+
+    if 'arguments' in options_from_json:
+        for args_ in options_from_json['arguments']:
             options.add_argument(args_)
 
-    if options_from_json.has_key("extensions"):
-        for ext_ in options_from_json["extensions"]:
+    if 'extensions' in options_from_json:
+        for ext_ in options_from_json['extensions']:
             options.add_extension(ext_)
 
-    if options_from_json.has_key("binary_location"):
-        options.binary_location = options_from_json["binary_location"]
+    if 'binary_location' in options_from_json:
+        options.binary_location = options_from_json['binary_location']
 
-    if to_capabilities:
-        return options.to_capabilities()
-    else:
-        return options
+    return options
 
 
 def _start_selenium(item):
@@ -379,9 +378,9 @@ def _start_webdriver_client(item):
     else:
         profile = _create_firefox_profile(item.config.option.firefox_preferences)
         if item.driver.upper() == 'REMOTE':
-            if item.config.option.chromeoptions:
-                capabilities = _create_chrome_options(item.config.option.chromeoptions)
-            else: 
+            if item.config.option.chrome_options:
+                capabilities = _create_chrome_options(item.config.option.chrome_options).to_capabilities()
+            else:
                 capabilities = getattr(webdriver.DesiredCapabilities, item.browser_name.upper())
             capabilities['version'] = item.browser_version
             capabilities['platform'] = item.platform.upper()
@@ -395,16 +394,16 @@ def _start_webdriver_client(item):
                 raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (item.browser_name, ', '.join(valid_browsers)))
 
         elif item.driver.upper() == 'CHROME':
-            if hasattr(item, 'chrome_path'):
-                if item.config.option.chromeoptions:
-                    options = _create_chrome_options(item.config.option.chromeoptions, to_capabilities=False)
+            if item.config.option.chrome_path:
+                if item.config.option.chrome_options:
+                    options = _create_chrome_options(item.config.option.chrome_options)
                     TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path,
-                                                    chrome_options=options)
+                                                          chrome_options=options)
                 else:
                     TestSetup.selenium = webdriver.Chrome(executable_path=item.chrome_path)
             else:
-                if item.config.option.chromeoptions:
-                    options = _create_chrome_options(item.config.option.chromeoptions, to_capabilities=False)
+                if item.config.option.chrome_options:
+                    options = _create_chrome_options(item.config.option.chrome_options)
                     TestSetup.selenium = webdriver.Chrome(chrome_options=options)
                 else:
                     TestSetup.selenium = webdriver.Chrome()

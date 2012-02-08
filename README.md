@@ -32,7 +32,7 @@ For full usage details run the following command:
       --port=num           port that selenium server is listening on.
       --driver=str         webdriver implementation.
       --chromepath=path    path to the google chrome driver executable.
-      --chromeopts         json string of chrome options to set (webdriver).
+      --chromeopts=str     json string of google chrome options to set (webdriver).
       --firefoxpath=path   path to the target firefox binary.
       --firefoxpref=str    json string of firefox preferences to set (webdriver).
       --browser=str        target browser (standalone rc server).
@@ -118,6 +118,22 @@ If you're using WebDriver and Firefox it's possible to set custom preferences. T
 ### Example (disable addon compatibility checking)
 
     --firefoxpref='{"extensions.checkCompatibility.nightly":false}'
+
+Setting Google Chrome options
+-----------------------------
+
+If you're using WebDriver and Google Chrome then you can set various options on the command line using a JSON string.
+
+Valid keys are:
+ * arguments: a list of command-line arguments to use when starting Google Chrome.
+ * binary_location: path to the Google Chrome executable to use.
+ * extensions: a list of Google Chrome extensions to install on startup.
+
+For more details on Google Chrome options see: http://code.google.com/p/chromedriver/wiki/CapabilitiesAndSwitches
+
+### Example (set initial homepage)
+
+    --chromeopts='{"arguments":["homepage=http://www.example.com"]}'
 
 Using credentials files
 -----------------------
