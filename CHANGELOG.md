@@ -1,11 +1,11 @@
 Change Log
 ==========
 
-0.8 (unreleased)
+0.8 (beta)
 ----------------
 
  * Added support for privacy markers
- * Capture final URL on test failures (reported in terminal)
+ * Capture final URL on test failures
  * Capture log on test failures if test is marked as public
  * Capture HTML and screenshot only on test failures
  * Improved the debug gathering
