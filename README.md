@@ -8,6 +8,7 @@ Requires:
   * py.test
   * selenium
   * pyyaml
+  * requests
 
 Installation
 ------------
@@ -43,6 +44,11 @@ For full usage details run the following command:
       --timeout=num        timeout (in seconds) for page loads, etc.
       --capturenetwork     capture network traffic to test_method_name.json
                            (selenium rc). (disabled by default).
+
+    safety:
+      --sensitiveurl=str   regular expression for identifying sensitive urls.
+      --destructive        include destructive tests (tests not explicitly marked
+                           as 'nondestructive'). (disabled by default).
 
     credentials:
       --credentials=path  location of yaml file containing user credentials.
@@ -109,6 +115,25 @@ You will need to include the `mozwebqa` in the method signature for your tests, 
         registration_pg = registration_page.RegistrationPage(mozwebqa)
         registration_pg.register_new_user()
         Assert.equal(registration_pg.page_title, "Sign Up Complete!")
+
+Destructive tests
+-----------------
+
+In order to prevent accidentally running destructive tests, only tests marked as nondestructive will run by default. If you want to mark a test as nondestructive then add the appropriate marker as shown below:
+
+### Example (mark test as nondestructive)
+
+    import pytest
+    @pytest.mark.nondestructive
+    def test_safely(self, mozwebqa):
+        ...
+
+If you want to run destructive tests then you can specify the `--destructive` command line option.
+
+Sensitive environments
+----------------------
+
+If running against a sensitive (production) environment any destructive tests will be skipped with an appropriate error message. You can specify a regular expression that matches your sensitive environments using the `--sensitiveurl` command line option.
 
 Setting Firefox preferences
 ---------------------------
