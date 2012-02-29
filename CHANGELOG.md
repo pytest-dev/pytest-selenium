@@ -1,8 +1,14 @@
 Change Log
 ==========
 
+0.9 (beta)
+----------
+
+* Only run nondestructive tests by default
+* Skip destructive tests if running against a sensitive environment
+
 0.8 (beta)
-----------------
+----------
 
  * Added support for privacy markers
  * Capture final URL on test failures
