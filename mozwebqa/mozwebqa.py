@@ -41,6 +41,7 @@ import json
 import os
 import pytest
 import py
+import re
 import time
 import urllib2
 import httplib
@@ -63,12 +64,34 @@ def pytest_configure(config):
             config._html = LogHTML(config)
             config.pluginmanager.register(config._html)
 
+        if not config.option.run_destructive:
+            if config.option.markexpr:
+                config.option.markexpr = 'nondestructive and (%s)' % config.option.markexpr
+            else: 
+                config.option.markexpr = 'nondestructive'
+
 
 def pytest_unconfigure(config):
     html = getattr(config, '_html', None)
     if html:
         del config._html
         config.pluginmanager.unregister(html)
+
+
+#def pytest_collection_modifyitems(session, config, items):
+#    deselected = []
+#    remaining = []
+# 
+#    for item in items:
+#        if ('nondestructive' not in item.keywords) and not \
+#            config.option.run_destructive:
+#            deselected.append(item)
+#        else:
+#            remaining.append(item)
+#
+#    if deselected:
+#        config.hook.pytest_deselected(items=deselected)
+#        items[:] = remaining
 
 
 def pytest_runtest_setup(item):
@@ -87,6 +110,19 @@ def pytest_runtest_setup(item):
     TestSetup.base_url = item.config.option.base_url
     TestSetup.default_implicit_wait = 10
     item.sauce_labs_credentials_file = item.config.option.sauce_labs_credentials_file
+
+    # TODO make sure this acts on the final URL if a redirect occurs
+    sensitive = re.search(item.config.option.sensitive_url, item.config.option.base_url)
+
+    # TODO register the nondestructive marker so that it is documented
+    destructive = 'nondestructive' not in item.keywords
+
+    if (sensitive and destructive):
+        # skip the test with an appropriate message
+        py.test.skip('This test is destructive and the target URL is ' \
+                     'considered a sensitive environment. If this test is ' \
+                     'not destructive, add the \'nondestructive\' marker to ' \
+                     'it.')
 
     if item.config.option.api.upper() == 'RC':
         TestSetup.timeout = item.config.option.timeout * 1000
@@ -229,6 +265,19 @@ def pytest_addoption(parser):
                      dest='build',
                      metavar='str',
                      help='build identifier (for continuous integration).')
+
+    group = parser.getgroup('safety', 'safety')
+    group._addoption('--sensitiveurl',
+                     action='store',
+                     dest='sensitive_url',
+                     default='mozilla\.(com|org)',
+                     metavar='str',
+                     help='regular expression for identifying sensitive urls.')
+    group._addoption('--destructive',
+                     action='store_true',
+                     dest='run_destructive',
+                     default=False,
+                     help='include destructive tests (tests not explicitly marked as \'nondestructive\'). (disabled by default).')
 
     group = parser.getgroup('credentials', 'credentials')
     group._addoption("--credentials",
