@@ -102,7 +102,7 @@ class TestDestructive:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 2
 
-    def testSkipDesctructiveTestsIfForcesAndRunningAgainstSensitiveURL(self, testdir):
+    def testSkipDestructiveTestsIfForcedAndRunningAgainstSensitiveURL(self, testdir):
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.skip_selenium
