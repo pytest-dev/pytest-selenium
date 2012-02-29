@@ -43,10 +43,10 @@ import pytest
 import py
 import re
 import time
-import urllib2
 import httplib
 import ConfigParser
 
+import requests
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import selenium
 from selenium import webdriver
@@ -63,8 +63,8 @@ def pytest_configure(config):
             'accidentally.')
 
         if config.option.base_url:
-            status_code = _get_status_code(config.option.base_url)
-            assert status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, status_code)
+            r = requests.get(config.option.base_url)
+            assert r.status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, r.status_code)
 
         if config.option.webqa_report_path:
             config._html = LogHTML(config)
@@ -84,22 +84,6 @@ def pytest_unconfigure(config):
         config.pluginmanager.unregister(html)
 
 
-#def pytest_collection_modifyitems(session, config, items):
-#    deselected = []
-#    remaining = []
-# 
-#    for item in items:
-#        if ('nondestructive' not in item.keywords) and not \
-#            config.option.run_destructive:
-#            deselected.append(item)
-#        else:
-#            remaining.append(item)
-#
-#    if deselected:
-#        config.hook.pytest_deselected(items=deselected)
-#        items[:] = remaining
-
-
 def pytest_runtest_setup(item):
     item.debug = _create_debug()
     item.api = item.config.option.api
@@ -117,17 +101,23 @@ def pytest_runtest_setup(item):
     TestSetup.default_implicit_wait = 10
     item.sauce_labs_credentials_file = item.config.option.sauce_labs_credentials_file
 
-    # TODO make sure this acts on the final URL if a redirect occurs
-    sensitive = re.search(item.config.option.sensitive_url, item.config.option.base_url)
+    # consider this environment sensitive if the base url or any redirection
+    # history matches the regular expression
+    r = requests.get(item.config.option.base_url)
+    urls = [h.url for h in r.history] + [r.url]
+    matches = [re.search(item.config.option.sensitive_url, u) for u in urls]
+    sensitive = any(matches)
 
     destructive = 'nondestructive' not in item.keywords
 
     if (sensitive and destructive):
+        first_match = matches[next(i for i, match in enumerate(matches) if match)]
+
         # skip the test with an appropriate message
         py.test.skip('This test is destructive and the target URL is ' \
                      'considered a sensitive environment. If this test is ' \
                      'not destructive, add the \'nondestructive\' marker to ' \
-                     'it.')
+                     'it. Sensitive URL: %s' % first_match.string)
 
     if item.config.option.api.upper() == 'RC':
         TestSetup.timeout = item.config.option.timeout * 1000
