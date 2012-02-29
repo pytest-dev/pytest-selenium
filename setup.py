@@ -18,7 +18,7 @@ setup(
     classifiers = [
         'Development Status :: 4 - Beta',
         'Intended Audience :: Developers',
-        'License :: OSI Approved :: Mozilla Public License 1.1 (MPL 1.1)',
+        'License :: OSI Approved :: Mozilla Public License 2.0 (MPL)',
         'Operating System :: POSIX',
         'Operating System :: Microsoft :: Windows',
         'Operating System :: MacOS :: MacOS X',
