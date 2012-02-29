@@ -47,10 +47,13 @@ def teardown_module(module):
     TestTimeout.webserver.stop()
 
 @pytest.mark.skip_selenium
+@pytest.mark.nondestructive
 class TestTimeout:
 
     def testWebDriverWithDefaultTimeout(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_timeout(mozwebqa):
                 assert mozwebqa.timeout == 60
         """)
@@ -60,6 +63,8 @@ class TestTimeout:
 
     def testWebDriverWithCustomTimeout(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_timeout(mozwebqa):
                 assert mozwebqa.timeout == 30
         """)
@@ -69,6 +74,8 @@ class TestTimeout:
 
     def testRCWithDefaultTimeout(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_timeout(mozwebqa):
                 assert mozwebqa.timeout == 60000
         """)
@@ -78,6 +85,8 @@ class TestTimeout:
 
     def testRCWithCustomTimeout(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_timeout(mozwebqa):
                 assert mozwebqa.timeout == 30000
         """)

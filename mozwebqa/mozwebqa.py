@@ -56,6 +56,12 @@ import yaml
 def pytest_configure(config):
     if not hasattr(config, 'slaveinput'):
 
+        config.addinivalue_line(
+            'markers', 'nondestructive: mark the test as nondestructive. ' \
+            'Tests are assumed to be destructive unless this marker is ' \
+            'present. This reduces the risk of running destructive tests ' \
+            'accidentally.')
+
         if config.option.base_url:
             status_code = _get_status_code(config.option.base_url)
             assert status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, status_code)
@@ -114,7 +120,6 @@ def pytest_runtest_setup(item):
     # TODO make sure this acts on the final URL if a redirect occurs
     sensitive = re.search(item.config.option.sensitive_url, item.config.option.base_url)
 
-    # TODO register the nondestructive marker so that it is documented
     destructive = 'nondestructive' not in item.keywords
 
     if (sensitive and destructive):

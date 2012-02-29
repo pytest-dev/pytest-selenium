@@ -42,49 +42,73 @@ from webserver import SimpleWebServer
 def setup_module(module):
     webserver = SimpleWebServer()
     webserver.start()
-    TestCredentials.webserver = webserver
+    TestDestructive.webserver = webserver
 
 
 def teardown_module(module):
-    TestCredentials.webserver.stop()
+    TestDestructive.webserver.stop()
 
 
 @pytest.mark.skip_selenium
 @pytest.mark.nondestructive
-class TestCredentials:
+class TestDestructive:
 
-    def testCredentials(self, testdir):
+    def testDestructiveTestsNotRunByDefault(self, testdir):
+        file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.skip_selenium
+            def test_selenium(mozwebqa):
+                assert True
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(passed) == 0
+
+    def testNonDestructiveTestsRunByDefault(self, testdir):
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.skip_selenium
             @pytest.mark.nondestructive
-            def test_credentials(mozwebqa):
-                assert mozwebqa.credentials['default']['username'] == 'aUsername'
-                assert mozwebqa.credentials['default']['password'] == 'aPassword'
+            def test_selenium(mozwebqa):
+                assert True
         """)
-        credentials = testdir.makefile('.yaml', credentials="""
-            default:
-                username: aUsername
-                password: aPassword
-        """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--driver=firefox', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, file_test)
         passed, skipped, failed = reprec.listoutcomes()
         assert len(passed) == 1
 
-    def testCredentialsKeyError(self, testdir):
+    def testDestructiveTestsRunWhenForced(self, testdir):
+        file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.skip_selenium
+            def test_selenium(mozwebqa):
+                assert True
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--destructive', file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(passed) == 1
+
+    def testBothDestructiveAndNonDestructiveTestsRunWhenForced(self, testdir):
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.skip_selenium
             @pytest.mark.nondestructive
-            def test_credentials(mozwebqa):
-                assert mozwebqa.credentials['default']['password'] == 'aPassword'
+            def test_selenium1(mozwebqa):
+                assert True
+            @pytest.mark.skip_selenium
+            def test_selenium2(mozwebqa):
+                assert True
         """)
-        credentials = testdir.makefile('.yaml', credentials="""
-            default:
-                username: aUsername
-        """)
-        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--credentials=%s' % credentials, '--driver=firefox', file_test)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--destructive', file_test)
         passed, skipped, failed = reprec.listoutcomes()
-        assert len(failed) == 1
-        out = failed[0].longrepr.reprcrash.message
-        assert out == "KeyError: 'password'"
+        assert len(passed) == 2
+
+    def testSkipDesctructiveTestsIfForcesAndRunningAgainstSensitiveURL(self, testdir):
+        file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.skip_selenium
+            def test_selenium(mozwebqa):
+                assert True
+        """)
+        reprec = testdir.inline_run('--baseurl=http://localhost:%s' % self.webserver.port, '--sensitiveurl=localhost', '--destructive', file_test)
+        passed, skipped, failed = reprec.listoutcomes()
+        assert len(skipped) == 1

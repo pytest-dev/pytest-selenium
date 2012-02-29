@@ -50,10 +50,13 @@ def teardown_module(module):
 
 
 @pytest.mark.skip_selenium
+@pytest.mark.nondestructive
 class TestUsage:
 
     def testShouldFailWithoutBaseURL(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -65,6 +68,8 @@ class TestUsage:
 
     def testShouldFailWithoutBrowserNameWhenUsingWebDriverAPI(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -76,6 +81,8 @@ class TestUsage:
 
     def testShouldFailWithoutBrowserVersionWhenUsingWebDriverAPI(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -87,6 +94,8 @@ class TestUsage:
 
     def testShouldFailWithoutPlatformWhenUsingWebDriverAPI(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -98,6 +107,8 @@ class TestUsage:
 
     def testShouldFailWithoutSauceLabsUser(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -112,6 +123,8 @@ class TestUsage:
 
     def testShouldFailWithoutSauceLabsKey(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -126,6 +139,8 @@ class TestUsage:
 
     def testShouldFailWithBlankSauceLabsUser(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -141,6 +156,8 @@ class TestUsage:
 
     def testShouldFailWithBlankSauceLabsKey(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -156,6 +173,8 @@ class TestUsage:
 
     def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -171,6 +190,8 @@ class TestUsage:
 
     def testShouldFailWithoutBrowserVersionWhenUsingSauceWithRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -186,6 +207,8 @@ class TestUsage:
 
     def testShouldFailWithoutPlatformWhenUsingSauceWithRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -201,6 +224,8 @@ class TestUsage:
 
     def testShouldFailWithoutBrowserOrEnvironmentWhenUsingRCAPI(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -212,6 +237,8 @@ class TestUsage:
 
     def testShouldErrorThatItCantFindTheChromeBinary(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_selenium(mozwebqa):
                 assert True
         """)
@@ -220,5 +247,3 @@ class TestUsage:
         passed, skipped, failed = reprec.listoutcomes()
         assert len(failed) == 1
         assert "Could not find Chrome binary at: foo" in failed[0].longrepr.reprcrash.message 
-
-

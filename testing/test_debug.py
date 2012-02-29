@@ -49,6 +49,7 @@ def teardown_module(module):
     TestDebug.webserver.stop()
 
 @pytest.mark.skip_selenium
+@pytest.mark.nondestructive
 class TestDebug:
 
     failure_files = ('screenshot.png', 'html.txt')
@@ -57,6 +58,8 @@ class TestDebug:
 
     def testDebugOnFail(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
@@ -73,6 +76,7 @@ class TestDebug:
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.xfail
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
@@ -87,6 +91,8 @@ class TestDebug:
 
     def testNoDebugOnPass(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
@@ -101,6 +107,7 @@ class TestDebug:
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.xfail
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
@@ -115,6 +122,7 @@ class TestDebug:
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.skipif('True')
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
@@ -127,6 +135,8 @@ class TestDebug:
 
     def testDebugWithReportSubdirectory(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
@@ -144,6 +154,7 @@ class TestDebug:
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.public
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
@@ -157,6 +168,8 @@ class TestDebug:
 
     def testNoLogWhenNotPublic(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
@@ -171,6 +184,7 @@ class TestDebug:
         file_test = testdir.makepyfile("""
             import pytest
             @pytest.mark.private
+            @pytest.mark.nondestructive
             def test_debug(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
@@ -183,6 +197,8 @@ class TestDebug:
 
     def testCaptureNetworkTraffic(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_capture_network_traffic(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'

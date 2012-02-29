@@ -48,10 +48,13 @@ def teardown_module(module):
     TestReport.webserver.stop()
 
 @pytest.mark.skip_selenium
+@pytest.mark.nondestructive
 class TestReport:
 
     def testReportWithoutDirectory(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_report(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
@@ -66,6 +69,8 @@ class TestReport:
 
     def testReportWithDirectory(self, testdir):
         file_test = testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
             def test_report(mozwebqa):
                 mozwebqa.selenium.open('/')
                 assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
