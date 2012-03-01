@@ -775,7 +775,7 @@ class LogHTML(object):
         html.append('.passed {color: green}')
         html.append('.skipped, .xfailed {color: orange}')
         html.append('.error, .failed, .xpassed {color: red}')
-        html.append('.log {display: inline-block; width: 800px; height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space: pre}')
+        html.append('.log {display:inline-block; width:800px; max-height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space:pre-wrap}')
         html.append('.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
         html.append('.screenshot img {width: 320px}')
         html.append('.video {display: inline-block; width: 320px; height: 240px}')
