@@ -1,5 +1,5 @@
 before_script:
-  - curl -k -L -o /tmp/selenium.jar http://selenium.googlecode.com/files/selenium-server-standalone-2.19.0.jar
+  - curl -k -L -o /tmp/selenium.jar http://selenium.googlecode.com/files/selenium-server-standalone-2.20.0.jar
   - java -jar /tmp/selenium.jar > selenium.out &
   - curl -k -L -o /tmp/chromedriver.zip http://chromium.googlecode.com/files/chromedriver_linux32_18.0.995.0.zip
   - unzip /tmp/chromedriver.zip -d /tmp
