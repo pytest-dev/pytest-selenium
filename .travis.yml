@@ -1,0 +1,25 @@
+before_script:
+  - curl -k -L -o /tmp/selenium.jar http://selenium.googlecode.com/files/selenium-server-standalone-2.19.0.jar
+  - curl -k -L -o /tmp/chromedriver.zip http://chromium.googlecode.com/files/chromedriver_linux32_18.0.995.0.zip
+  - unzip /tmp/chromedriver.zip
+  - java -jar /tmp/selenium.jar &
+  - sh -e /etc/init.d/xvfb start
+
+language: python
+python:
+  - 2.6
+  - 2.7
+
+install: python setup.py install
+
+script: py.test testing/
+
+env:
+  - DISPLAY=':99.0'
+
+notifications:
+  email:
+    - dave.hunt@gmail.com
+  irc:
+    - "irc.mozilla.org#automation"
+    - "irc.mozilla.org#mozwebqa"
