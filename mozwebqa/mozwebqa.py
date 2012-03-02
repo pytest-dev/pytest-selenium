@@ -72,10 +72,12 @@ def pytest_runtest_setup(item):
 
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
-    r = requests.get(item.config.option.base_url)
-    urls = [h.url for h in r.history] + [r.url]
-    matches = [re.search(item.config.option.sensitive_url, u) for u in urls]
-    sensitive = any(matches)
+    sensitive = False
+    if item.config.option.base_url:
+        r = requests.get(item.config.option.base_url)
+        urls = [h.url for h in r.history] + [r.url]
+        matches = [re.search(item.config.option.sensitive_url, u) for u in urls]
+        sensitive = any(matches)
 
     destructive = 'nondestructive' not in item.keywords
 
