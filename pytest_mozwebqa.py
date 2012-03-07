@@ -22,6 +22,8 @@ from selenium import webdriver
 import yaml
 
 
+__version__ = '0.9'
+
 def pytest_configure(config):
     if not hasattr(config, 'slaveinput'):
 

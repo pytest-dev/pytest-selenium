@@ -1,3 +1,7 @@
 *.swp
+*.komodoproject
 *.pyc
 *.egg-info/
+build
+dist
+results
