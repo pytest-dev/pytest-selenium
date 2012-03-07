@@ -99,7 +99,7 @@ def main(argv=None):
 
     opts, args = parser.parse_args(argv[1:])
     if args:
-        parser.error("wrong number of arguments") # Will exit
+        parser.error("wrong number of arguments")  # Will exit
 
     server = SimpleWebServer(opts.port)
     server.start()
