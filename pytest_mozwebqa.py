@@ -384,9 +384,9 @@ def _start_selenium(item):
 def _start_webdriver_client(item):
     if item.config.option.sauce_labs_credentials_file:
         capabilities = _get_common_sauce_settings(item)
-        capabilities.update({'platform': item.config.option.browser_name,
+        capabilities.update({'platform': item.config.option.platform,
                          'browserName': item.config.option.browser_name,
-                         'version': item.config.option.browser_name})
+                         'version': item.config.option.browser_version})
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor=executor,
                                               desired_capabilities=capabilities)
