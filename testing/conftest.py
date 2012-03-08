@@ -22,11 +22,13 @@ def pytest_sessionfinish(session, exitstatus):
 
 
 def pytest_internalerror(excrepr):
-    WebServer.webserver.stop()
+    if hasattr(WebServer, 'webserver'):
+        WebServer.webserver.stop()
 
 
 def pytest_keyboard_interrupt(excinfo):
-    WebServer.webserver.stop()
+    if hasattr(WebServer, 'webserver'):
+        WebServer.webserver.stop()
 
 
 class WebServer:
