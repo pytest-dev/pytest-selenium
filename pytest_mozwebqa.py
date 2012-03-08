@@ -4,13 +4,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import cgi
-import base64
 import json
 import pytest
 import py
 import re
-import httplib
 import ConfigParser
 
 import requests
@@ -263,18 +260,6 @@ def split_class_and_test_names(nodeid):
     classname = ".".join(classnames)
     name = names[-1]
     return (classname, name)
-
-
-def _get_status_code(url):
-    try:
-        connection = urllib2.urlopen(url)
-        status_code = connection.getcode()
-        connection.close()
-        return status_code
-    except urllib2.HTTPError, e:
-        return e.getcode()
-    except urllib2.URLError, e:
-        print 'Unable to connect to: %s' % url
 
 
 def _create_debug():
