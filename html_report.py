@@ -12,6 +12,9 @@ import os
 import py
 import time
 
+from py.xml import html
+from py.xml import raw
+
 
 class HTMLReport(object):
 
@@ -21,9 +24,8 @@ class HTMLReport(object):
         self._debug_path = 'debug'
         self.config = config
         self.test_logs = []
-        self.errors = self.errors = 0
+        self.errors = self.failed = 0
         self.passed = self.skipped = 0
-        self.failed = self.failed = 0
         self.xfailed = self.xpassed = 0
 
     def _debug_paths(self, testclass, testmethod):
@@ -78,64 +80,94 @@ class HTMLReport(object):
             links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % report.session_id
 
         links_html = []
-        self.test_logs.append('<tr class="%s"><td class="%s">%s</td><td>%s</td><td>%s</td><td>%is</td>' % (result.lower(), result.lower(), result, testclass, testmethod, round(time)))
-        self.test_logs.append('<td>')
         for name, path in links.iteritems():
-            links_html.append('<a href="%s">%s</a>' % (path, name))
-        self.test_logs.append(', '.join(links_html))
-        self.test_logs.append('</td>')
+            links_html.append(html.a(name, href=path))
+            links_html.append(' ')
+
+        self.test_logs.append(
+            html.tr(html.td(result,
+                            class_=result.lower()),
+                    html.td(testclass),
+                    html.td(testmethod),
+                    html.td(round(time)),
+                    html.td(*links_html),
+                    class_=result.lower()))
 
         if not 'Passed' in result:
-            self.test_logs.append('<tr class="additional"><td colspan="5">')
+            additional_html = []
 
             if report.longrepr:
-                self.test_logs.append('<div class="log">')
+                log = html.div(class_='log')
                 for line in str(report.longrepr).splitlines():
                     separator = line.startswith('_ ' * 10)
                     if separator:
-                        self.test_logs.append(line[:80])
+                        log.append(line[:80])
                     else:
                         exception = line.startswith("E   ")
                         if exception:
-                            self.test_logs.append('<span class="error">%s</span>' % cgi.escape(line))
+                            log.append(html.span(raw(cgi.escape(line)),
+                                                 class_='error'))
                         else:
-                            self.test_logs.append(cgi.escape(line))
-                    self.test_logs.append('<br />')
-                self.test_logs.append('</div>')
+                            log.append(raw(cgi.escape(line)))
+                    log.append(html.br())
+                additional_html.append(log)
 
             if 'Screenshot' in links:
-                self.test_logs.append('<div class="screenshot"><a href="%s"><img src="%s" /></a></div>' % (links['Screenshot'], links['Screenshot']))
+                additional_html.append(
+                    html.div(
+                        html.a(html.img(src=links['Screenshot']),
+                               href=links['Screenshot']),
+                        class_='screenshot'))
 
             if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
-                self.test_logs.append('<div id="player%s" class="video">' % report.session_id)
-                self.test_logs.append('<object width="100%" height="100%" type="application/x-shockwave-flash" data="http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729" name="player_api" id="player_api">')
-                self.test_logs.append('<param value="true" name="allowfullscreen">')
-                self.test_logs.append('<param value="always" name="allowscriptaccess">')
-                self.test_logs.append('<param value="high" name="quality">')
-                self.test_logs.append('<param value="true" name="cachebusting">')
-                self.test_logs.append('<param value="#000000" name="bgcolor">')
                 flash_vars = 'config={\
-                    &quot;clip&quot;:{\
-                        &quot;url&quot;:&quot;http%%3A//saucelabs.com/jobs/%s/video.flv&quot;,\
-                        &quot;provider&quot;:&quot;streamer&quot;,\
-                        &quot;autoPlay&quot;:false,\
-                        &quot;autoBuffering&quot;:true},\
-                    &quot;plugins&quot;:{\
-                        &quot;streamer&quot;:{\
-                            &quot;url&quot;:&quot;http://saucelabs.com/flowplayer/flowplayer.pseudostreaming-3.2.5.swf&quot;},\
-                        &quot;controls&quot;:{\
-                            &quot;mute&quot;:false,\
-                            &quot;volume&quot;:false,\
-                            &quot;backgroundColor&quot;:&quot;rgba(0, 0, 0, 0.7)&quot;}},\
-                    &quot;playerId&quot;:&quot;player%s&quot;,\
-                    &quot;playlist&quot;:[{\
-                        &quot;url&quot;:&quot;http%%3A//saucelabs.com/jobs/%s/video.flv&quot;,\
-                        &quot;provider&quot;:&quot;streamer&quot;,\
-                        &quot;autoPlay&quot;:false,\
-                        &quot;autoBuffering&quot;:true}]}' % (report.session_id, report.session_id, report.session_id)
-                self.test_logs.append('<param value="%s" name="flashvars">' % flash_vars.replace(' ', ''))
-                self.test_logs.append('</object></div>')
-            self.test_logs.append('</td></tr>')
+                    "clip":{\
+                        "url":"http%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
+                        "provider":"streamer",\
+                        "autoPlay":false,\
+                        "autoBuffering":true},\
+                    "plugins":{\
+                        "streamer":{\
+                            "url":"http://saucelabs.com/flowplayer/flowplayer.pseudostreaming-3.2.5.swf"},\
+                        "controls":{\
+                            "mute":false,\
+                            "volume":false,\
+                            "backgroundColor":"rgba(0, 0, 0, 0.7)"}},\
+                    "playerId":"player%(session_id)s",\
+                    "playlist":[{\
+                        "url":"http%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
+                        "provider":"streamer",\
+                        "autoPlay":false,\
+                        "autoBuffering":true}]}' % {'session_id': report.session_id}
+
+                additional_html.append(
+                    html.div(
+                        html.object(
+                            html.param(value='true',
+                                       name='allowfullscreen'),
+                            html.param(value='always',
+                                       name='allowscriptaccess'),
+                            html.param(value='high',
+                                       name='quality'),
+                            html.param(value='true',
+                                       name='cachebusting'),
+                            html.param(value='#000000',
+                                       name='bgcolor'),
+                            html.param(value=flash_vars.replace(' ', ''),
+                                       name='flashvars'),
+                            width='100%',
+                            height='100%',
+                            type='application/x-shockwave-flash',
+                            data='http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729',
+                            name='player_api',
+                            id='player_api'),
+                        id='player%s' % report.session_id,
+                        class_='video'))
+
+            self.test_logs.append(
+                html.tr(
+                    html.td(*additional_html,
+                            colspan='5')))
 
     def _make_report_dir(self):
         logfile_dirname = os.path.dirname(self.logfile)
@@ -233,41 +265,51 @@ class HTMLReport(object):
             'Credentials': self.config.option.credentials_file,
             'Sauce Labs Credentials': self.config.option.sauce_labs_credentials_file}
 
-        html = []
-        html.append('<html><head><title>Test Report</title><style>')
-        html.append('body {font-family: Helvetica, Arial, sans-serif; font-size: 12px}')
-        html.append('a {color: #999}')
-        html.append('h2 {font-size: 16px}')
-        html.append('table {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}')
-        html.append('#configuration tr:nth-child(odd) {background-color: #f6f6f6}')
-        html.append('th, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}')
-        html.append('th {font-weight: bold}')
-        html.append('tr.passed, tr.skipped, tr.xfailed, tr.error, tr.failed, tr.xpassed {color: inherit}')
-        html.append('tr.passed + tr.additional {display: none}')
-        html.append('.passed {color: green}')
-        html.append('.skipped, .xfailed {color: orange}')
-        html.append('.error, .failed, .xpassed {color: red}')
-        html.append('.log {display:inline-block; width:800px; max-height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space:pre-wrap}')
-        html.append('.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}')
-        html.append('.screenshot img {width: 320px}')
-        html.append('.video {display: inline-block; width: 320px; height: 240px}')
-        html.append('</style></head><body>')
-        html.append('<h2>Configuration</h2>')
-        html.append('<table id="configuration">')
-        html.append('\n'.join(['<tr><td>%s</td><td>%s</td></tr>' % (k, v) for k, v in sorted(configuration.items()) if v]))
-        html.append('</table>')
-        html.append('<h2>Summary</h2>')
-        html.append('<p>%i tests ran in %i seconds.<br />' % (numtests, suite_time_delta))
-        html.append('<span class="passed">%i passed</span>, ' % self.passed)
-        html.append('<span class="skipped">%i skipped</span>, ' % self.skipped)
-        html.append('<span class="failed">%i failed</span>, ' % self.failed)
-        html.append('<span class="error">%i errors</span>.<br />' % self.errors)
-        html.append('<span class="skipped">%i expected failures</span>, ' % self.xfailed)
-        html.append('<span class="failed">%i unexpected passes</span>.</p>' % self.xpassed)
-        html.append('<h2>Results</h2>')
-        html.append('<table id="results">')
-        html.append('<tr><th>Result</th><th>Class</th><th>Name</th><th>Duration</th><th>Links</th></tr>')
-        html.append(''.join(self.test_logs))
-        html.append('</table></body></html>')
-        logfile.write('\n'.join(html))
+        doc = html.html(
+            html.head(
+                html.title('Test Report'),
+                html.style(raw(
+                    'body {font-family: Helvetica, Arial, sans-serif; font-size: 12px}\n'
+                    'a {color: #999}\n'
+                    'h2 {font-size: 16px}\n'
+                    'table {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}\n'
+                    '#configuration tr:nth-child(odd) {background-color: #f6f6f6}\n'
+                    'th, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}\n'
+                    'th {font-weight: bold}\n'
+                    'tr.passed, tr.skipped, tr.xfailed, tr.error, tr.failed, tr.xpassed {color: inherit}\n'
+                    'tr.passed + tr.additional {display: none}\n'
+                    '.passed {color: green}\n'
+                    '.skipped, .xfailed {color: orange}\n'
+                    '.error, .failed, .xpassed {color: red}\n'
+                    '.log {display:inline-block; width:800px; max-height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space:pre-wrap}\n'
+                    '.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}\n'
+                    '.screenshot img {width: 320px}\n'
+                    '.video {display: inline-block; width: 320px; height: 240px}'))),
+            html.body(
+                html.h2('Configuration'),
+                html.table(
+                    [html.tr(html.td(k), html.td(v)) for k, v in sorted(configuration.items()) if v],
+                    id='configuration'),
+                html.h2('Summary'),
+                html.p(
+                    '%i tests ran in %i seconds.' % (numtests, suite_time_delta),
+                    html.br(),
+                    html.span('%i passed' % self.passed, class_='passed'), ', ',
+                    html.span('%i skipped' % self.skipped, class_='skipped'), ', ',
+                    html.span('%i failed' % self.failed, class_='failed'), ', ',
+                    html.span('%i errors' % self.errors, class_='error'), '.',
+                    html.br(),
+                    html.span('%i expected failures' % self.xfailed, class_='skipped'), ', ',
+                    html.span('%i unexpected passes' % self.xpassed, class_='failed'), '.'),
+                html.h2('Results'),
+                html.table(
+                    html.tr(html.th('Result'),
+                            html.th('Class'),
+                            html.th('Name'),
+                            html.th('Duration'),
+                            html.th('Links')),
+                    *self.test_logs,
+                    id='results')))
+
+        logfile.write(doc.unicode(indent=2))
         logfile.close()
