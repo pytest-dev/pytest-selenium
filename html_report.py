@@ -96,29 +96,6 @@ class HTMLReport(object):
         if not 'Passed' in result:
             additional_html = []
 
-            if report.longrepr:
-                log = html.div(class_='log')
-                for line in str(report.longrepr).splitlines():
-                    separator = line.startswith('_ ' * 10)
-                    if separator:
-                        log.append(line[:80])
-                    else:
-                        exception = line.startswith("E   ")
-                        if exception:
-                            log.append(html.span(raw(cgi.escape(line)),
-                                                 class_='error'))
-                        else:
-                            log.append(raw(cgi.escape(line)))
-                    log.append(html.br())
-                additional_html.append(log)
-
-            if 'Screenshot' in links:
-                additional_html.append(
-                    html.div(
-                        html.a(html.img(src=links['Screenshot']),
-                               href=links['Screenshot']),
-                        class_='screenshot'))
-
             if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
                 flash_vars = 'config={\
                     "clip":{\
@@ -163,6 +140,29 @@ class HTMLReport(object):
                             id='player_api'),
                         id='player%s' % report.session_id,
                         class_='video'))
+
+            if 'Screenshot' in links:
+                additional_html.append(
+                    html.div(
+                        html.a(html.img(src=links['Screenshot']),
+                               href=links['Screenshot']),
+                        class_='screenshot'))
+
+            if report.longrepr:
+                log = html.div(class_='log')
+                for line in str(report.longrepr).splitlines():
+                    separator = line.startswith('_ ' * 10)
+                    if separator:
+                        log.append(line[:80])
+                    else:
+                        exception = line.startswith("E   ")
+                        if exception:
+                            log.append(html.span(raw(cgi.escape(line)),
+                                                 class_='error'))
+                        else:
+                            log.append(raw(cgi.escape(line)))
+                    log.append(html.br())
+                additional_html.append(log)
 
             self.test_logs.append(
                 html.tr(
@@ -268,23 +268,25 @@ class HTMLReport(object):
         doc = html.html(
             html.head(
                 html.title('Test Report'),
-                html.style(raw(
-                    'body {font-family: Helvetica, Arial, sans-serif; font-size: 12px}\n'
-                    'a {color: #999}\n'
-                    'h2 {font-size: 16px}\n'
-                    'table {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}\n'
-                    '#configuration tr:nth-child(odd) {background-color: #f6f6f6}\n'
-                    'th, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}\n'
-                    'th {font-weight: bold}\n'
+                html.style(
+                    'body {font-family: Helvetica, Arial, sans-serif; font-size: 12px}\n',
+                    'body * {box-sizing: -moz-border-box; box-sizing: -webkit-border-box; box-sizing: border-box}\n',
+                    'a {color: #999}\n',
+                    'h2 {font-size: 16px}\n',
+                    'table {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}\n',
+                    '#configuration tr:nth-child(odd) {background-color: #f6f6f6}\n',
+                    '#results {width:100%}\n',
+                    'th, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}\n',
+                    'th {font-weight: bold}\n',
                     'tr.passed, tr.skipped, tr.xfailed, tr.error, tr.failed, tr.xpassed {color: inherit}\n'
-                    'tr.passed + tr.additional {display: none}\n'
-                    '.passed {color: green}\n'
-                    '.skipped, .xfailed {color: orange}\n'
-                    '.error, .failed, .xpassed {color: red}\n'
-                    '.log {display:inline-block; width:800px; max-height: 230px; overflow-y: scroll; color: black; border: 1px solid #E6E6E6; padding: 5px; background-color: #E6E6E6; font-family: "Courier New", Courier, monospace; white-space:pre-wrap}\n'
-                    '.screenshot {display: inline-block; border: 1px solid #E6E6E6; width: 320px; height: 240px; overflow: hidden}\n'
-                    '.screenshot img {width: 320px}\n'
-                    '.video {display: inline-block; width: 320px; height: 240px}'))),
+                    'tr.passed + tr.additional {display: none}\n',
+                    '.passed {color: green}\n',
+                    '.skipped, .xfailed {color: orange}\n',
+                    '.error, .failed, .xpassed {color: red}\n',
+                    '.log:only-child {height: inherit}\n',
+                    raw('.log {background-color: #e6e6e6; border: 1px solid #e6e6e6; color: black; display: block; font-family: "Courier New", Courier, monospace; height: 230px; overflow-y: scroll; padding: 5px; white-space:pre-wrap}\n'),
+                    '.screenshot, .video {border: 1px solid #e6e6e6; float:right; height:240px; margin-left:5px; overflow:hidden; width:320px}\n',
+                    '.screenshot img {width: 320px}')),
             html.body(
                 html.h2('Configuration'),
                 html.table(
