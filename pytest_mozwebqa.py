@@ -487,10 +487,11 @@ def _capture_screenshot(item):
 
 def _capture_html(item):
     if item.config.option.api.upper() == 'WEBDRIVER':
-        html = TestSetup.selenium.page_source.encode('utf-8')
+        html = TestSetup.selenium.page_source
     else:
-        html = TestSetup.selenium.get_html_source().encode('utf-8')
-    item.debug['html'].append(html)
+        html = TestSetup.selenium.get_html_source()
+    if html:
+        item.debug['html'].append(html.encode('utf-8'))
 
 
 def _capture_log(item):
