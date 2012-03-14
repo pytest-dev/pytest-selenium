@@ -139,24 +139,24 @@ def pytest_addoption(parser):
                      action='store',
                      default=config.get('DEFAULT', 'api'),
                      metavar='api',
-                     help="version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver (the default).")
+                     help="version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver. (default: %default)")
     group._addoption('--host',
                      action='store',
                      default='localhost',
                      metavar='str',
-                     help='host that selenium server is listening on.')
+                     help='host that selenium server is listening on. (default: %default)')
     group._addoption('--port',
                      action='store',
                      type='int',
                      default=4444,
                      metavar='num',
-                     help='port that selenium server is listening on.')
+                     help='port that selenium server is listening on. (default: %default)')
     group._addoption('--driver',
                      action='store',
                      dest='driver',
                      default='Remote',
                      metavar='str',
-                     help='webdriver implementation.')
+                     help='webdriver implementation. (default: %default)')
     group._addoption('--chromepath',
                      action='store',
                      dest='chrome_path',
@@ -206,12 +206,12 @@ def pytest_addoption(parser):
                      type='int',
                      default=60,
                      metavar='num',
-                     help='timeout (in seconds) for page loads, etc.')
+                     help='timeout (in seconds) for page loads, etc. (default: %default)')
     group._addoption('--capturenetwork',
                      action='store_true',
                      dest='capture_network',
                      default=False,
-                     help='capture network traffic to test_method_name.json (selenium rc). (disabled by default).')
+                     help='capture network traffic to test_method_name.json (selenium rc). (default: %default)')
     group._addoption('--build',
                      action='store',
                      dest='build',
@@ -224,12 +224,12 @@ def pytest_addoption(parser):
                      dest='sensitive_url',
                      default='mozilla\.(com|org)',
                      metavar='str',
-                     help='regular expression for identifying sensitive urls.')
+                     help='regular expression for identifying sensitive urls. (default: %default)')
     group._addoption('--destructive',
                      action='store_true',
                      dest='run_destructive',
                      default=False,
-                     help='include destructive tests (tests not explicitly marked as \'nondestructive\'). (disabled by default).')
+                     help='include destructive tests (tests not explicitly marked as \'nondestructive\'). (default: %default)')
 
     group = parser.getgroup('credentials', 'credentials')
     group._addoption("--credentials",
@@ -249,7 +249,7 @@ def pytest_addoption(parser):
                     dest='webqa_report_path',
                     metavar='path',
                     default='results/index.html',
-                    help="create mozilla webqa custom report file at given path. default is 'results/index.html'")
+                    help='create mozilla webqa custom report file at given path. (default: %default)')
 
 
 def split_class_and_test_names(nodeid):

@@ -27,15 +27,15 @@ For full usage details run the following command:
     $ py.test --help
 
     reporting:
-       --webqareport=path  create mozilla webqa custom report file at given path. default is 'results/index.html'
+       --webqareport=path  create mozilla webqa custom report file at given path. (default: results/index.html)
 
     selenium:
       --baseurl=url        base url for the application under test.
       --api=api            version of selenium api to use. 'rc' uses selenium rc.
-                           'webdriver' uses selenium webdriver (the default).
-      --host=str           host that selenium server is listening on.
-      --port=num           port that selenium server is listening on.
-      --driver=str         webdriver implementation.
+                           'webdriver' uses selenium webdriver. (default: webdriver)
+      --host=str           host that selenium server is listening on. (default: localhost)
+      --port=num           port that selenium server is listening on. (default: 4444)
+      --driver=str         webdriver implementation. (default: Remote)
       --chromepath=path    path to the google chrome driver executable.
       --chromeopts=str     json string of google chrome options to set (webdriver).
       --firefoxpath=path   path to the target firefox binary.
@@ -45,14 +45,14 @@ For full usage details run the following command:
       --browsername=str    target browser name (webdriver).
       --browserver=str     target browser version (webdriver).
       --platform=str       target platform (webdriver).
-      --timeout=num        timeout (in seconds) for page loads, etc.
+      --timeout=num        timeout (in seconds) for page loads, etc. (default: 60)
       --capturenetwork     capture network traffic to test_method_name.json
-                           (selenium rc). (disabled by default).
+                           (selenium rc). (default: False)
 
     safety:
-      --sensitiveurl=str   regular expression for identifying sensitive urls.
+      --sensitiveurl=str   regular expression for identifying sensitive urls. (default: mozilla\.(com|org))
       --destructive        include destructive tests (tests not explicitly marked
-                           as 'nondestructive'). (disabled by default).
+                           as 'nondestructive'). (default: False)
 
     credentials:
       --credentials=path  location of yaml file containing user credentials.
