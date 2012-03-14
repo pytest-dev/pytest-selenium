@@ -157,6 +157,11 @@ def pytest_addoption(parser):
                      default='Remote',
                      metavar='str',
                      help='webdriver implementation. (default: %default)')
+    group._addoption('--capabilities',
+                     action='store',
+                     dest='capabilities',
+                     metavar='str',
+                     help='json string of additional capabilties to set (webdriver).')
     group._addoption('--chromepath',
                      action='store',
                      dest='chrome_path',
@@ -387,6 +392,8 @@ def _start_webdriver_client(item):
         capabilities.update({'platform': item.config.option.platform,
                          'browserName': item.config.option.browser_name,
                          'version': item.config.option.browser_version})
+        if item.config.option.capabilities:
+            capabilities.update(json.loads(item.config.option.capabilities))
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (item.sauce_labs_credentials['username'], item.sauce_labs_credentials['api-key'])
         TestSetup.selenium = webdriver.Remote(command_executor=executor,
                                               desired_capabilities=capabilities)
@@ -397,8 +404,10 @@ def _start_webdriver_client(item):
                 capabilities = _create_chrome_options(item.config.option.chrome_options).to_capabilities()
             else:
                 capabilities = getattr(webdriver.DesiredCapabilities, item.config.option.browser_name.upper())
-            capabilities['version'] = item.config.option.browser_name
-            capabilities['platform'] = item.config.option.browser_name.upper()
+            capabilities['version'] = item.config.option.browser_version
+            capabilities['platform'] = item.config.option.platform.upper()
+            if item.config.option.capabilities:
+                capabilities.update(json.loads(item.config.option.capabilities))
             executor = 'http://%s:%s/wd/hub' % (item.config.option.host, item.config.option.port)
             try:
                 TestSetup.selenium = webdriver.Remote(command_executor=executor,

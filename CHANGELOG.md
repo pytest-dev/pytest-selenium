@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+1.0
+---
+
+* Allow additional capabilities to be specified on the command line
+
 0.9 (beta)
 ----------
 
