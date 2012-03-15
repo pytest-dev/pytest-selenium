@@ -6,14 +6,14 @@
 
 import base64
 import cgi
-import httplib
-import json
 import os
 import py
 import time
 
 from py.xml import html
 from py.xml import raw
+
+import sauce_labs
 
 
 class HTMLReport(object):
@@ -77,7 +77,10 @@ class HTMLReport(object):
                 links.update({'Failing URL': report.debug['urls'][-1]})
 
         if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
-            links['Sauce Labs Job'] = 'http://saucelabs.com/jobs/%s' % report.session_id
+            self.sauce_labs_job = sauce_labs.Job(report.session_id)
+
+        if hasattr(self, 'sauce_labs_job'):
+            links['Sauce Labs Job'] = self.sauce_labs_job.url
 
         links_html = []
         for name, path in links.iteritems():
@@ -96,50 +99,8 @@ class HTMLReport(object):
         if not 'Passed' in result:
             additional_html = []
 
-            if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
-                flash_vars = 'config={\
-                    "clip":{\
-                        "url":"http%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
-                        "provider":"streamer",\
-                        "autoPlay":false,\
-                        "autoBuffering":true},\
-                    "plugins":{\
-                        "streamer":{\
-                            "url":"http://saucelabs.com/flowplayer/flowplayer.pseudostreaming-3.2.5.swf"},\
-                        "controls":{\
-                            "mute":false,\
-                            "volume":false,\
-                            "backgroundColor":"rgba(0, 0, 0, 0.7)"}},\
-                    "playerId":"player%(session_id)s",\
-                    "playlist":[{\
-                        "url":"http%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
-                        "provider":"streamer",\
-                        "autoPlay":false,\
-                        "autoBuffering":true}]}' % {'session_id': report.session_id}
-
-                additional_html.append(
-                    html.div(
-                        html.object(
-                            html.param(value='true',
-                                       name='allowfullscreen'),
-                            html.param(value='always',
-                                       name='allowscriptaccess'),
-                            html.param(value='high',
-                                       name='quality'),
-                            html.param(value='true',
-                                       name='cachebusting'),
-                            html.param(value='#000000',
-                                       name='bgcolor'),
-                            html.param(value=flash_vars.replace(' ', ''),
-                                       name='flashvars'),
-                            width='100%',
-                            height='100%',
-                            type='application/x-shockwave-flash',
-                            data='http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729',
-                            name='player_api',
-                            id='player_api'),
-                        id='player%s' % report.session_id,
-                        class_='video'))
+            if hasattr(self, 'sauce_labs_job'):
+                additional_html.append(self.sauce_labs_job.video_html)
 
             if 'Screenshot' in links:
                 additional_html.append(
@@ -175,21 +136,6 @@ class HTMLReport(object):
             os.makedirs(logfile_dirname)
         return logfile_dirname
 
-    def _send_result_to_sauce(self, report):
-        if hasattr(report, 'session_id'):
-            try:
-                result = {'passed': report.passed or (report.failed and 'xfail' in report.keywords)}
-                credentials = _credentials(self.config.option.sauce_labs_credentials_file)
-                basic_authentication = ('%s:%s' % (credentials['username'], credentials['api-key'])).encode('base64')[:-1]
-                connection = httplib.HTTPConnection('saucelabs.com')
-                connection.request('PUT', '/rest/v1/%s/jobs/%s' % (credentials['username'], report.session_id),
-                                   json.dumps(result),
-                                   headers={'Authorization': 'Basic %s' % basic_authentication,
-                                            'Content-Type': 'text/json'})
-                connection.getresponse()
-            except:
-                pass
-
     def append_pass(self, report):
         self.passed += 1
         self._appendrow('Passed', report)
@@ -215,9 +161,6 @@ class HTMLReport(object):
             self.skipped += 1
 
     def pytest_runtest_logreport(self, report):
-        if self.config.option.sauce_labs_credentials_file:
-            self._send_result_to_sauce(report)
-
         if report.passed:
             if report.when == 'call':
                 self.append_pass(report)
