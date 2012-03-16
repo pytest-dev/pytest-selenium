@@ -50,7 +50,8 @@ class Client(selenium_client.Client):
         config = ConfigParser.ConfigParser(defaults={'tags': ''})
         config.read('mozwebqa.cfg')
         tags = config.get('DEFAULT', 'tags').split(',')
-        tags.extend([mark for mark in self.keywords.keys() if not mark.startswith('test')])
+        from _pytest.mark import MarkInfo
+        tags.extend([mark for mark in self.keywords.keys() if isinstance(self.keywords[mark], MarkInfo)])
         return {'build': self.build or None,
                 'name': self.test_id,
                 'tags': tags,
