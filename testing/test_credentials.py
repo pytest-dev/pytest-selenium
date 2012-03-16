@@ -4,7 +4,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import py
 import pytest
 
 pytestmark = pytestmark = [pytest.mark.skip_selenium,
@@ -43,10 +42,11 @@ def testCredentialsKeyError(testdir):
         default:
             username: aUsername
     """)
-    result = testdir.runpytest('--baseurl=http://localhost:8000',
-                               '--credentials=%s' % credentials,
-                               '--driver=firefox')
-    assert result.ret == 0
-    py.test.raises(Exception,
-                   result.stdout.fnmatch_lines,
-                   ["KeyError: 'password'"])
+    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+                                '--credentials=%s' % credentials,
+                                '--driver=firefox',
+                                file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(failed) == 1
+    out = failed[0].longrepr.reprcrash.message
+    assert out == "KeyError: 'password'"
