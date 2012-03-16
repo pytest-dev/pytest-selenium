@@ -39,23 +39,6 @@ def testShouldFailWithoutBrowserNameWhenUsingWebDriverAPI(testdir):
                   "the 'webdriver' api."
 
 
-def testShouldFailWithoutBrowserVersionWhenUsingWebDriverAPI(testdir):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-                                '--browsername=firefox',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(failed) == 1
-    out = failed[0].longrepr.reprcrash.message
-    assert out == 'UsageError: --browserver must be specified when using ' \
-                  "the 'webdriver' api."
-
-
 def testShouldFailWithoutPlatformWhenUsingWebDriverAPI(testdir):
     file_test = testdir.makepyfile("""
         import pytest
@@ -172,29 +155,6 @@ def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(testdir):
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
     assert out == 'UsageError: --browsername must be specified when using ' \
-                  "the 'rc' api with sauce labs."
-
-
-def testShouldFailWithoutBrowserVersionWhenUsingSauceWithRCAPI(testdir):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
-        username: username
-        api-key: api-key
-    """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-                                '--api=rc',
-                                '--saucelabs=%s' % sauce_labs_credentials,
-                                '--browsername=firefox',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(failed) == 1
-    out = failed[0].longrepr.reprcrash.message
-    assert out == 'UsageError: --browserver must be specified when using ' \
                   "the 'rc' api with sauce labs."
 
 
