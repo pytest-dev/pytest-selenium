@@ -42,9 +42,6 @@ class Client(selenium_client.Client):
         if not self.browser_name:
             raise pytest.UsageError("--browsername must be specified when using the 'rc' api with sauce labs.")
 
-        if not self.browser_version:
-            raise pytest.UsageError("--browserver must be specified when using the 'rc' api with sauce labs.")
-
         if not self.platform:
             raise pytest.UsageError("--platform must be specified when using the 'rc' api with sauce labs.")
 
@@ -63,8 +60,9 @@ class Client(selenium_client.Client):
     def start_webdriver_client(self):
         capabilities = self.common_settings
         capabilities.update({'platform': self.platform,
-                             'browserName': self.browser_name,
-                             'version': self.browser_version})
+                             'browserName': self.browser_name})
+        if self.browser_version:
+            capabilities['version'] = self.browser_version
         if self.capabilities:
             capabilities.update(json.loads(self.capabilities))
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
@@ -78,8 +76,9 @@ class Client(selenium_client.Client):
         settings.update({'username': self.credentials['username'],
                          'access-key': self.credentials['api-key'],
                          'os': self.platform,
-                         'browser': self.browser_name,
-                         'browser-version': self.browser_version})
+                         'browser': self.browser_name})
+        if self.browser_version:
+            capabilities['browser-version'] = self.browser_version
         self.selenium = selenium('ondemand.saucelabs.com', '80',
                                  json.dumps(settings),
                                  self.base_url)

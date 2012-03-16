@@ -62,15 +62,12 @@ class Client(object):
         if self.driver.upper() == 'REMOTE':
             if not self.browser_name:
                 raise pytest.UsageError("--browsername must be specified when using the 'webdriver' api.")
-    
-            if not self.browser_version:
-                raise pytest.UsageError("--browserver must be specified when using the 'webdriver' api.")
-    
+
             if not self.platform:
                 raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
 
     def check_rc_usage(self):
-        if not(self.browser or self.environment):
+        if not self.browser:
             raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
 
     def start(self):
@@ -87,10 +84,11 @@ class Client(object):
         profile = self.create_firefox_profile(self.firefox_preferences)
         if self.driver.upper() == 'REMOTE':
             if self.chrome_options:
-                capabilities = create_chrome_options(self.chrome_options).to_capabilities()
+                capabilities = self.create_chrome_options(self.chrome_options).to_capabilities()
             else:
                 capabilities = getattr(webdriver.DesiredCapabilities, self.browser_name.upper())
-            capabilities['version'] = self.browser_version
+            if self.browser_version:
+                capabilities['version'] = self.browser_version
             capabilities['platform'] = self.platform.upper()
             if self.capabilities:
                 capabilities.update(json.loads(self.capabilities))
@@ -106,14 +104,14 @@ class Client(object):
         elif self.driver.upper() == 'CHROME':
             if self.chrome_path:
                 if self.chrome_options:
-                    options = _create_chrome_options(self.chrome_options)
+                    options = self.create_chrome_options(self.chrome_options)
                     self.selenium = webdriver.Chrome(executable_path=self.chrome_path,
-                                                chrome_options=options)
+                                                     chrome_options=options)
                 else:
                     self.selenium = webdriver.Chrome(executable_path=self.chrome_path)
             else:
                 if self.chrome_options:
-                    options = create_chrome_options(self.chrome_options)
+                    options = self.create_chrome_options(self.chrome_options)
                     self.selenium = webdriver.Chrome(chrome_options=options)
                 else:
                     self.selenium = webdriver.Chrome()
