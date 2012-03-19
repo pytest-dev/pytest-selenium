@@ -45,6 +45,7 @@ class Client(object):
         self.capture_network = options.capture_network
         self.default_implicit_wait = 10
         self.sauce_labs_credentials = options.sauce_labs_credentials_file
+        self.assume_untrusted = options.assume_untrusted
 
     def check_usage(self):
         self.check_basic_usage()
@@ -142,16 +143,12 @@ class Client(object):
             return self.selenium.get_eval('selenium.sessionId')
 
     def create_firefox_profile(self, preferences):
+        profile = webdriver.FirefoxProfile()
         if preferences:
-            profile = webdriver.FirefoxProfile()
-            for key, value in json.loads(preferences).items():
-                if isinstance(value, unicode):
-                    value = str(value)
-                profile.set_preference(key, value)
-            profile.update_preferences()
-            return profile
-        else:
-            return None
+            [profile.set_preference(k, v) for k, v in json.loads(preferences).items()]
+        profile.assume_untrusted_cert_issuer = self.assume_untrusted
+        profile.update_preferences()
+        return profile
 
     def create_chrome_options(self, preferences):
         options = webdriver.ChromeOptions()

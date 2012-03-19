@@ -47,13 +47,12 @@ For full usage details run the following command:
       --browserver=str     target browser version (webdriver).
       --platform=str       target platform (webdriver).
       --timeout=num        timeout (in seconds) for page loads, etc. (default: 60)
-      --capturenetwork     capture network traffic to test_method_name.json
-                           (selenium rc). (default: False)
+      --capturenetwork     capture network traffic to test_method_name.json (selenium rc). (default: False)
+      --untrusted          assume that all certificate issuers are untrusted. (default: False)
 
     safety:
       --sensitiveurl=str   regular expression for identifying sensitive urls. (default: mozilla\.(com|org))
-      --destructive        include destructive tests (tests not explicitly marked
-                           as 'nondestructive'). (default: False)
+      --destructive        include destructive tests (tests not explicitly marked as 'nondestructive'). (default: False)
 
     credentials:
       --credentials=path  location of yaml file containing user credentials.

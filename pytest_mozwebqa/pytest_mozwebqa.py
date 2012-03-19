@@ -23,7 +23,7 @@ def pytest_configure(config):
             'accidentally.')
 
         if config.option.base_url:
-            r = requests.get(config.option.base_url)
+            r = requests.get(config.option.base_url, verify=False)
             assert r.status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, r.status_code)
 
         if config.option.webqa_report_path:
@@ -58,7 +58,7 @@ def pytest_runtest_setup(item):
     # history matches the regular expression
     sensitive = False
     if TestSetup.base_url:
-        r = requests.get(TestSetup.base_url)
+        r = requests.get(TestSetup.base_url, verify=False)
         urls = [h.url for h in r.history] + [r.url]
         matches = [re.search(item.config.option.sensitive_url, u) for u in urls]
         sensitive = any(matches)
@@ -241,6 +241,11 @@ def pytest_addoption(parser):
                      dest='build',
                      metavar='str',
                      help='build identifier (for continuous integration).')
+    group._addoption('--untrusted',
+                     action='store_true',
+                     dest='assume_untrusted',
+                     default=False,
+                     help='assume that all certificate issuers are untrusted. (default: %default)')
 
     group = parser.getgroup('safety', 'safety')
     group._addoption('--sensitiveurl',
