@@ -214,4 +214,4 @@ def testShouldErrorThatItCantFindTheChromeBinary(testdir):
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
-    assert "Could not find Chrome binary at: foo" in failed[0].longrepr.reprcrash.message 
+    assert "Could not find Chrome binary at: foo" in failed[0].longrepr.reprcrash.message

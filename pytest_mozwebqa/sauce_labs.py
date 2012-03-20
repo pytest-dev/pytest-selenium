@@ -34,7 +34,7 @@ class Client(selenium_client.Client):
 
         if not self.credentials['username']:
             raise pytest.UsageError('username must be specified in the sauce labs credentials file.')
-    
+
         if not self.credentials['api-key']:
             raise pytest.UsageError('api-key must be specified in the sauce labs credentials file.')
 

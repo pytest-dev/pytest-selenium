@@ -30,7 +30,7 @@ def pytest_configure(config):
         if not config.option.run_destructive:
             if config.option.markexpr:
                 config.option.markexpr = 'nondestructive and (%s)' % config.option.markexpr
-            else: 
+            else:
                 config.option.markexpr = 'nondestructive'
 
 
