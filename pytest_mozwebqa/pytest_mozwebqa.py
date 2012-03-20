@@ -22,10 +22,6 @@ def pytest_configure(config):
             'present. This reduces the risk of running destructive tests ' \
             'accidentally.')
 
-        if config.option.base_url:
-            r = requests.get(config.option.base_url, verify=False)
-            assert r.status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (config.option.base_url, r.status_code)
-
         if config.option.webqa_report_path:
             from html_report import HTMLReport
             config._html = HTMLReport(config)
@@ -43,6 +39,12 @@ def pytest_unconfigure(config):
     if html:
         del config._html
         config.pluginmanager.unregister(html)
+
+
+def pytest_sessionstart(session):
+    if session.config.option.base_url:
+        r = requests.get(session.config.option.base_url, verify=False)
+        assert r.status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (session.config.option.base_url, r.status_code)
 
 
 def pytest_runtest_setup(item):
