@@ -169,11 +169,14 @@ class Client(object):
 
     @property
     def screenshot(self):
-        if self.webdriver:
-            screenshot = self.selenium.get_screenshot_as_base64()
-        else:
-            screenshot = self.selenium.capture_entire_page_screenshot_to_string('')
-        return screenshot
+        try:
+            if self.webdriver:
+                screenshot = self.selenium.get_screenshot_as_base64()
+            else:
+                screenshot = self.selenium.capture_entire_page_screenshot_to_string('')
+            return screenshot
+        except:
+            return None
 
     @property
     def html(self):
