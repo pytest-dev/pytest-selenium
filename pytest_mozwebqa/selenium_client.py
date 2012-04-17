@@ -180,39 +180,47 @@ class Client(object):
 
     @property
     def html(self):
-        if self.webdriver:
-            html = self.selenium.page_source
-        else:
-            html = self.selenium.get_html_source()
-        if html:
+        try:
+            if self.webdriver:
+                html = self.selenium.page_source
+            else:
+                html = self.selenium.get_html_source()
             return html.encode('utf-8')
+        except:
+            return None
 
     @property
     def log(self):
-        if self.rc:
-            return self.selenium.get_log().encode('utf-8')
+        try:
+            if self.rc:
+                return self.selenium.get_log().encode('utf-8')
+        except:
+            return None
 
     @property
     def network_traffic(self):
-        if self.rc and self.capture_network:
-            return self.selenium.captureNetworkTraffic('json')
+        try:
+            if self.rc and self.capture_network:
+                return self.selenium.captureNetworkTraffic('json')
+        except:
+            return None
 
     @property
     def url(self):
-        if self.webdriver:
-            url = self.selenium.current_url
-        else:
-            url = self.selenium.get_location()
-        return url
+        try:
+            if self.webdriver:
+                url = self.selenium.current_url
+            else:
+                url = self.selenium.get_location()
+            return url
+        except:
+            return None
 
     def stop(self):
-        if self.webdriver:
-            try:
+        try:
+            if self.webdriver:
                 self.selenium.quit()
-            except:
-                pass
-        else:
-            try:
+            else:
                 self.selenium.stop()
-            except:
-                pass
+        except:
+            pass
