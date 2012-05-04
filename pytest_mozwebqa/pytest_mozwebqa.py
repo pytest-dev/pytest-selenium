@@ -103,6 +103,7 @@ def pytest_runtest_setup(item):
         TestSetup.timeout = TestSetup.selenium_client.timeout
         TestSetup.default_implicit_wait = TestSetup.selenium_client.default_implicit_wait
     else:
+        TestSetup.timeout = item.config.option.timeout
         TestSetup.selenium = None
 
 
