@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+1.0 (unreleased)
+----------------
+
+* Added support for Opera
+
 0.10 (beta)
 -----------
 

@@ -204,6 +204,11 @@ def pytest_addoption(parser):
                      dest='chrome_options',
                      metavar='str',
                      help='json string of google chrome options to set (webdriver).')
+    group._addoption('--operapath',
+                     action='store',
+                     dest='opera_path',
+                     metavar='path',
+                     help='path to the opera driver.')
     group._addoption('--browser',
                      action='store',
                      dest='browser',

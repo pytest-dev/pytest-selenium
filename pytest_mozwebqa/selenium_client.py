@@ -31,6 +31,7 @@ class Client(object):
             self.chrome_options = options.chrome_options
             self.firefox_path = options.firefox_path
             self.firefox_preferences = options.firefox_preferences
+            self.opera_path = options.opera_path
             self.timeout = options.timeout
 
             if self.driver.upper() == 'REMOTE':
@@ -124,6 +125,8 @@ class Client(object):
                 firefox_profile=profile)
         elif self.driver.upper() == 'IE':
             self.selenium = webdriver.Ie()
+        elif self.driver.upper() == 'OPERA':
+            self.selenium = webdriver.Opera(executable_path=self.opera_path)
         else:
             getattr(webdriver, self.driver)()
 

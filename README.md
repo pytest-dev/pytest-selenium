@@ -41,6 +41,7 @@ For full usage details run the following command:
       --chromeopts=str     json string of google chrome options to set (webdriver).
       --firefoxpath=path   path to the target firefox binary.
       --firefoxpref=str    json string of firefox preferences to set (webdriver).
+      --operapath=path     path to the opera driver.
       --browser=str        target browser (standalone rc server).
       --environment=str    target environment (grid rc).
       --browsername=str    target browser name (webdriver).
