@@ -99,9 +99,8 @@ class HTMLReport(object):
         if not 'Passed' in result:
             additional_html = []
 
-            #py 1.4.7 has a bug that prevents <object> in html
-            #if hasattr(self, 'sauce_labs_job'):
-            #    additional_html.append(self.sauce_labs_job.video_html)
+            if hasattr(self, 'sauce_labs_job'):
+                additional_html.append(self.sauce_labs_job.video_html)
 
             if 'Screenshot' in links:
                 additional_html.append(
