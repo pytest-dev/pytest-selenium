@@ -42,7 +42,7 @@ def pytest_unconfigure(config):
 
 
 def pytest_sessionstart(session):
-    if session.config.option.base_url:
+    if session.config.option.base_url and not session.config.option.collectonly:
         r = requests.get(session.config.option.base_url, verify=False)
         assert r.status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (session.config.option.base_url, r.status_code)
 
