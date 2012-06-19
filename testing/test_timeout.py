@@ -35,7 +35,7 @@ def testWebDriverWithCustomTimeout(testdir):
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
                                 '--api=webdriver',
                                 '--driver=firefox',
-                                '--timeout=30',
+                                '--webqatimeout=30',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
@@ -66,7 +66,7 @@ def testRCWithCustomTimeout(testdir):
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
                                 '--api=rc',
                                 '--browser=*firefox',
-                                '--timeout=30',
+                                '--webqatimeout=30',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1

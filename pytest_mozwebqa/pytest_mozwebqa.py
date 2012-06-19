@@ -103,7 +103,7 @@ def pytest_runtest_setup(item):
         TestSetup.timeout = TestSetup.selenium_client.timeout
         TestSetup.default_implicit_wait = TestSetup.selenium_client.default_implicit_wait
     else:
-        TestSetup.timeout = item.config.option.timeout
+        TestSetup.timeout = item.config.option.webqatimeout
         TestSetup.selenium = None
 
 
@@ -233,7 +233,7 @@ def pytest_addoption(parser):
                      action='store',
                      metavar='str',
                      help='target platform (webdriver).')
-    group._addoption('--timeout',
+    group._addoption('--webqatimeout',
                      action='store',
                      type='int',
                      default=60,

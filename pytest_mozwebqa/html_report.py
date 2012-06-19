@@ -203,7 +203,7 @@ class HTMLReport(object):
             'Google Chrome Path': self.config.option.chrome_path,
             'Selenium Server': server,
             'Browser': browser,
-            'Timeout': self.config.option.timeout,
+            'Timeout': self.config.option.webqatimeout,
             'Capture Network Traffic': self.config.option.capture_network,
             'Credentials': self.config.option.credentials_file,
             'Sauce Labs Credentials': self.config.option.sauce_labs_credentials_file}

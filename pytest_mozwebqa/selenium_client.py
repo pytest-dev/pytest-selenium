@@ -32,7 +32,7 @@ class Client(object):
             self.firefox_path = options.firefox_path
             self.firefox_preferences = options.firefox_preferences
             self.opera_path = options.opera_path
-            self.timeout = options.timeout
+            self.timeout = options.webqatimeout
 
             if self.driver.upper() == 'REMOTE':
                 self.browser_name = options.browser_name
@@ -41,7 +41,7 @@ class Client(object):
 
         if self.rc:
             self.browser = options.environment or options.browser
-            self.timeout = options.timeout * 1000
+            self.timeout = options.webqatimeout * 1000
 
         self.capture_network = options.capture_network
         self.default_implicit_wait = 10
