@@ -47,7 +47,7 @@ For full usage details run the following command:
       --browsername=str    target browser name (webdriver).
       --browserver=str     target browser version (webdriver).
       --platform=str       target platform (webdriver).
-      --timeout=num        timeout (in seconds) for page loads, etc. (default: 60)
+      --webqatimeout=num   timeout (in seconds) for page loads, etc. (default: 60)
       --capturenetwork     capture network traffic to test_method_name.json (selenium rc). (default: False)
       --untrusted          assume that all certificate issuers are untrusted. (default: False)
 
