@@ -1,3 +1,3 @@
-__version__ = '0.10'
+__version__ = '1.0'
 
 from pytest_mozwebqa import *

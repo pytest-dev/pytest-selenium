@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pytest-mozwebqa',
-      version='0.10',
+      version='1.0',
       description='Mozilla WebQA plugin for py.test.',
       author='Dave Hunt',
       author_email='dhunt@mozilla.com',

@@ -1,10 +1,12 @@
 Change Log
 ==========
 
-1.0 (unreleased)
+1.0
 ----------------
 
+* First stable release
 * Added support for Opera
+* Compatible with pytest-timeout
 
 0.10 (beta)
 -----------
