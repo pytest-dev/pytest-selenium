@@ -6,6 +6,7 @@
 
 import base64
 import cgi
+import datetime
 import os
 import py
 import time
@@ -194,6 +195,7 @@ class HTMLReport(object):
                   self.config.option.environment or \
                   self.config.option.browser
 
+        generated = datetime.datetime.now()
         configuration = {
             'Base URL': self.config.option.base_url,
             'Build': self.config.option.build,
@@ -208,6 +210,7 @@ class HTMLReport(object):
             'Credentials': self.config.option.credentials_file,
             'Sauce Labs Credentials': self.config.option.sauce_labs_credentials_file}
 
+        import pytest_mozwebqa
         doc = html.html(
             html.head(
                 html.title('Test Report'),
@@ -231,6 +234,10 @@ class HTMLReport(object):
                     '.screenshot, .video {border: 1px solid #e6e6e6; float:right; height:240px; margin-left:5px; overflow:hidden; width:320px}\n',
                     '.screenshot img {width: 320px}')),
             html.body(
+                html.p('Report generated on %s at %s by pytest-mozwebqa %s' % (
+                    generated.strftime('%d-%b-%Y'),
+                    generated.strftime('%H:%M:%S'),
+                    pytest_mozwebqa.__version__)),
                 html.h2('Configuration'),
                 html.table(
                     [html.tr(html.td(k), html.td(v)) for k, v in sorted(configuration.items()) if v],
