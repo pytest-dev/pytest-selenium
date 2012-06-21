@@ -79,7 +79,7 @@ class Client(selenium_client.Client):
                          'os': self.platform,
                          'browser': self.browser_name})
         if self.browser_version:
-            capabilities['browser-version'] = self.browser_version
+            settings['browser-version'] = self.browser_version
         self.selenium = selenium('ondemand.saucelabs.com', '80',
                                  json.dumps(settings),
                                  self.base_url)
