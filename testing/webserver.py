@@ -32,10 +32,11 @@ class HtmlOnlyHandler(BaseHTTPRequestHandler):
 
     def do_GET(self):
         """GET method handler."""
+
         self.send_response(200)
         self.send_header('Content-type', 'text/html')
         self.end_headers()
-        self.wfile.write('<html><body><h1>Success!</h1></body></html>')
+        self.wfile.write('<html><body><h1>Success!</h1><a href="#">Anchor text</a></body></html>')
 
     def log_message(self, format, *args):
         """Override default to avoid trashing stderr"""

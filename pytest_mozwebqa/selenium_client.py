@@ -31,6 +31,7 @@ class Client(object):
             self.chrome_options = options.chrome_options
             self.firefox_path = options.firefox_path
             self.firefox_preferences = options.firefox_preferences
+            self.profile_path = options.profile_path
             self.opera_path = options.opera_path
             self.timeout = options.webqatimeout
 
@@ -89,7 +90,7 @@ class Client(object):
             else:
                 capabilities = getattr(webdriver.DesiredCapabilities, self.browser_name.upper())
             if self.browser_name.upper() == 'FIREFOX':
-                profile = self.create_firefox_profile(self.firefox_preferences)
+                profile = self.create_firefox_profile(self.firefox_preferences, self.profile_path)
             else:
                 profile = None
             if self.browser_version:
@@ -123,7 +124,7 @@ class Client(object):
 
         elif self.driver.upper() == 'FIREFOX':
             binary = self.firefox_path and FirefoxBinary(self.firefox_path) or None
-            profile = self.create_firefox_profile(self.firefox_preferences)
+            profile = self.create_firefox_profile(self.firefox_preferences, self.profile_path)
             self.selenium = webdriver.Firefox(
                 firefox_binary=binary,
                 firefox_profile=profile)
@@ -149,8 +150,8 @@ class Client(object):
         else:
             return self.selenium.get_eval('selenium.sessionId')
 
-    def create_firefox_profile(self, preferences):
-        profile = webdriver.FirefoxProfile()
+    def create_firefox_profile(self, preferences, profile_path):
+        profile = webdriver.FirefoxProfile(profile_path)
         if preferences:
             [profile.set_preference(k, v) for k, v in json.loads(preferences).items()]
         profile.assume_untrusted_cert_issuer = self.assume_untrusted
