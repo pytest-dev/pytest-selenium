@@ -12,7 +12,7 @@ import requests
 
 import credentials
 
-__version__ = '1.0'
+__version__ = '1.1'
 
 def pytest_configure(config):
     if not hasattr(config, 'slaveinput'):
