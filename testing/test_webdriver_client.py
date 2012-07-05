@@ -31,7 +31,11 @@ def testSpecifyingFirefoxProfile(testdir):
         The profile changes the colors in the browser, which are then reflected when calling
         value_of_css_property.
     """
-    path_to_profile_folder = _createProfileFolder()
+    profile = testdir.tmpdir.mkdir('profile')
+    profile.join('prefs.js').write(
+        'user_pref("browser.anchor_color", "#FF69B4");'
+        'user_pref("browser.display.foreground_color", "#FF0000");'
+        'user_pref("browser.display.use_document_colors", false);')
     file_test = testdir.makepyfile("""
         import pytest, time
         @pytest.mark.nondestructive
@@ -47,7 +51,7 @@ def testSpecifyingFirefoxProfile(testdir):
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
         '--api=webdriver',
         '--driver=firefox',
-        '--profilepath=' + path_to_profile_folder,
+        '--profilepath=%s' % profile,
         file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
@@ -58,7 +62,11 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir):
         value_of_css_property. The test checks that the color of the h1 tag is overridden by
         the profile, while the color of the a tag is overridden by the preference.
     """
-    path_to_profile_folder = _createProfileFolder()
+    profile = testdir.tmpdir.mkdir('profile')
+    profile.join('prefs.js').write(
+        'user_pref("browser.anchor_color", "#FF69B4");'
+        'user_pref("browser.display.foreground_color", "#FF0000");'
+        'user_pref("browser.display.use_document_colors", false);')
     file_test = testdir.makepyfile("""
         import pytest, time
         @pytest.mark.nondestructive
@@ -75,24 +83,7 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir):
         '--api=webdriver',
         '--driver=firefox',
         '--firefoxpref=''{"browser.anchor_color":"#FF0000"}''',
-        '--profilepath=' + path_to_profile_folder,
+        '--profilepath=%s' % profile,
         file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
-
-def _createProfileFolder():
-    import os
-    path_to_profile_folder = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'firefox_profile')
-    if not os.path.exists(path_to_profile_folder):
-        os.makedirs(path_to_profile_folder)
-    prefs = [
-        'user_pref("browser.anchor_color", "#FF69B4");',
-        'user_pref("browser.display.background_color", "#FFFF66");',
-        'user_pref("browser.display.foreground_color", "#FF0000");',
-        'user_pref("browser.display.use_document_colors", false);',
-        'user_pref("browser.visited_color", "#FF99FF");'
-    ]
-    with open(os.path.join(path_to_profile_folder, 'prefs.js'), 'w') as prefs_js:
-        prefs_js.writelines(prefs)
-    return path_to_profile_folder
-
