@@ -205,6 +205,11 @@ def pytest_addoption(parser):
                      dest='profile_path',
                      metavar='str',
                      help='path to the firefox profile to use (webdriver).')
+    group._addoption('--extensionpaths',
+                     action='store',
+                     dest='extension_paths',
+                     metavar='str',
+                     help='comma delimited list of paths to firefox extensions to install (webdriver).')
     group._addoption('--chromeopts',
                      action='store',
                      dest='chrome_options',

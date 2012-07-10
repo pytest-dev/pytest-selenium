@@ -32,6 +32,7 @@ class Client(object):
             self.firefox_path = options.firefox_path
             self.firefox_preferences = options.firefox_preferences
             self.profile_path = options.profile_path
+            self.extension_paths = options.extension_paths
             self.opera_path = options.opera_path
             self.timeout = options.webqatimeout
 
@@ -91,6 +92,7 @@ class Client(object):
                 capabilities = getattr(webdriver.DesiredCapabilities, self.browser_name.upper())
             if self.browser_name.upper() == 'FIREFOX':
                 profile = self.create_firefox_profile(self.firefox_preferences, self.profile_path)
+                self.add_extensions_to_profile(profile, self.extension_paths)
             else:
                 profile = None
             if self.browser_version:
@@ -125,6 +127,7 @@ class Client(object):
         elif self.driver.upper() == 'FIREFOX':
             binary = self.firefox_path and FirefoxBinary(self.firefox_path) or None
             profile = self.create_firefox_profile(self.firefox_preferences, self.profile_path)
+            self.add_extensions_to_profile(profile, self.extension_paths)
             self.selenium = webdriver.Firefox(
                 firefox_binary=binary,
                 firefox_profile=profile)
@@ -157,6 +160,12 @@ class Client(object):
         profile.assume_untrusted_cert_issuer = self.assume_untrusted
         profile.update_preferences()
         return profile
+
+    def add_extensions_to_profile(self, profile, extensions):
+        if extensions != None:
+            extension_list = extensions.split(',')
+            for extension in extension_list:
+                profile.add_extension(extension)
 
     def create_chrome_options(self, preferences):
         options = webdriver.ChromeOptions()
