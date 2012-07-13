@@ -42,7 +42,7 @@ For full usage details run the following command:
       --firefoxpath=path   path to the target firefox binary.
       --firefoxpref=str    json string of firefox preferences to set (webdriver).
       --profilepath=path   path to the firefox profile directory (webdriver).
-      --extensionpaths=list    comma delimited list of paths to firefox extensions to install (webdriver).
+      --extension=path     path to browser extension to install (webdriver).
       --operapath=path     path to the opera driver.
       --browser=str        target browser (standalone rc server).
       --environment=str    target environment (grid rc).
@@ -177,7 +177,7 @@ If you're using WebDriver and Firefox it's possible to install extensions when s
 
 ### Example (install the extensions located at /path/to/ext1/ext1.xpi and /path/to/ext2/ext2.xpi)
 
-    --extensionpaths='/path/to/ext1/ext1.xpi, /path/to/ext2/ext2.xpi'
+    --extension='/path/to/ext1/ext1.xpi' --extension='/path/to/ext2/ext2.xpi'
 
 Setting Google Chrome options
 -----------------------------

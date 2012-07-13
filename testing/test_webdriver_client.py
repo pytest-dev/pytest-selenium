@@ -88,26 +88,24 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir):
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
-def testAddingFirefoxExtensions(testdir):
-    """Test that a list of firefox extensions are added when starting firefox.
-        This is just a visual test for now, to verify that the feature works. It is not
-         suitable for inclusion in an automated test suite.
-    """
+def testAddingFirefoxExtension(testdir):
+    """Test that a firefox extension can be added when starting firefox."""
     import os
-    path_to_extensions_folder = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'extensions')
-    extensions = os.path.join(path_to_extensions_folder, 'firebug-1.9.2-fx.xpi') + ',' \
-        + os.path.join(path_to_extensions_folder, 'noscript-2.4.7.xpi')
+    path_to_extensions_folder = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'testing')
+    extension = os.path.join(path_to_extensions_folder, 'empty.xpi')
     file_test = testdir.makepyfile("""
         import pytest, time
+        from selenium.webdriver.common.by import By
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
-            mozwebqa.selenium.get('http://localhost:8000/')
-            time.sleep(5)
+            mozwebqa.selenium.get('about:support')
+            extensions = mozwebqa.selenium.find_element(By.ID, 'extensions-tbody').text
+            assert 'Test Extension (empty)' in extensions
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
         '--api=webdriver',
         '--driver=firefox',
-        '--extensionpaths=''%s''' % extensions,
+        '--extension=''%s''' % extension,
         file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1

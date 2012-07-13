@@ -163,8 +163,7 @@ class Client(object):
 
     def add_extensions_to_profile(self, profile, extensions):
         if extensions != None:
-            extension_list = extensions.split(',')
-            for extension in extension_list:
+            for extension in extensions:
                 profile.add_extension(extension)
 
     def create_chrome_options(self, preferences):
