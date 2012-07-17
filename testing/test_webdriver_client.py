@@ -95,11 +95,10 @@ def testAddingFirefoxExtension(testdir):
     extension = os.path.join(path_to_extensions_folder, 'empty.xpi')
     file_test = testdir.makepyfile("""
         import pytest, time
-        from selenium.webdriver.common.by import By
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
             mozwebqa.selenium.get('about:support')
-            extensions = mozwebqa.selenium.find_element(By.ID, 'extensions-tbody').text
+            extensions = mozwebqa.selenium.find_element_by_id('extensions-tbody').text
             assert 'Test Extension (empty)' in extensions
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
