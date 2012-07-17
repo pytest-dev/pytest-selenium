@@ -5,6 +5,7 @@ Change Log
 ---
 
 * Added support for specifying a Firefox profile
+* Added support for specifying Firefox extensions
 
 1.0
 ---
