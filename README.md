@@ -173,7 +173,7 @@ If you're using WebDriver and Firefox it's possible to specify an existing Firef
 Installing Firefox extensions
 -----------------------------
 
-If you're using WebDriver and Firefox it's possible to install extensions when starting Firefox.
+If you're using WebDriver and Firefox it's possible to install extensions when starting the browser.
 
 ### Example (install the extensions located at /path/to/ext1/ext1.xpi and /path/to/ext2/ext2.xpi)
 
@@ -187,13 +187,21 @@ If you're using WebDriver and Google Chrome then you can set various options on 
 Valid keys are:
  * arguments: a list of command-line arguments to use when starting Google Chrome.
  * binary_location: path to the Google Chrome executable to use.
- * extensions: a list of Google Chrome extensions to install on startup.
 
 For more details on Google Chrome options see: http://code.google.com/p/chromedriver/wiki/CapabilitiesAndSwitches
 
 ### Example (set initial homepage)
 
     --chromeopts='{"arguments":["homepage=http://www.example.com"]}'
+
+Installing Google Chrome extensions
+-----------------------------------
+
+If you're using WebDriver and Google Chrome it's possible to install extensions when starting the browser.
+
+### Example (install the extensions located at /path/to/ext1/ext1.crx and /path/to/ext2/ext2.crx)
+
+    --extension='/path/to/ext1/ext1.crx' --extension='/path/to/ext2/ext2.crx'
 
 Using credentials files
 -----------------------
