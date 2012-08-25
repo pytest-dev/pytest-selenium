@@ -270,11 +270,11 @@ def pytest_addoption(parser):
                      dest='assume_untrusted',
                      default=False,
                      help='assume that all certificate issuers are untrusted. (default: %default)')
-    group._addoption('--proxy',
+    group._addoption('--proxyurl',
                      action='store',
-                     dest='proxy',
-                     metavar='str',
-                     help='http proxy address.')
+                     dest='proxy_url',
+                     metavar='url',
+                     help='proxy address.')
 
     group = parser.getgroup('safety', 'safety')
     group._addoption('--sensitiveurl',

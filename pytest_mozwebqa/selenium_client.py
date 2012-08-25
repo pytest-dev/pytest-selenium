@@ -50,7 +50,7 @@ class Client(object):
         self.default_implicit_wait = 10
         self.sauce_labs_credentials = options.sauce_labs_credentials_file
         self.assume_untrusted = options.assume_untrusted
-        self.proxy = options.proxy
+        self.proxy_url = options.proxy_url
 
     def check_usage(self):
         self.check_basic_usage()
@@ -87,10 +87,11 @@ class Client(object):
             self.selenium.set_context(self.test_id)
 
     def start_webdriver_client(self):
-        if self.proxy:
+        proxy = None
+        if self.proxy_url:
             proxy = Proxy()
-            proxy.http_proxy = self.proxy
-            proxy.ssl_proxy = self.proxy
+            proxy.http_proxy = self.proxy_url
+            proxy.ssl_proxy = self.proxy_url
         if self.driver.upper() == 'REMOTE':
             if self.chrome_options or self.extension_paths:
                 capabilities = self.create_chrome_options(
