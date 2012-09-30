@@ -45,8 +45,8 @@ def testSpecifyingFirefoxProfile(testdir):
             anchor = mozwebqa.selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
-            assert header_color == 'rgba(255,0,0,1)'
-            assert anchor_color == 'rgba(255,105,180,1)'
+            assert header_color == 'rgba(255, 0, 0, 1)'
+            assert anchor_color == 'rgba(255, 105, 180, 1)'
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
         '--api=webdriver',
@@ -76,8 +76,8 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir):
             anchor = mozwebqa.selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
-            assert header_color == 'rgba(255,0,0,1)'
-            assert anchor_color == 'rgba(255,0,0,1)'
+            assert header_color == 'rgba(255, 0, 0, 1)'
+            assert anchor_color == 'rgba(255, 0, 0, 1)'
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
         '--api=webdriver',
