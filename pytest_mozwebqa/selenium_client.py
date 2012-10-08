@@ -103,13 +103,14 @@ class Client(object):
                 profile = self.create_firefox_profile(
                     self.firefox_preferences,
                     self.profile_path,
-                    self.extension_paths,
-                    proxy)
+                    self.extension_paths)
             else:
                 profile = None
             if self.browser_version:
                 capabilities['version'] = self.browser_version
             capabilities['platform'] = self.platform.upper()
+            if proxy:
+                proxy.add_to_capabilities(capabilities)
             if self.capabilities:
                 capabilities.update(json.loads(self.capabilities))
             executor = 'http://%s:%s/wd/hub' % (self.host, self.port)
