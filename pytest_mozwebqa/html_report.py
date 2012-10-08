@@ -10,6 +10,8 @@ import datetime
 import os
 import py
 import time
+import sys
+import shutil
 
 from py.xml import html
 from py.xml import raw
@@ -28,6 +30,7 @@ class HTMLReport(object):
         self.errors = self.failed = 0
         self.passed = self.skipped = 0
         self.xfailed = self.xpassed = 0
+        self.resources = ('style.css', 'jquery.js', 'main.js')
 
     def _debug_paths(self, testclass, testmethod):
         root_path = os.path.join(os.path.dirname(self.logfile), self._debug_path)
@@ -88,17 +91,9 @@ class HTMLReport(object):
             links_html.append(html.a(name, href=path))
             links_html.append(' ')
 
-        self.test_logs.append(
-            html.tr(html.td(result,
-                            class_=result.lower()),
-                    html.td(testclass),
-                    html.td(testmethod),
-                    html.td(round(time)),
-                    html.td(*links_html),
-                    class_=result.lower()))
+        additional_html = []
 
         if not 'Passed' in result:
-            additional_html = []
 
             if hasattr(self, 'sauce_labs_job'):
                 additional_html.append(self.sauce_labs_job.video_html)
@@ -126,15 +121,23 @@ class HTMLReport(object):
                     log.append(html.br())
                 additional_html.append(log)
 
-            self.test_logs.append(
-                html.tr(
-                    html.td(*additional_html,
-                            colspan='5')))
+        self.test_logs.append(html.tr([
+            html.td(result, class_='col-result'),
+            html.td(testclass, class_='col-class'),
+            html.td(testmethod, class_='col-name'),
+            html.td(round(time), class_='col-duration'),
+            html.td(links_html, class_='col-links'),
+            html.td(additional_html, class_='debug')], class_=result.lower() + ' results-table-row'))
 
     def _make_report_dir(self):
         logfile_dirname = os.path.dirname(self.logfile)
         if logfile_dirname and not os.path.exists(logfile_dirname):
             os.makedirs(logfile_dirname)
+        # copy across the static resources
+        for file in self.resources:
+            shutil.copyfile(
+                os.path.join(os.path.dirname(__file__), 'resources', file),
+                os.path.abspath(os.path.join(logfile_dirname, file)))
         return logfile_dirname
 
     def append_pass(self, report):
@@ -213,26 +216,11 @@ class HTMLReport(object):
         import pytest_mozwebqa
         doc = html.html(
             html.head(
+                html.meta(charset='utf-8'),
                 html.title('Test Report'),
-                html.style(
-                    'body {font-family: Helvetica, Arial, sans-serif; font-size: 12px}\n',
-                    'body * {box-sizing: -moz-border-box; box-sizing: -webkit-border-box; box-sizing: border-box}\n',
-                    'a {color: #999}\n',
-                    'h2 {font-size: 16px}\n',
-                    'table {border: 1px solid #e6e6e6; color: #999; font-size: 12px; border-collapse: collapse}\n',
-                    '#configuration tr:nth-child(odd) {background-color: #f6f6f6}\n',
-                    '#results {width:100%}\n',
-                    'th, td {padding: 5px; border: 1px solid #E6E6E6; text-align: left}\n',
-                    'th {font-weight: bold}\n',
-                    'tr.passed, tr.skipped, tr.xfailed, tr.error, tr.failed, tr.xpassed {color: inherit}\n'
-                    'tr.passed + tr.additional {display: none}\n',
-                    '.passed {color: green}\n',
-                    '.skipped, .xfailed {color: orange}\n',
-                    '.error, .failed, .xpassed {color: red}\n',
-                    '.log:only-child {height: inherit}\n',
-                    raw('.log {background-color: #e6e6e6; border: 1px solid #e6e6e6; color: black; display: block; font-family: "Courier New", Courier, monospace; height: 230px; overflow-y: scroll; padding: 5px; white-space:pre-wrap}\n'),
-                    '.screenshot, .video {border: 1px solid #e6e6e6; float:right; height:240px; margin-left:5px; overflow:hidden; width:320px}\n',
-                    '.screenshot img {width: 320px}')),
+                html.link(rel='stylesheet', href='style.css'),
+                html.script(src='jquery.js'),
+                html.script(src='main.js')),
             html.body(
                 html.p('Report generated on %s at %s by pytest-mozwebqa %s' % (
                     generated.strftime('%d-%b-%Y'),
@@ -254,14 +242,14 @@ class HTMLReport(object):
                     html.span('%i expected failures' % self.xfailed, class_='skipped'), ', ',
                     html.span('%i unexpected passes' % self.xpassed, class_='failed'), '.'),
                 html.h2('Results'),
-                html.table(
-                    html.tr(html.th('Result'),
-                            html.th('Class'),
-                            html.th('Name'),
-                            html.th('Duration'),
-                            html.th('Links')),
-                    *self.test_logs,
-                    id='results')))
+                html.table([
+                    html.thead(html.tr([
+                        html.th('Result', class_='sortable', col='result'),
+                        html.th('Class', class_='sortable', col='class'),
+                        html.th('Name', class_='sortable', col='name'),
+                        html.th('Duration', class_='sortable numeric', col='duration'),
+                        html.th('Links')]), id='results-table-head'),
+                    html.tbody(*self.test_logs, id='results-table-body')], id='results-table')))
 
-        logfile.write(doc.unicode(indent=2))
+        logfile.write('<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">' + doc.unicode(indent=2))
         logfile.close()
