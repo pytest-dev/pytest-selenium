@@ -223,7 +223,7 @@ By default a custom HTML report will be written to results/index.html. If you wi
 Privacy
 -------
 
-By default log files are not captured as these may contain confidential data such as user credentials. If you are confident that a test does not contain such data, you can explicitly set the test as public:
+With Selenium RC you can capture log files. By default log files are not captured as these may contain confidential data such as user credentials. If you are confident that a test does not contain such data, you can explicitly set the test as public (the public mark has no effect on WebDriver tests, which do not capture logs):
 
 ### Example
 
