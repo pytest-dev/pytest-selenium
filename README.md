@@ -53,6 +53,8 @@ For full usage details run the following command:
       --webqatimeout=num   timeout (in seconds) for page loads, etc. (default: 60)
       --capturenetwork     capture network traffic to test_method_name.json (selenium rc). (default: False)
       --untrusted          assume that all certificate issuers are untrusted. (default: False)
+      --proxyhost=str      use a proxy running on this host.
+      --proxyport=int      use a proxy running on this port.
 
     safety:
       --sensitiveurl=str   regular expression for identifying sensitive urls. (default: mozilla\.(com|org))
@@ -243,3 +245,12 @@ You can also explicitly mark the test as private, which sets the test appopriate
     @pytest.mark.private
     def test_private(self, mozwebqa):
         home_pg = home_page.HomePage(mozwebqa)
+
+Using a proxy server
+--------------------
+
+If you want the browser launched to use a proxy (currently only supported by Firefox and Google Chrome) you must specify the `--proxyhost` and `--proxyport` command line arguments.
+
+### Example (proxy is running on localhost port 8080)
+
+    --proxyhost=localhost --proxyport=8080

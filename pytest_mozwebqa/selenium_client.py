@@ -50,7 +50,8 @@ class Client(object):
         self.default_implicit_wait = 10
         self.sauce_labs_credentials = options.sauce_labs_credentials_file
         self.assume_untrusted = options.assume_untrusted
-        self.proxy_url = options.proxy_url
+        self.proxy_host = options.proxy_host
+        self.proxy_port = options.proxy_port
 
     def check_usage(self):
         self.check_basic_usage()
@@ -88,10 +89,10 @@ class Client(object):
 
     def start_webdriver_client(self):
         proxy = None
-        if self.proxy_url:
+        if self.proxy_host and self.proxy_port:
             proxy = Proxy()
-            proxy.http_proxy = self.proxy_url
-            proxy.ssl_proxy = self.proxy_url
+            proxy.http_proxy = '%s:%s' % (self.proxy_host, self.proxy_port)
+            proxy.ssl_proxy = proxy.http_proxy
         if self.driver.upper() == 'REMOTE':
             if self.chrome_options or self.extension_paths:
                 capabilities = self.create_chrome_options(
@@ -146,11 +147,11 @@ class Client(object):
             profile = self.create_firefox_profile(
                 self.firefox_preferences,
                 self.profile_path,
-                self.extension_paths,
-                proxy)
+                self.extension_paths)
             self.selenium = webdriver.Firefox(
                 firefox_binary=binary,
-                firefox_profile=profile)
+                firefox_profile=profile,
+                proxy=proxy)
         elif self.driver.upper() == 'IE':
             self.selenium = webdriver.Ie()
         elif self.driver.upper() == 'OPERA':
@@ -173,7 +174,7 @@ class Client(object):
         else:
             return self.selenium.get_eval('selenium.sessionId')
 
-    def create_firefox_profile(self, preferences, profile_path, extensions, proxy=None):
+    def create_firefox_profile(self, preferences, profile_path, extensions):
         profile = webdriver.FirefoxProfile(profile_path)
         if proxy:
             profile.set_proxy(proxy)
