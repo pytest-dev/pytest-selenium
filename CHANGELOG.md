@@ -4,6 +4,7 @@ Change Log
 1.1
 ---
 
+* Added support for setting a proxy for Firefox, Google Chrome, and Opera
 * Added support for specifying a Firefox profile
 * Added support for specifying Firefox extensions
 
