@@ -112,7 +112,7 @@ def testAddingFirefoxExtension(testdir, webserver):
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
-def testFirefoxProxy(testdir):
+def testFirefoxProxy(testdir, webserver):
     """Test that a proxy can be set for firefox."""
     file_test = testdir.makepyfile("""
         import pytest
@@ -122,17 +122,17 @@ def testFirefoxProxy(testdir):
             header = mozwebqa.selenium.find_element_by_tag_name('h1')
             assert header.text == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
         '--api=webdriver',
         '--driver=firefox',
         '--proxyhost=localhost',
-        '--proxyport=8000',
+        '--proxyport=%s' % webserver.port,
         file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
 @pytest.mark.chrome
-def testChromeProxy(testdir):
+def testChromeProxy(testdir, webserver):
     """Test that a proxy can be set for chrome."""
     file_test = testdir.makepyfile("""
         import pytest
@@ -142,17 +142,17 @@ def testChromeProxy(testdir):
             header = mozwebqa.selenium.find_element_by_tag_name('h1')
             assert header.text == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
         '--api=webdriver',
         '--driver=chrome',
         '--proxyhost=localhost',
-        '--proxyport=8000',
+        '--proxyport=%s' % webserver.port,
         file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
 @pytest.mark.opera
-def testOperaProxy(testdir):
+def testOperaProxy(testdir, webserver):
     """Test that a proxy can be set for opera."""
     file_test = testdir.makepyfile("""
         import pytest
@@ -162,11 +162,11 @@ def testOperaProxy(testdir):
             header = mozwebqa.selenium.find_element_by_tag_name('h1')
             assert header.text == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
         '--api=webdriver',
         '--driver=opera',
         '--proxyhost=localhost',
-        '--proxyport=8000',
+        '--proxyport=%s' % webserver.port,
         file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
