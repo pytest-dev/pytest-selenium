@@ -131,6 +131,7 @@ def testFirefoxProxy(testdir):
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
+@pytest.mark.chrome
 def testChromeProxy(testdir):
     """Test that a proxy can be set for chrome."""
     file_test = testdir.makepyfile("""
@@ -144,6 +145,26 @@ def testChromeProxy(testdir):
     reprec = testdir.inline_run('--baseurl=http://localhost:8000',
         '--api=webdriver',
         '--driver=chrome',
+        '--proxyhost=localhost',
+        '--proxyport=8000',
+        file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(passed) == 1
+
+@pytest.mark.opera
+def testOperaProxy(testdir):
+    """Test that a proxy can be set for opera."""
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_selenium(mozwebqa):
+            mozwebqa.selenium.get('http://example.com')
+            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+            assert header.text == 'Success!'
+    """)
+    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+        '--api=webdriver',
+        '--driver=opera',
         '--proxyhost=localhost',
         '--proxyport=8000',
         file_test)
