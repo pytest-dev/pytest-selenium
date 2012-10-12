@@ -2,7 +2,7 @@ before_script:
   - curl -k -L -o /tmp/selenium.jar http://selenium.googlecode.com/files/selenium-server-standalone-2.22.0.jar
   - java -jar /tmp/selenium.jar > selenium.out &
   - curl -k -L -o /tmp/chromedriver.zip http://chromedriver.googlecode.com/files/chromedriver_linux32_20.0.1133.0.zip
-  - unzip /tmp/chromedriver.zip -d /tmp
+  - sudo unzip /tmp/chromedriver.zip -d /usr/bin
   - sh -e /etc/init.d/xvfb start
   - sleep 10
 

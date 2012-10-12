@@ -208,10 +208,12 @@ def testShouldErrorThatItCantFindTheChromeBinary(testdir, webserver):
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--driver=chrome',
-                                '--chromepath=/tmp/chromedriver',
                                 '--chromeopts={"binary_location":"foo"}',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
-    assert "Could not find Chrome binary at: foo" in failed[0].longrepr.reprcrash.message
+    if 'ChromeDriver executable needs to be available in the path' in out:
+        pytest.fail('You must have Chrome Driver installed on your path for this test to run correctly. '
+                    'For further information see pytest-mozwebqa documentation.')
+    assert 'Could not find Chrome binary at: foo' in out
