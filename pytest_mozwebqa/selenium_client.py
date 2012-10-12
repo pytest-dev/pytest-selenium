@@ -88,59 +88,52 @@ class Client(object):
             self.selenium.set_context(self.test_id)
 
     def start_webdriver_client(self):
-        proxy = None
+        capabilities = {}
+        if self.capabilities:
+            capabilities.update(json.loads(self.capabilities))
         if self.proxy_host and self.proxy_port:
             proxy = Proxy()
             proxy.http_proxy = '%s:%s' % (self.proxy_host, self.proxy_port)
             proxy.ssl_proxy = proxy.http_proxy
+            proxy.add_to_capabilities(capabilities)
+        profile = None
+
         if self.driver.upper() == 'REMOTE':
+            capabilities.update(getattr(webdriver.DesiredCapabilities, self.browser_name.upper()))
             if self.chrome_options or self.extension_paths:
                 capabilities = self.create_chrome_options(
                     self.chrome_options,
                     self.extension_paths).to_capabilities()
-            else:
-                capabilities = getattr(webdriver.DesiredCapabilities, self.browser_name.upper())
             if self.browser_name.upper() == 'FIREFOX':
                 profile = self.create_firefox_profile(
                     self.firefox_preferences,
                     self.profile_path,
                     self.extension_paths)
-            else:
-                profile = None
             if self.browser_version:
                 capabilities['version'] = self.browser_version
             capabilities['platform'] = self.platform.upper()
-            if proxy:
-                proxy.add_to_capabilities(capabilities)
-            if self.capabilities:
-                capabilities.update(json.loads(self.capabilities))
             executor = 'http://%s:%s/wd/hub' % (self.host, self.port)
             try:
                 self.selenium = webdriver.Remote(command_executor=executor,
-                                                 desired_capabilities=capabilities,
+                                                 desired_capabilities=capabilities or None,
                                                  browser_profile=profile)
             except AttributeError:
                 valid_browsers = [attr for attr in dir(webdriver.DesiredCapabilities) if not attr.startswith('__')]
                 raise AttributeError("Invalid browser name: '%s'. Valid options are: %s" % (self.browser_name, ', '.join(valid_browsers)))
 
         elif self.driver.upper() == 'CHROME':
+            options = None
+            if self.chrome_options or self.extension_paths:
+                options = self.create_chrome_options(
+                    self.chrome_options,
+                    self.extension_paths)
             if self.chrome_path:
-                if self.chrome_options or self.extension_paths:
-                    options = self.create_chrome_options(
-                        self.chrome_options,
-                        self.extension_paths)
-                    self.selenium = webdriver.Chrome(executable_path=self.chrome_path,
-                                                     chrome_options=options)
-                else:
-                    self.selenium = webdriver.Chrome(executable_path=self.chrome_path)
+                self.selenium = webdriver.Chrome(executable_path=self.chrome_path,
+                                                 chrome_options=options,
+                                                 desired_capabilities=capabilities or None)
             else:
-                if self.chrome_options or self.extension_paths:
-                    options = self.create_chrome_options(
-                        self.chrome_options,
-                        self.extension_paths)
-                    self.selenium = webdriver.Chrome(chrome_options=options)
-                else:
-                    self.selenium = webdriver.Chrome()
+                self.selenium = webdriver.Chrome(chrome_options=options,
+                                                 desired_capabilities=capabilities or None)
 
         elif self.driver.upper() == 'FIREFOX':
             binary = self.firefox_path and FirefoxBinary(self.firefox_path) or None
@@ -151,11 +144,13 @@ class Client(object):
             self.selenium = webdriver.Firefox(
                 firefox_binary=binary,
                 firefox_profile=profile,
-                proxy=proxy)
+                capabilities=capabilities or None)
         elif self.driver.upper() == 'IE':
             self.selenium = webdriver.Ie()
         elif self.driver.upper() == 'OPERA':
-            self.selenium = webdriver.Opera(executable_path=self.opera_path)
+            capabilities.update(webdriver.DesiredCapabilities.OPERA)
+            self.selenium = webdriver.Opera(executable_path=self.opera_path,
+                                            desired_capabilities=capabilities)
         else:
             self.selenium = getattr(webdriver, self.driver)()
 
