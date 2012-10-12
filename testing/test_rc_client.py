@@ -10,7 +10,7 @@ pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
 
 
-def testStartRCClientUsingEnvironment(testdir):
+def testStartRCClientUsingEnvironment(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -18,7 +18,7 @@ def testStartRCClientUsingEnvironment(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--environment=*firefox',
                                 file_test)
@@ -26,7 +26,7 @@ def testStartRCClientUsingEnvironment(testdir):
     assert len(passed) == 1
 
 
-def testStartRCClientUsingBrowser(testdir):
+def testStartRCClientUsingBrowser(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -34,7 +34,7 @@ def testStartRCClientUsingBrowser(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--browser=*firefox',
                                 file_test)

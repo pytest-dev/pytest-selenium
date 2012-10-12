@@ -10,7 +10,7 @@ pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
 
 
-def testCredentials(testdir):
+def testCredentials(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.skip_selenium
@@ -24,13 +24,13 @@ def testCredentials(testdir):
             username: aUsername
             password: aPassword
     """)
-    result = testdir.runpytest('--baseurl=http://localhost:8000',
+    result = testdir.runpytest('--baseurl=http://localhost:%s' % webserver.port,
                                '--credentials=%s' % credentials,
                                '--driver=firefox')
     assert result.ret == 0
 
 
-def testCredentialsKeyError(testdir):
+def testCredentialsKeyError(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.skip_selenium
@@ -42,7 +42,7 @@ def testCredentialsKeyError(testdir):
         default:
             username: aUsername
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--credentials=%s' % credentials,
                                 '--driver=firefox',
                                 file_test)

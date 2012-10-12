@@ -31,6 +31,10 @@ def pytest_keyboard_interrupt(excinfo):
         WebServer.webserver.stop()
 
 
+def pytest_funcarg__webserver(request):
+    return WebServer.webserver
+
+
 class WebServer:
 
     pass

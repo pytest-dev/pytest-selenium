@@ -15,7 +15,7 @@ log_file = 'log.txt'
 network_traffic_file = 'networktraffic.json'
 
 
-def testDebugOnFail(testdir):
+def testDebugOnFail(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -23,11 +23,11 @@ def testDebugOnFail(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=rc',
-        '--browser=*firefox',
-        '--webqareport=result.html',
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=rc',
+                                '--browser=*firefox',
+                                '--webqareport=result.html',
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     path = _test_debug_path(str(testdir.tmpdir))
@@ -36,7 +36,7 @@ def testDebugOnFail(testdir):
         assert os.path.isfile(os.path.join(path, file))
 
 
-def testDebugOnXFail(testdir):
+def testDebugOnXFail(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.xfail
@@ -45,11 +45,11 @@ def testDebugOnXFail(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=rc',
-        '--browser=*firefox',
-        '--webqareport=result.html',
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=rc',
+                                '--browser=*firefox',
+                                '--webqareport=result.html',
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(skipped) == 1
     path = _test_debug_path(str(testdir.tmpdir))
@@ -58,7 +58,7 @@ def testDebugOnXFail(testdir):
         assert os.path.isfile(os.path.join(path, file))
 
 
-def testNoDebugOnPass(testdir):
+def testNoDebugOnPass(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -66,18 +66,18 @@ def testNoDebugOnPass(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=rc',
-        '--browser=*firefox',
-        '--webqareport=result.html',
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=rc',
+                                '--browser=*firefox',
+                                '--webqareport=result.html',
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
     debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
     assert not os.path.exists(debug_path)
 
 
-def testNoDebugOnXPass(testdir):
+def testNoDebugOnXPass(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.xfail
@@ -86,18 +86,18 @@ def testNoDebugOnXPass(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=rc',
-        '--browser=*firefox',
-        '--webqareport=result.html',
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=rc',
+                                '--browser=*firefox',
+                                '--webqareport=result.html',
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
     assert not os.path.exists(debug_path)
 
 
-def testNoDebugOnSkip(testdir):
+def testNoDebugOnSkip(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.skipif('True')
@@ -106,18 +106,18 @@ def testNoDebugOnSkip(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=rc',
-        '--browser=*firefox',
-        '--webqareport=result.html',
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=rc',
+                                '--browser=*firefox',
+                                '--webqareport=result.html',
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(skipped) == 1
     debug_path = os.path.sep.join([str(testdir.tmpdir), 'debug'])
     assert not os.path.exists(debug_path)
 
 
-def testDebugWithReportSubdirectory(testdir):
+def testDebugWithReportSubdirectory(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -127,7 +127,7 @@ def testDebugWithReportSubdirectory(testdir):
     """)
     report_subdirectory = 'report'
     reprec = testdir.inline_run(
-        '--baseurl=http://localhost:8000',
+        '--baseurl=http://localhost:%s' % webserver.port,
         '--api=rc',
         '--browser=*firefox',
         '--webqareport=%s/result.html' % report_subdirectory,
@@ -141,7 +141,7 @@ def testDebugWithReportSubdirectory(testdir):
         assert os.path.isfile(os.path.join(path, file))
 
 
-def testLogWhenPublic(testdir):
+def testLogWhenPublic(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.public
@@ -150,11 +150,11 @@ def testLogWhenPublic(testdir):
             mozwebqa.selenium.open('/')
             assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=rc',
-        '--browser=*firefox',
-        '--webqareport=result.html',
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=rc',
+                                '--browser=*firefox',
+                                '--webqareport=result.html',
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     path = _test_debug_path(str(testdir.tmpdir))
@@ -162,7 +162,7 @@ def testLogWhenPublic(testdir):
     assert os.path.isfile(os.path.join(path, log_file))
 
 
-def testNoLogWhenNotPublic(testdir):
+def testNoLogWhenNotPublic(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -171,7 +171,7 @@ def testNoLogWhenNotPublic(testdir):
             assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
     """)
     reprec = testdir.inline_run(
-        '--baseurl=http://localhost:8000',
+        '--baseurl=http://localhost:%s' % webserver.port,
         '--api=rc',
         '--browser=*firefox',
         '--webqareport=result.html',
@@ -182,7 +182,7 @@ def testNoLogWhenNotPublic(testdir):
     assert not os.path.exists(os.path.join(path, log_file))
 
 
-def testNoLogWhenPrivate(testdir):
+def testNoLogWhenPrivate(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.private
@@ -192,7 +192,7 @@ def testNoLogWhenPrivate(testdir):
             assert mozwebqa.selenium.get_text('css=h1') != 'Success!'
     """)
     reprec = testdir.inline_run(
-        '--baseurl=http://localhost:8000',
+        '--baseurl=http://localhost:%s' % webserver.port,
         '--api=rc',
         '--browser=*firefox',
         '--webqareport=result.html',
@@ -203,7 +203,7 @@ def testNoLogWhenPrivate(testdir):
     assert not os.path.exists(os.path.join(path, log_file))
 
 
-def testCaptureNetworkTraffic(testdir):
+def testCaptureNetworkTraffic(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -212,7 +212,7 @@ def testCaptureNetworkTraffic(testdir):
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
     reprec = testdir.inline_run(
-        '--baseurl=http://localhost:8000',
+        '--baseurl=http://localhost:%s' % webserver.port,
         '--api=rc',
         '--browser=*firefox',
         '--capturenetwork',

@@ -10,23 +10,24 @@ pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
 
 
-def testStartWebDriverClient(testdir):
+def testStartWebDriverClient(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
-            mozwebqa.selenium.get('http://localhost:8000/')
+            mozwebqa.selenium.get(mozwebqa.base_url)
             header = mozwebqa.selenium.find_element_by_tag_name('h1')
             assert header.text == 'Success!'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=webdriver',
                                 '--driver=firefox',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
-def testSpecifyingFirefoxProfile(testdir):
+
+def testSpecifyingFirefoxProfile(testdir, webserver):
     """Test that a specified profile is used when starting firefox.
         The profile changes the colors in the browser, which are then reflected when calling
         value_of_css_property.
@@ -40,7 +41,7 @@ def testSpecifyingFirefoxProfile(testdir):
         import pytest, time
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
-            mozwebqa.selenium.get('http://localhost:8000/')
+            mozwebqa.selenium.get(mozwebqa.base_url)
             header = mozwebqa.selenium.find_element_by_tag_name('h1')
             anchor = mozwebqa.selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
@@ -48,15 +49,16 @@ def testSpecifyingFirefoxProfile(testdir):
             assert header_color == 'rgba(255, 0, 0, 1)'
             assert anchor_color == 'rgba(255, 105, 180, 1)'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=webdriver',
-        '--driver=firefox',
-        '--profilepath=%s' % profile,
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=webdriver',
+                                '--driver=firefox',
+                                '--profilepath=%s' % profile,
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
-def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir):
+
+def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir, webserver):
     """Test that a specified profile is used when starting firefox.
         The profile changes the colors in the browser, which are then reflected when calling
         value_of_css_property. The test checks that the color of the h1 tag is overridden by
@@ -71,7 +73,7 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir):
         import pytest, time
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
-            mozwebqa.selenium.get('http://localhost:8000/')
+            mozwebqa.selenium.get(mozwebqa.base_url)
             header = mozwebqa.selenium.find_element_by_tag_name('h1')
             anchor = mozwebqa.selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
@@ -79,16 +81,17 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir):
             assert header_color == 'rgba(255, 0, 0, 1)'
             assert anchor_color == 'rgba(255, 0, 0, 1)'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=webdriver',
-        '--driver=firefox',
-        '--firefoxpref=''{"browser.anchor_color":"#FF0000"}''',
-        '--profilepath=%s' % profile,
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=webdriver',
+                                '--driver=firefox',
+                                '--firefoxpref=''{"browser.anchor_color":"#FF0000"}''',
+                                '--profilepath=%s' % profile,
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 
-def testAddingFirefoxExtension(testdir):
+
+def testAddingFirefoxExtension(testdir, webserver):
     """Test that a firefox extension can be added when starting firefox."""
     import os
     path_to_extensions_folder = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'testing')
@@ -101,10 +104,10 @@ def testAddingFirefoxExtension(testdir):
             extensions = mozwebqa.selenium.find_element_by_id('extensions-tbody').text
             assert 'Test Extension (empty)' in extensions
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
-        '--api=webdriver',
-        '--driver=firefox',
-        '--extension=''%s''' % extension,
-        file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=webdriver',
+                                '--driver=firefox',
+                                '--extension=''%s''' % extension,
+                                file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1

@@ -11,7 +11,7 @@ pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
 
 
-def testReportWithoutDirectory(testdir):
+def testReportWithoutDirectory(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -20,7 +20,7 @@ def testReportWithoutDirectory(testdir):
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
     report = 'result.html'
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--browser=*firefox',
                                 '--webqareport=%s' % report,
@@ -32,7 +32,7 @@ def testReportWithoutDirectory(testdir):
     assert os.path.isfile(report_file)
 
 
-def testReportWithDirectory(testdir):
+def testReportWithDirectory(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -41,7 +41,7 @@ def testReportWithDirectory(testdir):
             assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
     """)
     report = 'report/result.html'
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--browser=*firefox',
                                 '--webqareport=%s' % report,

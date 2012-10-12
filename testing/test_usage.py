@@ -10,7 +10,7 @@ pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
 
 
-def testShouldFailWithoutBaseURL(testdir):
+def testShouldFailWithoutBaseURL(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -24,14 +24,14 @@ def testShouldFailWithoutBaseURL(testdir):
     assert out == 'UsageError: --baseurl must be specified.'
 
 
-def testShouldFailWithoutBrowserNameWhenUsingWebDriverAPI(testdir):
+def testShouldFailWithoutBrowserNameWhenUsingWebDriverAPI(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
             assert True
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000', file_test)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port, file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
@@ -39,14 +39,14 @@ def testShouldFailWithoutBrowserNameWhenUsingWebDriverAPI(testdir):
                   "the 'webdriver' api."
 
 
-def testShouldFailWithoutPlatformWhenUsingWebDriverAPI(testdir):
+def testShouldFailWithoutPlatformWhenUsingWebDriverAPI(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
             assert True
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--browsername=firefox',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -56,7 +56,7 @@ def testShouldFailWithoutPlatformWhenUsingWebDriverAPI(testdir):
                   "'webdriver' api."
 
 
-def testShouldFailWithoutSauceLabsUser(testdir):
+def testShouldFailWithoutSauceLabsUser(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -66,7 +66,7 @@ def testShouldFailWithoutSauceLabsUser(testdir):
     sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
         api-key: api-key
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--saucelabs=%s' % sauce_labs_credentials,
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -75,7 +75,7 @@ def testShouldFailWithoutSauceLabsUser(testdir):
     assert out == "KeyError: 'username'"
 
 
-def testShouldFailWithoutSauceLabsKey(testdir):
+def testShouldFailWithoutSauceLabsKey(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -85,7 +85,7 @@ def testShouldFailWithoutSauceLabsKey(testdir):
     sauce_labs_credentials = testdir.makefile('.yaml', sauce_labs="""
         username: username
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--saucelabs=%s' % sauce_labs_credentials,
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -94,7 +94,7 @@ def testShouldFailWithoutSauceLabsKey(testdir):
     assert out == "KeyError: 'api-key'"
 
 
-def testShouldFailWithBlankSauceLabsUser(testdir):
+def testShouldFailWithBlankSauceLabsUser(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -105,7 +105,7 @@ def testShouldFailWithBlankSauceLabsUser(testdir):
         username:
         api-key: api-key
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--saucelabs=%s' % sauce_labs_credentials,
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -115,7 +115,7 @@ def testShouldFailWithBlankSauceLabsUser(testdir):
                   'credentials file.'
 
 
-def testShouldFailWithBlankSauceLabsKey(testdir):
+def testShouldFailWithBlankSauceLabsKey(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -126,7 +126,7 @@ def testShouldFailWithBlankSauceLabsKey(testdir):
         username: username
         api-key:
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--saucelabs=%s' % sauce_labs_credentials,
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -136,7 +136,7 @@ def testShouldFailWithBlankSauceLabsKey(testdir):
                   'credentials file.'
 
 
-def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(testdir):
+def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -147,7 +147,7 @@ def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(testdir):
         username: username
         api-key: api-key
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--saucelabs=%s' % sauce_labs_credentials,
                                 file_test)
@@ -158,7 +158,7 @@ def testShouldFailWithoutBrowserNameWhenUsingSauceWithRCAPI(testdir):
                   "the 'rc' api with sauce labs."
 
 
-def testShouldFailWithoutPlatformWhenUsingSauceWithRCAPI(testdir):
+def testShouldFailWithoutPlatformWhenUsingSauceWithRCAPI(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -169,7 +169,7 @@ def testShouldFailWithoutPlatformWhenUsingSauceWithRCAPI(testdir):
         username: username
         api-key: api-key
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--saucelabs=%s' % sauce_labs_credentials,
                                 '--browsername=firefox',
@@ -182,14 +182,14 @@ def testShouldFailWithoutPlatformWhenUsingSauceWithRCAPI(testdir):
                   "'rc' api with sauce labs."
 
 
-def testShouldFailWithoutBrowserOrEnvironmentWhenUsingRCAPI(testdir):
+def testShouldFailWithoutBrowserOrEnvironmentWhenUsingRCAPI(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
             assert True
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -199,14 +199,14 @@ def testShouldFailWithoutBrowserOrEnvironmentWhenUsingRCAPI(testdir):
                   "when using the 'rc' api."
 
 
-def testShouldErrorThatItCantFindTheChromeBinary(testdir):
+def testShouldErrorThatItCantFindTheChromeBinary(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_selenium(mozwebqa):
             assert True
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--driver=chrome',
                                 '--chromepath=/tmp/chromedriver',
                                 '--chromeopts={"binary_location":"foo"}',

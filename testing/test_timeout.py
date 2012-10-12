@@ -10,14 +10,14 @@ pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
 
 
-def testWebDriverWithDefaultTimeout(testdir):
+def testWebDriverWithDefaultTimeout(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_timeout(mozwebqa):
             assert mozwebqa.timeout == 60
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=webdriver',
                                 '--driver=firefox',
                                 file_test)
@@ -25,14 +25,14 @@ def testWebDriverWithDefaultTimeout(testdir):
     assert len(passed) == 1
 
 
-def testWebDriverWithCustomTimeout(testdir):
+def testWebDriverWithCustomTimeout(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_timeout(mozwebqa):
             assert mozwebqa.timeout == 30
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=webdriver',
                                 '--driver=firefox',
                                 '--webqatimeout=30',
@@ -41,14 +41,14 @@ def testWebDriverWithCustomTimeout(testdir):
     assert len(passed) == 1
 
 
-def testRCWithDefaultTimeout(testdir):
+def testRCWithDefaultTimeout(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_timeout(mozwebqa):
             assert mozwebqa.timeout == 60000
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--browser=*firefox',
                                 file_test)
@@ -56,14 +56,14 @@ def testRCWithDefaultTimeout(testdir):
     assert len(passed) == 1
 
 
-def testRCWithCustomTimeout(testdir):
+def testRCWithCustomTimeout(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_timeout(mozwebqa):
             assert mozwebqa.timeout == 30000
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:8000',
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
                                 '--api=rc',
                                 '--browser=*firefox',
                                 '--webqatimeout=30',
