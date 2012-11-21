@@ -100,7 +100,7 @@ class Client(object):
 
         if self.driver.upper() == 'REMOTE':
             capabilities.update(getattr(webdriver.DesiredCapabilities, self.browser_name.upper()))
-            if self.chrome_options or self.extension_paths:
+            if json.loads(self.chrome_options) or self.extension_paths:
                 capabilities = self.create_chrome_options(
                     self.chrome_options,
                     self.extension_paths).to_capabilities()
