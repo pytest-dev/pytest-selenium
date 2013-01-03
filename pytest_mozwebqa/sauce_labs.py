@@ -99,20 +99,20 @@ class Job(object):
     def video_html(self):
         flash_vars = 'config={\
             "clip":{\
-                "url":"http%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
+                "url":"https%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
                 "provider":"streamer",\
                 "autoPlay":false,\
                 "autoBuffering":true},\
             "plugins":{\
                 "streamer":{\
-                    "url":"http://saucelabs.com/flowplayer/flowplayer.pseudostreaming-3.2.5.swf"},\
+                    "url":"https://saucelabs.com/flowplayer/flowplayer.pseudostreaming-3.2.5.swf"},\
                 "controls":{\
                     "mute":false,\
                     "volume":false,\
                     "backgroundColor":"rgba(0, 0, 0, 0.7)"}},\
             "playerId":"player%(session_id)s",\
             "playlist":[{\
-                "url":"http%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
+                "url":"https%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
                 "provider":"streamer",\
                 "autoPlay":false,\
                 "autoBuffering":true}]}' % {'session_id': self.session_id}
@@ -129,7 +129,7 @@ class Job(object):
                 width='100%',
                 height='100%',
                 type='application/x-shockwave-flash',
-                data='http://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2566397726976729',
+                data='https://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2930636672245027',
                 name='player_api',
                 id='player_api'),
             id='player%s' % self.session_id,
