@@ -43,7 +43,7 @@ def pytest_unconfigure(config):
 
 
 def pytest_sessionstart(session):
-    if session.config.option.base_url and not session.config.option.collectonly:
+    if session.config.option.base_url and not (session.config.option.skip_url_check or session.config.option.collectonly):
         r = requests.get(session.config.option.base_url, verify=False)
         assert r.status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (session.config.option.base_url, r.status_code)
 
@@ -158,6 +158,11 @@ def pytest_addoption(parser):
                      default=config.get('DEFAULT', 'baseurl'),
                      metavar='url',
                      help='base url for the application under test.')
+    group._addoption('--skipurlcheck',
+                     action='store_true',
+                     dest='skip_url_check',
+                     default=False,
+                     help='skip the base url check. (default: %default)')
     group._addoption('--api',
                      action='store',
                      default=config.get('DEFAULT', 'api'),
