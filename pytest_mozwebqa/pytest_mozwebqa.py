@@ -45,7 +45,7 @@ def pytest_unconfigure(config):
 def pytest_sessionstart(session):
     if session.config.option.base_url and not (session.config.option.skip_url_check or session.config.option.collectonly):
         r = requests.get(session.config.option.base_url, verify=False)
-        assert r.status_code == 200, 'Base URL did not return status code 200. (URL: %s, Response: %s)' % (session.config.option.base_url, r.status_code)
+        assert r.status_code in (200, 401), 'Base URL did not return status code 200 or 401. (URL: %s, Response: %s)' % (session.config.option.base_url, r.status_code)
 
 
 def pytest_runtest_setup(item):
@@ -56,6 +56,18 @@ def pytest_runtest_setup(item):
         'logs': [],
         'network_traffic': []}
     TestSetup.base_url = item.config.option.base_url
+
+    # configure proxies
+    if hasattr(item.config, 'browsermob_proxy'):
+        item.config.option.proxy_host = item.config.option.browsermob_proxy_host
+        item.config.option.proxy_port = item.config.browsermob_proxy.port
+
+    if hasattr(item.config, 'zap'):
+        if all([item.config.option.proxy_host, item.config.option.proxy_port]):
+            item.config.zap.core.setOptionProxyChainName(item.config.option.proxy_host)
+            item.config.zap.core.setOptionProxyChainPort(item.config.option.proxy_port)
+        item.config.option.proxy_host = item.config.option.zap_host
+        item.config.option.proxy_port = item.config.option.zap_port
 
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
