@@ -7,6 +7,8 @@ Change Log
 * Added support for setting a proxy for Firefox, Google Chrome, and Opera
 * Added support for specifying a Firefox profile
 * Added support for specifying Firefox extensions
+* Added support for pytest-browsermob-proxy
+* Added support for pytest-zap
 
 1.0
 ---
