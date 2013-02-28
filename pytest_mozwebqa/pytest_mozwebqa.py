@@ -47,6 +47,18 @@ def pytest_sessionstart(session):
         r = requests.get(session.config.option.base_url, verify=False)
         assert r.status_code in (200, 401), 'Base URL did not return status code 200 or 401. (URL: %s, Response: %s)' % (session.config.option.base_url, r.status_code)
 
+    # configure session proxies
+    if hasattr(session.config, 'browsermob_session_proxy'):
+        session.config.option.proxy_host = session.config.option.bmp_host
+        session.config.option.proxy_port = session.config.browsermob_session_proxy.port
+
+    if hasattr(session.config, 'zap'):
+        if all([session.config.option.proxy_host, session.config.option.proxy_port]):
+            session.config.zap.core.set_option_proxy_chain_name(session.config.option.proxy_host)
+            session.config.zap.core.set_option_proxy_chain_port(session.config.option.proxy_port)
+        session.config.option.proxy_host = session.config.option.zap_host
+        session.config.option.proxy_port = session.config.option.zap_port
+
 
 def pytest_runtest_setup(item):
     item.debug = {
@@ -57,17 +69,10 @@ def pytest_runtest_setup(item):
         'network_traffic': []}
     TestSetup.base_url = item.config.option.base_url
 
-    # configure proxies
-    if hasattr(item.config, 'browsermob_proxy'):
+    # configure test proxies
+    if hasattr(item.config, 'browsermob_test_proxy'):
         item.config.option.proxy_host = item.config.option.bmp_host
-        item.config.option.proxy_port = item.config.browsermob_proxy.port
-
-    if hasattr(item.config, 'zap'):
-        if all([item.config.option.proxy_host, item.config.option.proxy_port]):
-            item.config.zap.core.setOptionProxyChainName(item.config.option.proxy_host)
-            item.config.zap.core.setOptionProxyChainPort(item.config.option.proxy_port)
-        item.config.option.proxy_host = item.config.option.zap_host
-        item.config.option.proxy_port = item.config.option.zap_port
+        item.config.option.proxy_port = item.config.browsermob_test_proxy.port
 
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
