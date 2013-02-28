@@ -59,7 +59,7 @@ def pytest_runtest_setup(item):
 
     # configure proxies
     if hasattr(item.config, 'browsermob_proxy'):
-        item.config.option.proxy_host = item.config.option.browsermob_proxy_host
+        item.config.option.proxy_host = item.config.option.bmp_host
         item.config.option.proxy_port = item.config.browsermob_proxy.port
 
     if hasattr(item.config, 'zap'):
