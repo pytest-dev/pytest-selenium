@@ -60,7 +60,7 @@ def pytest_runtest_setup(item):
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
     sensitive = False
-    if TestSetup.base_url:
+    if TestSetup.base_url and not item.config.option.skip_url_check:
         r = requests.get(TestSetup.base_url, verify=False)
         urls = [h.url for h in r.history] + [r.url]
         matches = [re.search(item.config.option.sensitive_url, u) for u in urls]
@@ -162,7 +162,7 @@ def pytest_addoption(parser):
                      action='store_true',
                      dest='skip_url_check',
                      default=False,
-                     help='skip the base url check. (default: %default)')
+                     help='skip the base url and sensitivity checks. (default: %default)')
     group._addoption('--api',
                      action='store',
                      default=config.get('DEFAULT', 'api'),

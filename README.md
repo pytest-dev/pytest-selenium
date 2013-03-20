@@ -31,7 +31,7 @@ For full usage details run the following command:
 
     selenium:
       --baseurl=url        base url for the application under test.
-      --skipurlcheck       skip the base url check. (default: False)
+      --skipurlcheck       skip the base url and sensitivity checks. (default: False)
       --api=api            version of selenium api to use. 'rc' uses selenium rc.
                            'webdriver' uses selenium webdriver. (default: webdriver)
       --host=str           host that selenium server is listening on. (default: localhost)
