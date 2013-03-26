@@ -171,8 +171,6 @@ class Client(object):
 
     def create_firefox_profile(self, preferences, profile_path, extensions):
         profile = webdriver.FirefoxProfile(profile_path)
-        if proxy:
-            profile.set_proxy(proxy)
         if preferences:
             [profile.set_preference(k, v) for k, v in json.loads(preferences).items()]
         profile.assume_untrusted_cert_issuer = self.assume_untrusted
