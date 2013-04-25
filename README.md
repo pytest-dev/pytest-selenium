@@ -60,7 +60,7 @@ For full usage details run the following command:
 
     credentials:
       --credentials=path  location of yaml file containing user credentials.
-      --saucelabs=path    credendials file containing sauce labs username and api key.
+      --saucelabs=path    credentials file containing sauce labs username and api key.
 
 ### Configuration
 
