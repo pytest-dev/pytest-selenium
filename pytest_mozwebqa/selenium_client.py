@@ -146,7 +146,7 @@ class Client(object):
         elif self.driver.upper() == 'OPERA':
             self.selenium = webdriver.Opera(executable_path=self.opera_path)
         else:
-            getattr(webdriver, self.driver)()
+            self.selenium = getattr(webdriver, self.driver)()
 
     def start_rc_client(self):
         self.selenium = selenium(self.host, str(self.port), self.browser, self.base_url)
