@@ -8,6 +8,7 @@ import base64
 import cgi
 import datetime
 import os
+import pkg_resources
 import py
 import time
 import sys
@@ -136,7 +137,8 @@ class HTMLReport(object):
         # copy across the static resources
         for file in self.resources:
             shutil.copyfile(
-                os.path.join(os.path.dirname(__file__), 'resources', file),
+                pkg_resources.resource_filename(
+                    __name__, os.path.sep.join(['resources', file])),
                 os.path.abspath(os.path.join(logfile_dirname, file)))
         return logfile_dirname
 
