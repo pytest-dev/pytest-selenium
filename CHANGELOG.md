@@ -9,6 +9,8 @@ Change Log
 * Added support for specifying Firefox extensions
 * Added support for pytest-browsermob-proxy
 * Added support for pytest-zap
+* Added sortable HTML reports
+* Provide an option to skip the URL check
 
 1.0
 ---
