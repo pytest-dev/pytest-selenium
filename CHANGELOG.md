@@ -1,6 +1,11 @@
 Change Log
 ==========
 
+1.1.1
+-----
+* Open links from the HTML report in a new tab/window. Fixes #100
+* Remove Sauce Labs links and videos for jobs without sessions. Fixes #101
+
 1.1
 ---
 
