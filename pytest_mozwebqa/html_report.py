@@ -81,10 +81,9 @@ class HTMLReport(object):
             if report.debug['urls']:
                 links.update({'Failing URL': report.debug['urls'][-1]})
 
-        if self.config.option.sauce_labs_credentials_file and hasattr(report, 'session_id'):
+        self.sauce_labs_job = None
+        if self.config.option.sauce_labs_credentials_file and getattr(report, 'session_id', None):
             self.sauce_labs_job = sauce_labs.Job(report.session_id)
-
-        if hasattr(self, 'sauce_labs_job'):
             links['Sauce Labs Job'] = self.sauce_labs_job.url
 
         links_html = []
@@ -96,7 +95,7 @@ class HTMLReport(object):
 
         if not 'Passed' in result:
 
-            if hasattr(self, 'sauce_labs_job'):
+            if self.sauce_labs_job:
                 additional_html.append(self.sauce_labs_job.video_html)
 
             if 'Screenshot' in links:
