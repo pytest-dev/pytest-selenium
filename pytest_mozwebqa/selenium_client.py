@@ -7,6 +7,7 @@
 import json
 
 import pytest
+from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
 from selenium.webdriver.common.proxy import Proxy
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import selenium
@@ -41,6 +42,13 @@ class Client(object):
                 self.browser_name = options.browser_name
                 self.browser_version = options.browser_version
                 self.platform = options.platform
+
+            if options.event_listener:
+                mod_name, class_name = options.event_listener.rsplit('.', 1)
+                mod = __import__(mod_name, fromlist=[class_name])
+                self.event_listener = getattr(mod, class_name)
+            else:
+                self.event_listener = None
 
         if self.rc:
             self.browser = options.environment or options.browser
@@ -160,6 +168,9 @@ class Client(object):
                                             desired_capabilities=capabilities)
         else:
             self.selenium = getattr(webdriver, self.driver)()
+
+        if self.event_listener is not None and not isinstance(self.selenium, EventFiringWebDriver):
+            self.selenium = EventFiringWebDriver(self.selenium, self.event_listener())
 
     def start_rc_client(self):
         self.selenium = selenium(self.host, str(self.port), self.browser, self.base_url)

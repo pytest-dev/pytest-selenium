@@ -55,6 +55,8 @@ For full usage details run the following command:
       --untrusted          assume that all certificate issuers are untrusted. (default: False)
       --proxyhost=str      use a proxy running on this host.
       --proxyport=int      use a proxy running on this port.
+      --eventlistener=str  selenium eventlistener class, e.g.
+                           "package.module.EventListenerClassName" (webdriver)
 
     safety:
       --sensitiveurl=str   regular expression for identifying sensitive urls. (default: mozilla\.(com|org))

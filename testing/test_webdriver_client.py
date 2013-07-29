@@ -5,6 +5,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
+from selenium.webdriver.support.abstract_event_listener import AbstractEventListener
 
 pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
@@ -172,3 +173,30 @@ def testOperaProxy(testdir, webserver):
         file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
+
+def testEventListeningWebDriverClientHook(testdir, webserver):
+    file_test = testdir.makepyfile("""
+        import pytest
+        from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
+
+        @pytest.mark.nondestructive
+        def test_selenium(mozwebqa):
+            # Make sure the webdriver client was wrapped
+            assert isinstance(mozwebqa.selenium, EventFiringWebDriver)
+            with pytest.raises(Exception) as e:
+                mozwebqa.selenium.get(mozwebqa.base_url)
+            # Make sure the event hook explodes as expected
+            assert 'before_navigate_to' in e.exconly()
+
+    """)
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=webdriver',
+                                '--driver=firefox',
+                                '--eventlistener=test_webdriver_client.ConcreteEventListener',
+                                file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(passed) == 1
+
+class ConcreteEventListener(AbstractEventListener):
+    def before_navigate_to(self, url, driver):
+        raise Exception('before_navigate_to')
