@@ -80,3 +80,31 @@ def testSkipDestructiveTestsIfForcedAndRunningAgainstSensitiveURL(testdir, webse
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(skipped) == 1
+
+def testSkipDestructiveTestsIfNotForcedAndRunningAgainstProdURLs(testdir, webserver):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.skip_selenium
+        @pytest.mark.parametrize(
+            ('param'), ['val1', 'val2', 'val3', 'val4']
+        )
+        def test_selenium(mozwebqa, param):
+            assert True
+    """)
+    reprec = testdir.inline_run('--baseurl=http://addons.mozilla.org',
+                                '--destructive',
+                                file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(skipped) == 4
+
+    reprec = testdir.inline_run('--baseurl=http://www.mozilla.com',
+                                '--destructive',
+                                file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(skipped) == 4
+
+    reprec = testdir.inline_run('--baseurl=http://marketplace.firefox.com',
+                                '--destructive',
+                                file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(skipped) == 4

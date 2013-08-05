@@ -302,7 +302,7 @@ def pytest_addoption(parser):
     group._addoption('--sensitiveurl',
                      action='store',
                      dest='sensitive_url',
-                     default='mozilla\.(com|org)',
+                     default='(firefox\.com)|(mozilla\.(com|org))',
                      metavar='str',
                      help='regular expression for identifying sensitive urls. (default: %default)')
     group._addoption('--destructive',
