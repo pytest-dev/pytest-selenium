@@ -27,11 +27,11 @@ class Client(object):
 
         if self.webdriver:
             self.driver = options.driver
-            self.capabilities = options.capabilities
+            self.capabilities = options.capabilities or []
             self.chrome_path = options.chrome_path
             self.chrome_options = options.chrome_options or '{}'
             self.firefox_path = options.firefox_path
-            self.firefox_preferences = options.firefox_preferences
+            self.firefox_preferences = options.firefox_preferences or []
             self.profile_path = options.profile_path
             self.extension_paths = options.extension_paths or []
             self.opera_path = options.opera_path
@@ -89,8 +89,15 @@ class Client(object):
 
     def start_webdriver_client(self):
         capabilities = {}
-        if self.capabilities:
-            capabilities.update(json.loads(self.capabilities))
+        for c in self.capabilities:
+            name, value = c.split(':')
+            # handle integer capabilities
+            if value.isdigit():
+                value = int(value)
+            # handle boolean capabilities
+            elif value.lower() in ['true', 'false']:
+                value = value.lower() == 'true'
+            capabilities.update({name: value})
         if self.proxy_host and self.proxy_port:
             proxy = Proxy()
             proxy.http_proxy = '%s:%s' % (self.proxy_host, self.proxy_port)
@@ -171,8 +178,15 @@ class Client(object):
 
     def create_firefox_profile(self, preferences, profile_path, extensions):
         profile = webdriver.FirefoxProfile(profile_path)
-        if preferences:
-            [profile.set_preference(k, v) for k, v in json.loads(preferences).items()]
+        for p in preferences:
+            name, value = p.split(':')
+            # handle integer preferences
+            if value.isdigit():
+                value = int(value)
+            # handle boolean preferences
+            elif value.lower() in ['true', 'false']:
+                value = value.lower() == 'true'
+            profile.set_preference(name, value)
         profile.assume_untrusted_cert_issuer = self.assume_untrusted
         profile.update_preferences()
         for extension in extensions:

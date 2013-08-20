@@ -64,8 +64,15 @@ class Client(selenium_client.Client):
                              'browserName': self.browser_name})
         if self.browser_version:
             capabilities['version'] = self.browser_version
-        if self.capabilities:
-            capabilities.update(json.loads(self.capabilities))
+        for c in self.capabilities:
+            name, value = c.split(':')
+            # handle integer capabilities
+            if value.isdigit():
+                value = int(value)
+            # handle boolean capabilities
+            elif value.lower() in ['true', 'false']:
+                value = value.lower() == 'true'
+            capabilities.update({name: value})
         executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % (
             self.credentials['username'],
             self.credentials['api-key'])

@@ -81,12 +81,14 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir, webserver):
             assert header_color == 'rgba(255, 0, 0, 1)'
             assert anchor_color == 'rgba(255, 0, 0, 1)'
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=webdriver',
-                                '--driver=firefox',
-                                '--firefoxpref=''{"browser.anchor_color":"#FF0000"}''',
-                                '--profilepath=%s' % profile,
-                                file_test)
+    reprec = testdir.inline_run(
+        '--baseurl=http://localhost:%s' % webserver.port,
+        '--api=webdriver',
+        '--driver=firefox',
+        '--firefoxpref=extensions.checkCompatibility.nightly:false',
+        '--firefoxpref=browser.anchor_color:#FF0000',
+        '--profilepath=%s' % profile,
+        file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
 

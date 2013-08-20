@@ -202,11 +202,11 @@ def pytest_addoption(parser):
                      default='Remote',
                      metavar='str',
                      help='webdriver implementation. (default: %default)')
-    group._addoption('--capabilities',
-                     action='store',
+    group._addoption('--capability',
+                     action='append',
                      dest='capabilities',
                      metavar='str',
-                     help='json string of additional capabilties to set (webdriver).')
+                     help='additional capability to set in format "name:value" (webdriver).')
     group._addoption('--chromepath',
                      action='store',
                      dest='chrome_path',
@@ -218,10 +218,10 @@ def pytest_addoption(parser):
                      metavar='path',
                      help='path to the target firefox binary.')
     group._addoption('--firefoxpref',
-                     action='store',
+                     action='append',
                      dest='firefox_preferences',
                      metavar='str',
-                     help='json string of firefox preferences to set (webdriver).')
+                     help='firefox preference name and value to set in format "name:value" (webdriver).')
     group._addoption('--profilepath',
                      action='store',
                      dest='profile_path',
