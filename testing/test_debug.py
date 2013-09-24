@@ -144,7 +144,7 @@ def testDebugWithReportSubdirectory(testdir, webserver):
 def testLogWhenPublic(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
-        @pytest.mark.public
+        @pytest.mark.privacy('public')
         @pytest.mark.nondestructive
         def test_debug(mozwebqa):
             mozwebqa.selenium.open('/')

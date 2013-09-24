@@ -132,6 +132,11 @@ def pytest_runtest_teardown(item):
 
 def pytest_runtest_makereport(__multicall__, item, call):
     report = __multicall__.execute()
+    try:
+        report.public = item.keywords['privacy'].args[0] == 'public'
+    except (IndexError, KeyError):
+        # privacy mark is not present or has no value
+        report.public = False
     if report.when == 'call':
         report.session_id = getattr(item, 'session_id', None)
         if hasattr(TestSetup, 'selenium') and TestSetup.selenium and not 'skip_selenium' in item.keywords:
@@ -142,8 +147,9 @@ def pytest_runtest_makereport(__multicall__, item, call):
                 screenshot and item.debug['screenshots'].append(screenshot)
                 html = TestSetup.selenium_client.html
                 html and item.debug['html'].append(html)
-                log = TestSetup.selenium_client.log
-                log and item.debug['logs'].append(log)
+                if report.public:
+                    log = TestSetup.selenium_client.log
+                    log and item.debug['logs'].append(log)
                 report.sections.append(('pytest-mozwebqa', _debug_summary(item.debug)))
             network_traffic = TestSetup.selenium_client.network_traffic
             network_traffic and item.debug['network_traffic'].append(network_traffic)
