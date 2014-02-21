@@ -81,30 +81,20 @@ def testSkipDestructiveTestsIfForcedAndRunningAgainstSensitiveURL(testdir, webse
     passed, skipped, failed = reprec.listoutcomes()
     assert len(skipped) == 1
 
-def testSkipDestructiveTestsIfNotForcedAndRunningAgainstProdURLs(testdir, webserver):
+
+@pytest.mark.parametrize('baseurl', [
+    'http://addons.mozilla.org',
+    'http://www.mozilla.com',
+    'http://marketplace.firefox.com'])
+def testSkipDestructiveTestsIfForcedAndRunningAgainstDefaultSensitiveURL(testdir, baseurl):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.skip_selenium
-        @pytest.mark.parametrize(
-            ('param'), ['val1', 'val2', 'val3', 'val4']
-        )
-        def test_selenium(mozwebqa, param):
+        def test_selenium(mozwebqa):
             assert True
     """)
-    reprec = testdir.inline_run('--baseurl=http://addons.mozilla.org',
+    reprec = testdir.inline_run('--baseurl=%s' % baseurl,
                                 '--destructive',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
-    assert len(skipped) == 4
-
-    reprec = testdir.inline_run('--baseurl=http://www.mozilla.com',
-                                '--destructive',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(skipped) == 4
-
-    reprec = testdir.inline_run('--baseurl=http://marketplace.firefox.com',
-                                '--destructive',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(skipped) == 4
+    assert len(skipped) == 1
