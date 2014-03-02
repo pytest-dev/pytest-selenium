@@ -51,3 +51,24 @@ def testReportWithDirectory(testdir, webserver):
     report_file = os.path.sep.join([str(testdir.tmpdir), report])
     assert os.path.exists(report_file)
     assert os.path.isfile(report_file)
+
+
+def testReportWithUnicodeCharacters(testdir, webserver):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_report(mozwebqa):
+            mozwebqa.selenium.get(mozwebqa.base_url)
+            assert mozwebqa.selenium.find_element_by_tag_name('p').text == 'E'
+    """)
+    report = 'report/result.html'
+    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
+                                '--api=webdriver',
+                                '--driver=firefox',
+                                '--webqareport=%s' % report,
+                                file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(failed) == 1
+    report_file = os.path.sep.join([str(testdir.tmpdir), report])
+    assert os.path.exists(report_file)
+    assert os.path.isfile(report_file)

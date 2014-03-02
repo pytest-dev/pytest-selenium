@@ -9,11 +9,10 @@ import cgi
 import datetime
 import os
 import pkg_resources
-import py
 import time
-import sys
 import shutil
 
+import py
 from py.xml import html
 from py.xml import raw
 
@@ -108,6 +107,7 @@ class HTMLReport(object):
             if report.longrepr:
                 log = html.div(class_='log')
                 for line in str(report.longrepr).splitlines():
+                    line = line.decode('utf-8')
                     separator = line.startswith('_ ' * 10)
                     if separator:
                         log.append(line[:80])

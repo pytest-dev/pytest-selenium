@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 # Copyright 2008-2009 WebDriver committers
 # Copyright 2008-2009 Google Inc.
 #
@@ -16,7 +18,6 @@
 """A simple web server for testing purposes."""
 
 import logging
-import os
 import socket
 import threading
 import urllib
@@ -34,9 +35,10 @@ class HtmlOnlyHandler(BaseHTTPRequestHandler):
         """GET method handler."""
 
         self.send_response(200)
-        self.send_header('Content-type', 'text/html')
+        self.send_header('Content-type', 'text/html; charset="utf-8"')
         self.end_headers()
-        self.wfile.write('<html><body><h1>Success!</h1><a href="#">Anchor text</a></body></html>')
+        self.wfile.write(
+            u'<html><body><h1>Success!</h1><a href="#">Anchor text</a><p>Ё</p></body></html>'.encode('utf-8'))
 
     def log_message(self, format, *args):
         """Override default to avoid trashing stderr"""
