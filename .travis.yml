@@ -23,5 +23,4 @@ notifications:
   email:
     - dave.hunt@gmail.com
   irc:
-    - "irc.mozilla.org#automation"
     - "irc.mozilla.org#mozwebqa"
