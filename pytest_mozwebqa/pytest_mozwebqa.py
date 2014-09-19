@@ -4,6 +4,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
 import py
 import re
 import ConfigParser
@@ -199,7 +200,7 @@ def pytest_addoption(parser):
     group._addoption('--driver',
                      action='store',
                      dest='driver',
-                     default='Remote',
+                     default=os.environ.get('SELENIUM_DRIVER', 'Remote'),
                      metavar='str',
                      help='webdriver implementation. (default: %default)')
     group._addoption('--capability',
@@ -255,17 +256,20 @@ def pytest_addoption(parser):
     group._addoption('--browsername',
                      action='store',
                      dest='browser_name',
+                     default=os.environ.get('SELENIUM_BROWSER'),
                      metavar='str',
-                     help='target browser name (webdriver).')
+                     help='[webdriver] target browser name (default: %default).')
     group._addoption('--browserver',
                      action='store',
                      dest='browser_version',
+                     default=os.environ.get('SELENIUM_VERSION'),
                      metavar='str',
-                     help='target browser version (webdriver).')
+                     help='[webdriver] target browser version (default: %default).')
     group._addoption('--platform',
                      action='store',
+                     default=os.environ.get('SELENIUM_PLATFORM'),
                      metavar='str',
-                     help='target platform (webdriver).')
+                     help='[webdriver] target platform (default: %default).')
     group._addoption('--webqatimeout',
                      action='store',
                      type='int',
