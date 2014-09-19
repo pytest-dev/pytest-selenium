@@ -207,7 +207,7 @@ def pytest_addoption(parser):
                      action='append',
                      dest='capabilities',
                      metavar='str',
-                     help='additional capability to set in format "name:value" (webdriver).')
+                     help='[webdriver] additional capability to set in format "name:value".')
     group._addoption('--chromepath',
                      action='store',
                      dest='chrome_path',
@@ -222,22 +222,22 @@ def pytest_addoption(parser):
                      action='append',
                      dest='firefox_preferences',
                      metavar='str',
-                     help='firefox preference name and value to set in format "name:value" (webdriver).')
+                     help='[webdriver] firefox preference name and value to set in format "name:value".')
     group._addoption('--profilepath',
                      action='store',
                      dest='profile_path',
                      metavar='str',
-                     help='path to the firefox profile to use (webdriver).')
+                     help='[webdriver] path to the firefox profile to use.')
     group._addoption('--extension',
                      action='append',
                      dest='extension_paths',
                      metavar='str',
-                     help='path to browser extension to install (webdriver).')
+                     help='[webdriver] path to browser extension to install.')
     group._addoption('--chromeopts',
                      action='store',
                      dest='chrome_options',
                      metavar='str',
-                     help='json string of google chrome options to set (webdriver).')
+                     help='[webdriver] json string of google chrome options to set.')
     group._addoption('--operapath',
                      action='store',
                      dest='opera_path',
@@ -305,7 +305,7 @@ def pytest_addoption(parser):
                      action='store',
                      dest='event_listener',
                      metavar='str',
-                     help='selenium eventlistener class, e.g. package.module.EventListenerClassName (webdriver)')
+                     help='[webdriver] selenium eventlistener class, e.g. package.module.EventListenerClassName.')
 
     group = parser.getgroup('safety', 'safety')
     group._addoption('--sensitiveurl',
