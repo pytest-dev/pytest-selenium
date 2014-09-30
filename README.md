@@ -112,6 +112,10 @@ Run tests against Sauce Labs using webdriver API using Firefox 5 on Windows:
 
     $ py.test --baseurl=http://example.com --browsername=firefox --browserver=5.0 --platform=WINDOWS --saucelabs=sauce_labs.yaml
 
+Run tests against Sauce Labs (Mobile Web Application) using webdriver API using Default Browser on Android with Appium:
+
+	$ py.test --baseurl=http://example.com --browsername=browser --platformver=4.4 --platform=android --device=Android --appium=1.2.2 --saucelabs=sauce_labs.yaml
+
 Writing tests for pytest_mozwebqa
 ---------------------------------
 
@@ -256,3 +260,17 @@ If you want the browser launched to use a proxy (currently only supported by Fir
 ### Example (proxy is running on localhost port 8080)
 
     --proxyhost=localhost --proxyport=8080
+
+Testing with Appium on Saucelabs
+--------------------------------
+
+If you want, you have the option to use Appium to drive your Mobile Web Application tests instead of using the deprecated AndroidDriver.
+
+	self.desired_capabilities = {}
+	self.desired_capabilities['platformName'] = 'android'
+	self.desired_capabilities['platformVersion'] = '4.4'
+	self.desired_capabilities['browserName'] = 'browser'
+	self.desired_capabilities['deviceName'] = 'Android'
+	self.desired_capabilities['appiumVersion'] = '1.2.2'
+
+Note that this will only work with the latest Appium version  (i.e version 1.2.2) and the latest Android emulators (i.e Android 4.4 or later). The deviceName must be 'Android' and be careful because it is case sensitive. Also if you would like to specify the Chrome browser instead of the Android default browser you can modify the browserName desired capability as follows: self.desired_capabilities['browserName'] = 'chrome'

@@ -24,6 +24,9 @@ class Client(selenium_client.Client):
         self.browser_name = options.browser_name
         self.browser_version = options.browser_version
         self.platform = options.platform
+        self.platform_version = options.platform_version
+        self.device_name = options.device_name
+        self.appium = options.appium_version
 
         self.keywords = keywords
         self.build = options.build
@@ -60,8 +63,16 @@ class Client(selenium_client.Client):
 
     def start_webdriver_client(self):
         capabilities = self.common_settings
-        capabilities.update({'platform': self.platform,
-                             'browserName': self.browser_name})
+        if self.appium:
+            capabilities.update({'platformName': self.platform,
+                            'browserName': self.browser_name,
+                            'platformVersion': self.platform_version,
+                            'deviceName': self.device_name,
+                            'appiumVersion': self.appium})
+        else:
+            capabilities.update({'platform': self.platform,
+                            'browserName': self.browser_name})
+
         if self.browser_version:
             capabilities['version'] = self.browser_version
         for c in self.capabilities:

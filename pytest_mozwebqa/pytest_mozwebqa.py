@@ -169,6 +169,13 @@ def pytest_addoption(parser):
     })
     config.read('mozwebqa.cfg')
 
+    group = parser.getgroup('appium', 'appium')
+    group._addoption('--appium',
+                     action='store',
+                     dest='appium_version',
+                     metavar='str',
+                     help='target appium version (webdriver).')
+
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--baseurl',
                      action='store',
@@ -186,6 +193,16 @@ def pytest_addoption(parser):
                      default=config.get('DEFAULT', 'api'),
                      metavar='api',
                      help="version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver. (default: %default)")
+    group._addoption('--device',
+                     action='store',
+                     dest='device_name',
+                     metavar='str',
+                     help='target device type/name (webdriver).')
+    group._addoption('--platformver',
+                     action='store',
+                     dest='platform_version',
+                     metavar='str',
+                     help='target platform version (webdriver).')
     group._addoption('--host',
                      action='store',
                      default='localhost',
