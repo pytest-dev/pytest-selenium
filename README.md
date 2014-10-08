@@ -77,10 +77,17 @@ be project specific.
     baseurl: 'http://www.example.com'
     api: 'rc'
     tags: 'tag1, tag2'
+    privacy: 'public restricted'
 
 The `tags` entry is an optional comma separated list of tags that are set when
 using Sauce Labs. This is useful for filtering the list of jobs based on the
 application under test or similar.
+
+The `privacy` entry is used to determine who you share your Sauce Labs jobs
+with. Check the
+[documentation](https://saucelabs.com/docs/additional-config#sharing) for the
+accepted values. This defaults to
+[public restricted](https://saucelabs.com/docs/additional-config#restricted).
 
 ### Examples
 
@@ -232,25 +239,35 @@ By default a custom HTML report will be written to results/index.html. If you wi
 Privacy
 -------
 
-With Selenium RC you can capture log files. By default log files are not captured as these may contain confidential data such as user credentials. If you are confident that a test does not contain such data, you can explicitly set the test as public (the public mark has no effect on WebDriver tests, which do not capture logs):
+With Selenium RC you can capture log files. By default log files are not
+captured as these may contain confidential data such as user credentials. If
+you are confident that a test does not contain such data, you can explicitly
+set the test as public. This mark is also used to set the job sharing level for
+Sauce Labs jobs:
+
+Privacy marks have higher priority than the `privacy` entry in `mozwebqa.cfg`.
 
 ### Example
 
     import pytest
     
-    @pytest.mark.public
+    @pytest.mark.privacy('public')
     def test_public(self, mozwebqa):
         home_pg = home_page.HomePage(mozwebqa)
 
-You can also explicitly mark the test as private, which sets the test appopriately in Sauce Labs jobs.
+You can also explicitly mark the test as private, which sets the test
+appopriately in Sauce Labs jobs.
 
 ### Example
 
     import pytest
     
-    @pytest.mark.private
+    @pytest.mark.privacy('private')
     def test_private(self, mozwebqa):
         home_pg = home_page.HomePage(mozwebqa)
+
+For the full list of accepted values, check the
+[Sauce Labs documentation](https://saucelabs.com/docs/additional-config#sharing).
 
 Using a proxy server
 --------------------

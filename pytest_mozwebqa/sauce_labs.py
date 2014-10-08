@@ -50,16 +50,22 @@ class Client(selenium_client.Client):
 
     @property
     def common_settings(self):
-        config = ConfigParser.ConfigParser(defaults={'tags': ''})
+        config = ConfigParser.ConfigParser(defaults={
+            'tags': '',
+            'privacy': 'public restricted'})
         config.read('mozwebqa.cfg')
         tags = config.get('DEFAULT', 'tags').split(',')
         from _pytest.mark import MarkInfo
         tags.extend([mark for mark in self.keywords.keys() if isinstance(self.keywords[mark], MarkInfo)])
+        try:
+            privacy = self.keywords['privacy'].args[0]
+        except (IndexError, KeyError):
+            # privacy mark is not present or has no value
+            privacy = config.get('DEFAULT', 'privacy')
         return {'build': self.build or None,
                 'name': self.test_id,
                 'tags': tags,
-                'public': 'private' not in self.keywords,
-                'restricted-public-info': 'public' not in self.keywords}
+                'public': privacy}
 
     def start_webdriver_client(self):
         capabilities = self.common_settings
