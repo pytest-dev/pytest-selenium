@@ -22,49 +22,9 @@ Installation
 Running tests with pytest_mozwebqa
 ----------------------------------
 
-For full usage details run the following command:
+    Usage: py.test [options] [file_or_dir] [file_or_dir] [...]
 
-    $ py.test --help
-
-    reporting:
-       --webqareport=path  create mozilla webqa custom report file at given path. (default: results/index.html)
-
-    selenium:
-      --baseurl=url        base url for the application under test.
-      --skipurlcheck       skip the base url and sensitivity checks. (default: False)
-      --api=api            version of selenium api to use. 'rc' uses selenium rc.
-                           'webdriver' uses selenium webdriver. (default: webdriver)
-      --host=str           host that selenium server is listening on. (default: localhost)
-      --port=num           port that selenium server is listening on. (default: 4444)
-      --driver=str         webdriver implementation. (default: Remote)
-      --capability=str     additional capabilty to set in format "name:value" (webdriver).
-      --chromepath=path    path to the google chrome driver executable.
-      --chromeopts=str     json string of google chrome options to set (webdriver).
-      --firefoxpath=path   path to the target firefox binary.
-      --firefoxpref=str    firefox preference name and value to set in format "name:value" (webdriver).
-      --profilepath=path   path to the firefox profile directory (webdriver).
-      --extension=path     path to browser extension to install (webdriver).
-      --operapath=path     path to the opera driver.
-      --browser=str        target browser (standalone rc server).
-      --environment=str    target environment (grid rc).
-      --browsername=str    target browser name (webdriver).
-      --browserver=str     target browser version (webdriver).
-      --platform=str       target platform (webdriver).
-      --webqatimeout=num   timeout (in seconds) for page loads, etc. (default: 60)
-      --capturenetwork     capture network traffic to test_method_name.json (selenium rc). (default: False)
-      --untrusted          assume that all certificate issuers are untrusted. (default: False)
-      --proxyhost=str      use a proxy running on this host.
-      --proxyport=int      use a proxy running on this port.
-      --eventlistener=str  selenium eventlistener class, e.g.
-                           "package.module.EventListenerClassName" (webdriver)
-
-    safety:
-      --sensitiveurl=str   regular expression for identifying sensitive urls. (default: mozilla\.(com|org))
-      --destructive        include destructive tests (tests not explicitly marked as 'nondestructive'). (default: False)
-
-    credentials:
-      --credentials=path  location of yaml file containing user credentials.
-      --saucelabs=path    credentials file containing sauce labs username and api key.
+For full usage details run `py.test --help`.
 
 ### Configuration
 

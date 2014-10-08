@@ -1,6 +1,19 @@
 Change Log
 ==========
 
+1.2
+-----
+* Improved handling of Firefox preferences and additional capabilities. Fixes #103 & #104
+* Skip destructive tests on firefox.com domain by default
+* Use a parameterised test for sensitive URLs
+* Support for Selenium EventListeningWebDriver
+* Fixed UnicodeDecodeError in HTML report. Fixes #114
+* Update the Selenium server used in the Travis-CI tests
+* Add simple headless testing support with PhantomJS
+* Load Selenium defaults from environment variables
+* Adding Appium support for Saucelabs
+* Allow overriding the Sauce Labs sharing
+
 1.1.1
 -----
 * Open links from the HTML report in a new tab/window. Fixes #100

@@ -1,11 +1,11 @@
 from setuptools import setup
 
 setup(name='pytest-mozwebqa',
-      version='1.1.1',
+      version='1.2',
       description='Mozilla WebQA plugin for py.test.',
       author='Dave Hunt',
       author_email='dhunt@mozilla.com',
-      url='https://github.com/davehunt/pytest-mozwebqa',
+      url='https://github.com/mozilla/pytest-mozwebqa',
       packages=['pytest_mozwebqa'],
       package_data={'pytest_mozwebqa': ['resources/style.css', 'resources/main.js', 'resources/jquery.js']},
       py_modules=[
