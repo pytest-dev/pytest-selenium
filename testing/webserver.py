@@ -34,7 +34,9 @@ class HtmlOnlyHandler(BaseHTTPRequestHandler):
     def do_GET(self):
         """GET method handler."""
 
-        self.send_response(200)
+        path_parts = self.path.split('/')
+        response_code = len(path_parts) == 3 and int(path_parts[1]) or 200
+        self.send_response(response_code)
         self.send_header('Content-type', 'text/html; charset="utf-8"')
         self.end_headers()
         self.wfile.write(

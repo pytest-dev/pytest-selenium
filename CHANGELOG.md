@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+1.3
+-----
+* Output request headers when initial test for baseurl fails. Fixes #130
+
 1.2
 -----
 * Improved handling of Firefox preferences and additional capabilities. Fixes #103 & #104
