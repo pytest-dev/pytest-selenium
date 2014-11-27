@@ -46,7 +46,12 @@ def pytest_unconfigure(config):
 
 
 def pytest_sessionstart(session):
-    if session.config.option.base_url and not (session.config.option.skip_url_check or session.config.option.collectonly):
+    if hasattr(session.config, 'slaveinput') or \
+            session.config.option.skip_url_check or \
+            session.config.option.collectonly:
+        return
+
+    if session.config.option.base_url:
         r = requests.get(session.config.option.base_url, verify=False, timeout=REQUESTS_TIMEOUT)
         assert r.status_code in (200, 401), ('Base URL did not return status code 200 or 401. '
                                              '(URL: %s, Response: %s, Headers: %s)' %
