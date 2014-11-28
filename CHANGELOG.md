@@ -1,8 +1,12 @@
 Change Log
 ==========
 
+1.4
+---
+* Only check the base URL from the main process when pytest-xdist is in use.
+
 1.3
------
+---
 * Output request headers when initial test for baseurl fails. Fixes #130
 
 1.2
