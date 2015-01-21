@@ -220,13 +220,13 @@ def pytest_addoption(parser):
                      help='target platform version (webdriver).')
     group._addoption('--host',
                      action='store',
-                     default='localhost',
+                     default=os.environ.get('SELENIUM_HOST', 'localhost'),
                      metavar='str',
                      help='host that selenium server is listening on. (default: %default)')
     group._addoption('--port',
                      action='store',
                      type='int',
-                     default=4444,
+                     default=os.environ.get('SELENIUM_PORT', 4444),
                      metavar='num',
                      help='port that selenium server is listening on. (default: %default)')
     group._addoption('--driver',
