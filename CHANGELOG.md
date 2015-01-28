@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+1.5
+---
+* Support environment variables for Selenium host and port.
+
 1.4
 ---
 * Only check the base URL from the main process when pytest-xdist is in use.
