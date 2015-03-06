@@ -5,6 +5,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import json
+import os
 
 import pytest
 from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
@@ -15,8 +16,12 @@ from selenium import webdriver
 
 class Client(object):
 
-    def __init__(self, test_id, options):
+    def __init__(self, test_id, options, keywords):
         self.test_id = test_id
+        self.options = options
+        self.keywords = keywords
+
+        self.cloud = None
         self.host = options.host
         self.port = options.port
         self.base_url = options.base_url
@@ -45,7 +50,6 @@ class Client(object):
             self.event_listener = None
 
         self.default_implicit_wait = 10
-        self.sauce_labs_credentials = options.sauce_labs_credentials_file
         self.assume_untrusted = options.assume_untrusted
         self.proxy_host = options.proxy_host
         self.proxy_port = options.proxy_port
@@ -139,6 +143,23 @@ class Client(object):
             capabilities.update(webdriver.DesiredCapabilities.OPERA)
             self.selenium = webdriver.Opera(executable_path=self.opera_path,
                                             desired_capabilities=capabilities)
+        elif self.driver.upper() == 'BROWSERSTACK':
+            # TODO support reading configuration from .browserstack
+            from cloud import BrowserStack
+            username = os.getenv('BROWSERSTACK_USERNAME')
+            access_key = os.getenv('BROWSERSTACK_ACCESS_KEY')
+            self.cloud = BrowserStack(username, access_key)
+            self.selenium = self.cloud.driver(self.test_id, capabilities, self.options)
+        elif self.driver.upper() == 'SAUCELABS':
+            # TODO support reading configuration from .saucelabs
+            from cloud import SauceLabs
+            for v in ['SAUCELABS_USERNAME', 'SAUCELABS_API_KEY']:
+                if v not in os.environ:
+                    raise ValueError('Mandatory environment variable undefined: %s' % v)
+            username = os.environ['SAUCELABS_USERNAME']
+            api_key = os.environ['SAUCELABS_API_KEY']
+            self.cloud = SauceLabs(username, api_key)
+            self.selenium = self.cloud.driver(self.test_id, capabilities, self.options, self.keywords)
         else:
             self.selenium = getattr(webdriver, self.driver)()
 

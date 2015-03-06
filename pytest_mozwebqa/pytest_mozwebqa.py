@@ -9,7 +9,6 @@ import re
 import ConfigParser
 
 import py
-import pytest
 import requests
 
 import credentials
@@ -22,6 +21,7 @@ class DeferPlugin(object):
     """Simple plugin to defer pytest-html hook functions."""
 
     def pytest_html_environment(self, config):
+        # TODO remove reference to Sauce Labs
         server = config.option.sauce_labs_credentials_file and \
             'Sauce Labs' or 'http://%s:%s' % (config.option.host,
                                               config.option.port)
@@ -39,8 +39,7 @@ class DeferPlugin(object):
                 'Selenium Server': server,
                 'Browser': browser,
                 'Timeout': config.option.webqatimeout,
-                'Credentials': config.option.credentials_file,
-                'Sauce Labs Credentials': config.option.sauce_labs_credentials_file}
+                'Credentials': config.option.credentials_file}
 
 
 def pytest_configure(config):
@@ -115,27 +114,17 @@ def pytest_runtest_setup(item):
                      'not destructive, add the \'nondestructive\' marker to '
                      'it. Sensitive URL: %s' % first_match.string)
 
-    if item.config.option.sauce_labs_credentials_file:
-        item.sauce_labs_credentials = credentials.read(item.config.option.sauce_labs_credentials_file)
-
     if item.config.option.credentials_file:
         TestSetup.credentials = credentials.read(item.config.option.credentials_file)
 
     test_id = '.'.join(split_class_and_test_names(item.nodeid))
 
     if 'skip_selenium' not in item.keywords:
-        if hasattr(item, 'sauce_labs_credentials'):
-            from sauce_labs import Client
-            TestSetup.selenium_client = Client(
-                test_id,
-                item.config.option,
-                item.keywords,
-                item.sauce_labs_credentials)
-        else:
-            from selenium_client import Client
-            TestSetup.selenium_client = Client(
-                test_id,
-                item.config.option)
+        from selenium_client import Client
+        TestSetup.selenium_client = Client(
+            test_id,
+            item.config.option,
+            item.keywords)
         TestSetup.selenium_client.start()
         item.session_id = TestSetup.selenium_client.session_id
         TestSetup.selenium = TestSetup.selenium_client.selenium
@@ -177,15 +166,14 @@ def pytest_runtest_makereport(__multicall__, item, call):
                 html = TestSetup.selenium.page_source.encode('utf-8')
                 if html is not None and pytest_html is not None:
                     extra.append(pytest_html.extras.text(html, 'HTML'))
-            if hasattr(item, 'sauce_labs_credentials') and report.session_id:
-                result = {'passed': report.passed or (report.failed and 'xfail' in report.keywords)}
-                import sauce_labs
-                sauce_labs_job = sauce_labs.Job(report.session_id)
-                extra_summary.append('Sauce Labs Job: %s' % sauce_labs_job.url)
+            if TestSetup.selenium_client.cloud is not None and report.session_id:
+                cloud = TestSetup.selenium_client.cloud
+                extra_summary.append('%s Job: %s' % (cloud.name, cloud.url(report.session_id)))
                 if pytest_html is not None:
-                    extra.append(pytest_html.extras.url(sauce_labs_job.url, 'Sauce Labs Job'))
-                    extra.append(pytest_html.extras.html(sauce_labs_job.video_html))
-                sauce_labs_job.send_result(result, item.sauce_labs_credentials)
+                    extra.append(pytest_html.extras.url(cloud.url, '%s Job' % cloud.name))
+                    extra.append(pytest_html.extras.html(cloud.additional_html(report.session_id)))
+                passed = report.passed or (report.failed and xfail)
+                cloud.update_status(report.session_id, passed)
         report.sections.append(('pytest-mozwebqa', '\n'.join(extra_summary)))
         report.extra = extra
     return report
@@ -353,11 +341,6 @@ def pytest_addoption(parser):
                      dest='credentials_file',
                      metavar='path',
                      help="location of yaml file containing user credentials.")
-    group._addoption('--saucelabs',
-                     action='store',
-                     dest='sauce_labs_credentials_file',
-                     metavar='path',
-                     help='credendials file containing sauce labs username and api key.')
 
 
 def split_class_and_test_names(nodeid):

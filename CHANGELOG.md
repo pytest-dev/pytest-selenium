@@ -3,6 +3,7 @@ Change Log
 
 2.0
 ---
+* Added support for BrowserStack
 * Use pytest-html for HTML reports
 * Removed support for Selenium RC
 

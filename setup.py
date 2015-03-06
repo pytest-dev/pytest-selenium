@@ -10,8 +10,7 @@ setup(name='pytest-mozwebqa',
       py_modules=[
           'pytest_mozwebqa.pytest_mozwebqa',
           'pytest_mozwebqa.credentials',
-          'pytest_mozwebqa.selenium_client',
-          'pytest_mozwebqa.sauce_labs'],
+          'pytest_mozwebqa.selenium_client'],
       install_requires=[
           'pytest>=2.2.4',
           'selenium>=2.26.0',

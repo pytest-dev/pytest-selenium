@@ -62,14 +62,6 @@ Run tests against a remote webdriver server either directly or via grid:
 
     $ py.test --baseurl=http://example.com --browsername=firefox --browserver=5 --platform=mac
 
-Run tests against Sauce Labs using Firefox 5 on Windows:
-
-    $ py.test --baseurl=http://example.com --browsername=firefox --browserver=5.0 --platform=WINDOWS --saucelabs=sauce_labs.yaml
-
-Run tests against Sauce Labs using default browser on Android with Appium:
-
-	$ py.test --baseurl=http://example.com --browsername=browser --platformver=4.4 --platform=android --device=Android --appium=1.2.2 --saucelabs=sauce_labs.yaml
-
 Writing tests for pytest_mozwebqa
 ---------------------------------
 
@@ -215,6 +207,43 @@ appopriately in Sauce Labs jobs.
 
 For the full list of accepted values, check the
 [Sauce Labs documentation](https://saucelabs.com/docs/additional-config#sharing).
+
+Cloud integration
+-----------------
+
+### Sauce Labs
+
+To run your automated tests using [Sauce Labs](https://saucelabs.com/), specify
+`SauceLabs` as your driver and set the `SAUCELABS_USERNAME` and
+`SAUCELABS_API_KEY` environment variables:
+
+```shell
+export SAUCELABS_USERNAME=Username
+export SAUCELABS_API_KEY=Secret
+py.test --driver=SauceLabs --browsername=Firefox --platform="Windows 8"
+```
+
+See the [supported platforms](https://docs.saucelabs.com/reference/platforms-configurator/)
+to help you with your configuration. Additional capabilities can be set using
+the `--capability` comand line arguments. See the
+[test configuration documentation](https://docs.saucelabs.com/reference/test-configuration/)
+for full details of what can be configured.
+
+### BrowserStack
+
+To run your automated tests using [BrowserStack](https://www.browserstack.com/),
+specify `BrowserStack` as your driver and set the `BROWSERSTACK_USERNAME` and
+`BROWSERSTACK_ACCESS_KEY` environment variables:
+
+```shell
+export BROWSERSTACK_USERNAME=Username
+export BROWSERSTACK_ACCESS_KEY=Secret
+py.test --driver=BrowserStack --browsername=firefox --platform=WIN8
+```
+
+See the [capabilities documentation](https://www.browserstack.com/automate/capabilities)
+for additional configuration that can be set using `--capability` command line
+arguments.
 
 Using a proxy server
 --------------------
