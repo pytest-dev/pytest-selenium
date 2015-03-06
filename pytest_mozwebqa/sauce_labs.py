@@ -4,12 +4,12 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import httplib
 import json
 
 import ConfigParser
 import pytest
 from py.xml import html
+import requests
 from selenium import selenium
 from selenium import webdriver
 
@@ -160,17 +160,7 @@ class Job(object):
             class_='video')
 
     def send_result(self, result, credentials):
-        try:
-            basic_authentication = (
-                '%s:%s' % (credentials['username'],
-                           credentials['api-key'])).encode('base64')[:-1]
-            connection = httplib.HTTPConnection('saucelabs.com')
-            connection.request(
-                'PUT',
-                '/rest/v1/%s/jobs/%s' % (credentials['username'], self.session_id),
-                json.dumps(result),
-                headers={'Authorization': 'Basic %s' % basic_authentication,
-                         'Content-Type': 'text/json'})
-            connection.getresponse()
-        except:
-            pass
+        requests.put('http://saucelabs.com/rest/v1/%s/jobs/%s' % (
+            credentials['username'], self.session_id),
+            data=json.dumps(result),
+            auth=(credentials['username'], credentials['api-key']))
