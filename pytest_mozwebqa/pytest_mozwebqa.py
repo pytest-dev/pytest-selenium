@@ -13,7 +13,7 @@ import requests
 
 import credentials
 
-__version__ = '1.5'
+__version__ = '1.6'
 REQUESTS_TIMEOUT = 10
 
 

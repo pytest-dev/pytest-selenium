@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+1.6
+---
+* Use requests when sending the Sauce Labs result.
+
 1.5
 ---
 * Support environment variables for Selenium host and port.
