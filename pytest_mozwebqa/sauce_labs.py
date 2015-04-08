@@ -10,7 +10,6 @@ import ConfigParser
 import pytest
 from py.xml import html
 import requests
-from selenium import selenium
 from selenium import webdriver
 
 import selenium_client
@@ -32,21 +31,14 @@ class Client(selenium_client.Client):
         self.build = options.build
         self.credentials = credentials
 
-    def check_basic_usage(self):
-        super(Client, self).check_basic_usage()
+    def check_usage(self):
+        super(Client, self).check_usage()
 
         if not self.credentials['username']:
             raise pytest.UsageError('username must be specified in the sauce labs credentials file.')
 
         if not self.credentials['api-key']:
             raise pytest.UsageError('api-key must be specified in the sauce labs credentials file.')
-
-    def check_rc_usage(self):
-        if not self.browser_name:
-            raise pytest.UsageError("--browsername must be specified when using the 'rc' api with sauce labs.")
-
-        if not self.platform:
-            raise pytest.UsageError("--platform must be specified when using the 'rc' api with sauce labs.")
 
     @property
     def common_settings(self):
@@ -67,7 +59,7 @@ class Client(selenium_client.Client):
                 'tags': tags,
                 'public': privacy}
 
-    def start_webdriver_client(self):
+    def start_client(self):
         capabilities = self.common_settings
         if self.appium:
             capabilities.update({'platformName': self.platform,
@@ -95,19 +87,6 @@ class Client(selenium_client.Client):
             self.credentials['api-key'])
         self.selenium = webdriver.Remote(command_executor=executor,
                                          desired_capabilities=capabilities)
-
-    def start_rc_client(self):
-        settings = self.common_settings
-        settings.update({'username': self.credentials['username'],
-                         'access-key': self.credentials['api-key'],
-                         'os': self.platform,
-                         'browser': self.browser_name})
-        if self.browser_version:
-            settings['browser-version'] = self.browser_version
-        self.selenium = selenium('ondemand.saucelabs.com', '80',
-                                 json.dumps(settings),
-                                 self.base_url)
-        self.selenium.start()
 
 
 class Job(object):

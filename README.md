@@ -35,7 +35,6 @@ be project specific.
 
     [DEFAULT]
     baseurl: 'http://www.example.com'
-    api: 'rc'
     tags: 'tag1, tag2'
     privacy: 'public restricted'
 
@@ -51,14 +50,6 @@ accepted values. This defaults to
 
 ### Examples
 
-Run tests against a standalone RC server using Firefox in the default location:
-
-    $ py.test --baseurl=http://example.com --api=rc --browser="*firefox"
-
-Run tests against a grid server with an RC node environment named 'Firefox 5 on Mac OS X':
-
-    $ py.test --baseurl=http://example.com --api=rc --environment="Firefox 5 on Mac OS X"
-
 Run tests against a local webdriver using Firefox:
 
     $ py.test --baseurl=http://example.com --driver=firefox --firefoxpath=/Applications/Firefox.app/Contents/MacOS/firefox-bin
@@ -71,15 +62,11 @@ Run tests against a remote webdriver server either directly or via grid:
 
     $ py.test --baseurl=http://example.com --browsername=firefox --browserver=5 --platform=mac
 
-Run tests against Sauce Labs using RC API using Firefox 5 on Windows 2003:
-
-    $ py.test --baseurl=http://example.com --api=rc --browsername=firefox --browserver=5.0 --platform="Windows 2003" --saucelabs=sauce_labs.yaml
-
-Run tests against Sauce Labs using webdriver API using Firefox 5 on Windows:
+Run tests against Sauce Labs using Firefox 5 on Windows:
 
     $ py.test --baseurl=http://example.com --browsername=firefox --browserver=5.0 --platform=WINDOWS --saucelabs=sauce_labs.yaml
 
-Run tests against Sauce Labs (Mobile Web Application) using webdriver API using Default Browser on Android with Appium:
+Run tests against Sauce Labs using default browser on Android with Appium:
 
 	$ py.test --baseurl=http://example.com --browsername=browser --platformver=4.4 --platform=android --device=Android --appium=1.2.2 --saucelabs=sauce_labs.yaml
 
@@ -118,10 +105,10 @@ Sensitive environments
 
 If running against a sensitive (production) environment any destructive tests will be skipped with an appropriate error message. You can specify a regular expression that matches your sensitive environments using the `--sensitiveurl` command line option.
 
-Setting WebDriver capabilities
-------------------------------
+Setting capabilities
+--------------------
 
-If you're using WebDriver it's possible to specify additional capabilities on the command line:
+It's possible to specify additional capabilities on the command line:
 
 ### Example (accept SSL certificates)
 
@@ -131,7 +118,7 @@ If you're using WebDriver it's possible to specify additional capabilities on th
 Setting Firefox preferences
 ---------------------------
 
-If you're using WebDriver and Firefox it's possible to set custom preferences:
+If you're using Firefox it's possible to set custom preferences:
 
 ### Example (disable addon compatibility checking)
 
@@ -140,7 +127,7 @@ If you're using WebDriver and Firefox it's possible to set custom preferences:
 Specifying a Firefox profile
 ----------------------------
 
-If you're using WebDriver and Firefox it's possible to specify an existing Firefox profile to use when starting Firefox.
+If you're using Firefox it's possible to specify an existing Firefox profile to use when starting Firefox.
 
 ### Example (use the profile located at /path/to/profile_directory)
 
@@ -149,7 +136,7 @@ If you're using WebDriver and Firefox it's possible to specify an existing Firef
 Installing Firefox extensions
 -----------------------------
 
-If you're using WebDriver and Firefox it's possible to install extensions when starting the browser.
+If you're using Firefox it's possible to install extensions when starting the browser.
 
 ### Example (install the extensions located at /path/to/ext1/ext1.xpi and /path/to/ext2/ext2.xpi)
 
@@ -158,7 +145,7 @@ If you're using WebDriver and Firefox it's possible to install extensions when s
 Setting Google Chrome options
 -----------------------------
 
-If you're using WebDriver and Google Chrome then you can set various options on the command line using a JSON string.
+If you're using Google Chrome then you can set various options on the command line using a JSON string.
 
 Valid keys are:
  * arguments: a list of command-line arguments to use when starting Google Chrome.
@@ -173,7 +160,7 @@ For more details on Google Chrome options see: http://code.google.com/p/chromedr
 Installing Google Chrome extensions
 -----------------------------------
 
-If you're using WebDriver and Google Chrome it's possible to install extensions when starting the browser.
+If you're using Google Chrome it's possible to install extensions when starting the browser.
 
 ### Example (install the extensions located at /path/to/ext1/ext1.crx and /path/to/ext2/ext2.crx)
 
@@ -199,11 +186,7 @@ By default a custom HTML report will be written to results/index.html. If you wi
 Privacy
 -------
 
-With Selenium RC you can capture log files. By default log files are not
-captured as these may contain confidential data such as user credentials. If
-you are confident that a test does not contain such data, you can explicitly
-set the test as public. This mark is also used to set the job sharing level for
-Sauce Labs jobs:
+You can specify the job sharing level for Sauce Labs jobs.
 
 Privacy marks have higher priority than the `privacy` entry in `mozwebqa.cfg`.
 

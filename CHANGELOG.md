@@ -1,6 +1,10 @@
 Change Log
 ==========
 
+2.0
+---
+* Removed support for Selenium RC
+
 1.6
 ---
 * Use requests when sending the Sauce Labs result.

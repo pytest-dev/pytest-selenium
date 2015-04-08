@@ -13,7 +13,6 @@ import py
 import time
 import shutil
 
-import py
 from py.xml import html
 from py.xml import raw
 
@@ -41,7 +40,6 @@ class HTMLReport(object):
         if not os.path.exists(full_path):
             os.makedirs(full_path)
         relative_path = os.path.join(self._debug_path, test_path)
-        absolute_path = os.path.join(root_path, test_path)
         return (relative_path, full_path)
 
     def _appendrow(self, result, report):
@@ -64,19 +62,6 @@ class HTMLReport(object):
                 f = open(os.path.join(full_path, filename), 'wb')
                 f.write(report.debug['html'][-1])
                 links.update({'HTML': os.path.join(relative_path, filename)})
-
-            # Log may contain passwords, etc so we only capture it for tests marked as public
-            if report.public and report.debug['logs']:
-                filename = 'log.txt'
-                f = open(os.path.join(full_path, filename), 'wb')
-                f.write(report.debug['logs'][-1])
-                links.update({'Log': os.path.join(relative_path, filename)})
-
-            if report.debug['network_traffic']:
-                filename = 'networktraffic.json'
-                f = open(os.path.join(full_path, filename), 'wb')
-                f.write(report.debug['network_traffic'][-1])
-                links.update({'Network Traffic': os.path.join(relative_path, filename)})
 
             if report.debug['urls']:
                 links.update({'Failing URL': report.debug['urls'][-1]})
@@ -196,22 +181,18 @@ class HTMLReport(object):
                   self.config.option.platform and \
                   '%s %s on %s' % (str(self.config.option.browser_name).title(),
                                    self.config.option.browser_version,
-                                   str(self.config.option.platform).title()) or \
-                  self.config.option.environment or \
-                  self.config.option.browser
+                                   str(self.config.option.platform).title())
 
         generated = datetime.datetime.now()
         configuration = {
             'Base URL': self.config.option.base_url,
             'Build': self.config.option.build,
-            'Selenium API': self.config.option.api,
             'Driver': self.config.option.driver,
             'Firefox Path': self.config.option.firefox_path,
             'Google Chrome Path': self.config.option.chrome_path,
             'Selenium Server': server,
             'Browser': browser,
             'Timeout': self.config.option.webqatimeout,
-            'Capture Network Traffic': self.config.option.capture_network,
             'Credentials': self.config.option.credentials_file,
             'Sauce Labs Credentials': self.config.option.sauce_labs_credentials_file}
 

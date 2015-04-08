@@ -16,13 +16,13 @@ def testReportWithoutDirectory(testdir, webserver):
         import pytest
         @pytest.mark.nondestructive
         def test_report(mozwebqa):
-            mozwebqa.selenium.open('/')
-            assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
+            mozwebqa.selenium.get(mozwebqa.base_url)
+            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+            assert header.text == 'Success!'
     """)
     report = 'result.html'
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=rc',
-                                '--browser=*firefox',
+                                '--driver=firefox',
                                 '--webqareport=%s' % report,
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -37,13 +37,13 @@ def testReportWithDirectory(testdir, webserver):
         import pytest
         @pytest.mark.nondestructive
         def test_report(mozwebqa):
-            mozwebqa.selenium.open('/')
-            assert mozwebqa.selenium.get_text('css=h1') == 'Success!'
+            mozwebqa.selenium.get(mozwebqa.base_url)
+            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+            assert header.text == 'Success!'
     """)
     report = 'report/result.html'
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=rc',
-                                '--browser=*firefox',
+                                '--driver=firefox',
                                 '--webqareport=%s' % report,
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -63,7 +63,6 @@ def testReportWithUnicodeCharacters(testdir, webserver):
     """)
     report = 'report/result.html'
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=webdriver',
                                 '--driver=firefox',
                                 '--webqareport=%s' % report,
                                 file_test)

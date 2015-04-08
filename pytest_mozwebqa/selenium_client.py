@@ -10,7 +10,6 @@ import pytest
 from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
 from selenium.webdriver.common.proxy import Proxy
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from selenium import selenium
 from selenium import webdriver
 
 
@@ -21,40 +20,30 @@ class Client(object):
         self.host = options.host
         self.port = options.port
         self.base_url = options.base_url
-        self.api = options.api.upper()
 
-        self.webdriver = self.api == 'WEBDRIVER'
-        self.rc = self.api == 'RC'
+        self.driver = options.driver
+        self.capabilities = options.capabilities or []
+        self.chrome_path = options.chrome_path
+        self.chrome_options = options.chrome_options or '{}'
+        self.firefox_path = options.firefox_path
+        self.firefox_preferences = options.firefox_preferences or []
+        self.profile_path = options.profile_path
+        self.extension_paths = options.extension_paths or []
+        self.opera_path = options.opera_path
+        self.timeout = options.webqatimeout
 
-        if self.webdriver:
-            self.driver = options.driver
-            self.capabilities = options.capabilities or []
-            self.chrome_path = options.chrome_path
-            self.chrome_options = options.chrome_options or '{}'
-            self.firefox_path = options.firefox_path
-            self.firefox_preferences = options.firefox_preferences or []
-            self.profile_path = options.profile_path
-            self.extension_paths = options.extension_paths or []
-            self.opera_path = options.opera_path
-            self.timeout = options.webqatimeout
+        if self.driver.upper() == 'REMOTE':
+            self.browser_name = options.browser_name
+            self.browser_version = options.browser_version
+            self.platform = options.platform
 
-            if self.driver.upper() == 'REMOTE':
-                self.browser_name = options.browser_name
-                self.browser_version = options.browser_version
-                self.platform = options.platform
+        if options.event_listener:
+            mod_name, class_name = options.event_listener.rsplit('.', 1)
+            mod = __import__(mod_name, fromlist=[class_name])
+            self.event_listener = getattr(mod, class_name)
+        else:
+            self.event_listener = None
 
-            if options.event_listener:
-                mod_name, class_name = options.event_listener.rsplit('.', 1)
-                mod = __import__(mod_name, fromlist=[class_name])
-                self.event_listener = getattr(mod, class_name)
-            else:
-                self.event_listener = None
-
-        if self.rc:
-            self.browser = options.environment or options.browser
-            self.timeout = options.webqatimeout * 1000
-
-        self.capture_network = options.capture_network
         self.default_implicit_wait = 10
         self.sauce_labs_credentials = options.sauce_labs_credentials_file
         self.assume_untrusted = options.assume_untrusted
@@ -62,40 +51,22 @@ class Client(object):
         self.proxy_port = options.proxy_port
 
     def check_usage(self):
-        self.check_basic_usage()
-
-        if self.webdriver:
-            self.check_webdriver_usage()
-        else:
-            self.check_rc_usage()
-
-    def check_basic_usage(self):
         if not self.base_url:
             raise pytest.UsageError('--baseurl must be specified.')
 
-    def check_webdriver_usage(self):
         if self.driver.upper() == 'REMOTE':
             if not self.browser_name:
-                raise pytest.UsageError("--browsername must be specified when using the 'webdriver' api.")
+                raise pytest.UsageError("--browsername must be specified.")
 
             if not self.platform:
-                raise pytest.UsageError("--platform must be specified when using the 'webdriver' api.")
-
-    def check_rc_usage(self):
-        if not self.browser:
-            raise pytest.UsageError("--browser or --environment must be specified when using the 'rc' api.")
+                raise pytest.UsageError("--platform must be specified.")
 
     def start(self):
         self.check_usage()
-        if self.webdriver:
-            self.start_webdriver_client()
-            self.selenium.implicitly_wait(self.default_implicit_wait)
-        else:
-            self.start_rc_client()
-            self.selenium.set_timeout(self.timeout)
-            self.selenium.set_context(self.test_id)
+        self.start_client()
+        self.selenium.implicitly_wait(self.default_implicit_wait)
 
-    def start_webdriver_client(self):
+    def start_client(self):
         capabilities = {}
         for c in self.capabilities:
             name, value = c.split(':')
@@ -174,20 +145,9 @@ class Client(object):
         if self.event_listener is not None and not isinstance(self.selenium, EventFiringWebDriver):
             self.selenium = EventFiringWebDriver(self.selenium, self.event_listener())
 
-    def start_rc_client(self):
-        self.selenium = selenium(self.host, str(self.port), self.browser, self.base_url)
-
-        if self.capture_network:
-            self.selenium.start('captureNetworkTraffic=true')
-        else:
-            self.selenium.start()
-
     @property
     def session_id(self):
-        if self.webdriver:
-            return self.selenium.session_id
-        else:
-            return self.selenium.get_eval('selenium.sessionId')
+        return self.selenium.session_id
 
     def create_firefox_profile(self, preferences, profile_path, extensions):
         profile = webdriver.FirefoxProfile(profile_path)
@@ -221,61 +181,3 @@ class Client(object):
             options.add_extension(extension)
 
         return options
-
-    @property
-    def screenshot(self):
-        try:
-            if self.webdriver:
-                screenshot = self.selenium.get_screenshot_as_base64()
-            else:
-                screenshot = self.selenium.capture_entire_page_screenshot_to_string('')
-            return screenshot
-        except:
-            return None
-
-    @property
-    def html(self):
-        try:
-            if self.webdriver:
-                html = self.selenium.page_source
-            else:
-                html = self.selenium.get_html_source()
-            return html.encode('utf-8')
-        except:
-            return None
-
-    @property
-    def log(self):
-        try:
-            if self.rc:
-                return self.selenium.get_log().encode('utf-8')
-        except:
-            return None
-
-    @property
-    def network_traffic(self):
-        try:
-            if self.rc and self.capture_network:
-                return self.selenium.captureNetworkTraffic('json')
-        except:
-            return None
-
-    @property
-    def url(self):
-        try:
-            if self.webdriver:
-                url = self.selenium.current_url
-            else:
-                url = self.selenium.get_location()
-            return url
-        except:
-            return None
-
-    def stop(self):
-        try:
-            if self.webdriver:
-                self.selenium.quit()
-            else:
-                self.selenium.stop()
-        except:
-            pass

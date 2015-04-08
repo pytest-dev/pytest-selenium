@@ -21,7 +21,6 @@ def testStartWebDriverClient(testdir, webserver):
             assert header.text == 'Success!'
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=webdriver',
                                 '--driver=firefox',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -51,7 +50,6 @@ def testSpecifyingFirefoxProfile(testdir, webserver):
             assert anchor_color == 'rgba(255, 105, 180, 1)'
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=webdriver',
                                 '--driver=firefox',
                                 '--profilepath=%s' % profile,
                                 file_test)
@@ -84,7 +82,6 @@ def testSpecifyingFirefoxProfileAndOverridingPreferences(testdir, webserver):
     """)
     reprec = testdir.inline_run(
         '--baseurl=http://localhost:%s' % webserver.port,
-        '--api=webdriver',
         '--driver=firefox',
         '--firefoxpref=extensions.checkCompatibility.nightly:false',
         '--firefoxpref=browser.anchor_color:#FF0000',
@@ -110,7 +107,6 @@ def testAddingFirefoxExtension(testdir, webserver):
             assert 'Test Extension (empty)' in extensions
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=webdriver',
                                 '--driver=firefox',
                                 '--extension=''%s''' % extension,
                                 file_test)
@@ -128,7 +124,6 @@ def testFirefoxProxy(testdir, webserver):
             assert header.text == 'Success!'
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-        '--api=webdriver',
         '--driver=firefox',
         '--proxyhost=localhost',
         '--proxyport=%s' % webserver.port,
@@ -148,7 +143,6 @@ def testChromeProxy(testdir, webserver):
             assert header.text == 'Success!'
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-        '--api=webdriver',
         '--driver=chrome',
         '--proxyhost=localhost',
         '--proxyport=%s' % webserver.port,
@@ -168,7 +162,6 @@ def testOperaProxy(testdir, webserver):
             assert header.text == 'Success!'
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-        '--api=webdriver',
         '--driver=opera',
         '--proxyhost=localhost',
         '--proxyport=%s' % webserver.port,
@@ -192,12 +185,12 @@ def testEventListeningWebDriverClientHook(testdir, webserver):
 
     """)
     reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--api=webdriver',
                                 '--driver=firefox',
                                 '--eventlistener=test_webdriver_client.ConcreteEventListener',
                                 file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(passed) == 1
+
 
 class ConcreteEventListener(AbstractEventListener):
     def before_navigate_to(self, url, driver):

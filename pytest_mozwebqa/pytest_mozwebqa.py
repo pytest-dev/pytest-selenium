@@ -74,9 +74,7 @@ def pytest_runtest_setup(item):
     item.debug = {
         'urls': [],
         'screenshots': [],
-        'html': [],
-        'logs': [],
-        'network_traffic': []}
+        'html': []}
     TestSetup.base_url = item.config.option.base_url
 
     # configure test proxies
@@ -137,7 +135,7 @@ def pytest_runtest_setup(item):
 
 def pytest_runtest_teardown(item):
     if hasattr(TestSetup, 'selenium') and TestSetup.selenium and 'skip_selenium' not in item.keywords:
-        TestSetup.selenium_client.stop()
+        TestSetup.selenium.quit()
 
 
 def pytest_runtest_makereport(__multicall__, item, call):
@@ -150,19 +148,15 @@ def pytest_runtest_makereport(__multicall__, item, call):
     if report.when == 'call':
         report.session_id = getattr(item, 'session_id', None)
         if hasattr(TestSetup, 'selenium') and TestSetup.selenium and 'skip_selenium' not in item.keywords:
-            if report.skipped and 'xfail' in report.keywords or report.failed and 'xfail' not in report.keywords:
-                url = TestSetup.selenium_client.url
+            xfail = hasattr(report, "wasxfail")
+            if (report.skipped and xfail) or (report.failed and not xfail):
+                url = TestSetup.selenium.current_url
                 url and item.debug['urls'].append(url)
-                screenshot = TestSetup.selenium_client.screenshot
+                screenshot = TestSetup.selenium.get_screenshot_as_base64()
                 screenshot and item.debug['screenshots'].append(screenshot)
-                html = TestSetup.selenium_client.html
+                html = TestSetup.selenium.page_source.encode('utf-8')
                 html and item.debug['html'].append(html)
-                if report.public:
-                    log = TestSetup.selenium_client.log
-                    log and item.debug['logs'].append(log)
                 report.sections.append(('pytest-mozwebqa', _debug_summary(item.debug)))
-            network_traffic = TestSetup.selenium_client.network_traffic
-            network_traffic and item.debug['network_traffic'].append(network_traffic)
             report.debug = item.debug
             if hasattr(item, 'sauce_labs_credentials') and report.session_id:
                 result = {'passed': report.passed or (report.failed and 'xfail' in report.keywords)}
@@ -178,10 +172,7 @@ def pytest_funcarg__mozwebqa(request):
 
 
 def pytest_addoption(parser):
-    config = ConfigParser.ConfigParser(defaults={
-        'baseurl': '',
-        'api': 'webdriver'
-    })
+    config = ConfigParser.ConfigParser(defaults={'baseurl': ''})
     config.read('mozwebqa.cfg')
 
     group = parser.getgroup('appium', 'appium')
@@ -189,7 +180,7 @@ def pytest_addoption(parser):
                      action='store',
                      dest='appium_version',
                      metavar='str',
-                     help='target appium version (webdriver).')
+                     help='target appium version.')
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--baseurl',
@@ -203,21 +194,16 @@ def pytest_addoption(parser):
                      dest='skip_url_check',
                      default=False,
                      help='skip the base url and sensitivity checks. (default: %default)')
-    group._addoption('--api',
-                     action='store',
-                     default=config.get('DEFAULT', 'api'),
-                     metavar='api',
-                     help="version of selenium api to use. 'rc' uses selenium rc. 'webdriver' uses selenium webdriver. (default: %default)")
     group._addoption('--device',
                      action='store',
                      dest='device_name',
                      metavar='str',
-                     help='target device type/name (webdriver).')
+                     help='target device type/name.')
     group._addoption('--platformver',
                      action='store',
                      dest='platform_version',
                      metavar='str',
-                     help='target platform version (webdriver).')
+                     help='target platform version.')
     group._addoption('--host',
                      action='store',
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),
@@ -239,7 +225,7 @@ def pytest_addoption(parser):
                      action='append',
                      dest='capabilities',
                      metavar='str',
-                     help='[webdriver] additional capability to set in format "name:value".')
+                     help='additional capability to set in format "name:value".')
     group._addoption('--chromepath',
                      action='store',
                      dest='chrome_path',
@@ -254,65 +240,50 @@ def pytest_addoption(parser):
                      action='append',
                      dest='firefox_preferences',
                      metavar='str',
-                     help='[webdriver] firefox preference name and value to set in format "name:value".')
+                     help='firefox preference name and value to set in format "name:value".')
     group._addoption('--profilepath',
                      action='store',
                      dest='profile_path',
                      metavar='str',
-                     help='[webdriver] path to the firefox profile to use.')
+                     help='path to the firefox profile to use.')
     group._addoption('--extension',
                      action='append',
                      dest='extension_paths',
                      metavar='str',
-                     help='[webdriver] path to browser extension to install.')
+                     help='path to browser extension to install.')
     group._addoption('--chromeopts',
                      action='store',
                      dest='chrome_options',
                      metavar='str',
-                     help='[webdriver] json string of google chrome options to set.')
+                     help='json string of google chrome options to set.')
     group._addoption('--operapath',
                      action='store',
                      dest='opera_path',
                      metavar='path',
                      help='path to the opera driver.')
-    group._addoption('--browser',
-                     action='store',
-                     dest='browser',
-                     metavar='str',
-                     help='target browser (standalone rc server).')
-    group._addoption('--environment',
-                     action='store',
-                     dest='environment',
-                     metavar='str',
-                     help='target environment (grid rc).')
     group._addoption('--browsername',
                      action='store',
                      dest='browser_name',
                      default=os.environ.get('SELENIUM_BROWSER'),
                      metavar='str',
-                     help='[webdriver] target browser name (default: %default).')
+                     help='target browser name (default: %default).')
     group._addoption('--browserver',
                      action='store',
                      dest='browser_version',
                      default=os.environ.get('SELENIUM_VERSION'),
                      metavar='str',
-                     help='[webdriver] target browser version (default: %default).')
+                     help='target browser version (default: %default).')
     group._addoption('--platform',
                      action='store',
                      default=os.environ.get('SELENIUM_PLATFORM'),
                      metavar='str',
-                     help='[webdriver] target platform (default: %default).')
+                     help='target platform (default: %default).')
     group._addoption('--webqatimeout',
                      action='store',
                      type='int',
                      default=60,
                      metavar='num',
                      help='timeout (in seconds) for page loads, etc. (default: %default)')
-    group._addoption('--capturenetwork',
-                     action='store_true',
-                     dest='capture_network',
-                     default=False,
-                     help='capture network traffic to test_method_name.json (selenium rc). (default: %default)')
     group._addoption('--build',
                      action='store',
                      dest='build',
@@ -337,7 +308,7 @@ def pytest_addoption(parser):
                      action='store',
                      dest='event_listener',
                      metavar='str',
-                     help='[webdriver] selenium eventlistener class, e.g. package.module.EventListenerClassName.')
+                     help='selenium eventlistener class, e.g. package.module.EventListenerClassName.')
 
     group = parser.getgroup('safety', 'safety')
     group._addoption('--sensitiveurl',
