@@ -3,6 +3,7 @@ Change Log
 
 2.0
 ---
+* Use pytest-html for HTML reports
 * Removed support for Selenium RC
 
 1.6

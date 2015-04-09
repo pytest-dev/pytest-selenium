@@ -7,14 +7,9 @@ setup(name='pytest-mozwebqa',
       author_email='dhunt@mozilla.com',
       url='https://github.com/mozilla/pytest-mozwebqa',
       packages=['pytest_mozwebqa'],
-      package_data={'pytest_mozwebqa': [
-          'resources/style.css',
-          'resources/main.js',
-          'resources/jquery.js']},
       py_modules=[
           'pytest_mozwebqa.pytest_mozwebqa',
           'pytest_mozwebqa.credentials',
-          'pytest_mozwebqa.html_report',
           'pytest_mozwebqa.selenium_client',
           'pytest_mozwebqa.sauce_labs'],
       install_requires=[

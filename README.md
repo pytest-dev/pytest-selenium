@@ -178,10 +178,14 @@ The credentials files use YAML syntax, and the usage will vary depending on the 
     #   username: admin
     #   password: password
 
-Custom report
--------------
+HTML report
+-----------
 
-By default a custom HTML report will be written to results/index.html. If you wish this to be located elsewhere, or have a different filename, you can specify the --webqareport command line option.
+If the pytest-html plugin is installed then the HTML reports will include
+additional information such as the failing URL, screenshot, and page source.
+For Sauce Labs, a link to the job and inline video will also be included. Check
+the [pytest-html documentation](https://pypi.python.org/pypi/pytest-html) for
+how to install the plugin and generate HTML reports.
 
 Privacy
 -------

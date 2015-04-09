@@ -102,20 +102,25 @@ class Job(object):
     def video_html(self):
         flash_vars = 'config={\
             "clip":{\
-                "url":"https%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
+                "url":"https://assets.saucelabs.com/jobs/%(session_id)s/video.flv",\
                 "provider":"streamer",\
                 "autoPlay":false,\
                 "autoBuffering":true},\
+            "play": {\
+                "opacity":1,\
+                "label":null,\
+                "replayLabel":null},\
             "plugins":{\
                 "streamer":{\
-                    "url":"https://saucelabs.com/flowplayer/flowplayer.pseudostreaming-3.2.5.swf"},\
+                    "url":"https://cdn1.saucelabs.com/sauce_skin_deprecated/lib/flowplayer/flowplayer.pseudostreaming-3.2.13.swf",\
+                    "queryString":"%%3Fstart%%3D%%24%%7Bstart%%7D"},\
                 "controls":{\
                     "mute":false,\
                     "volume":false,\
-                    "backgroundColor":"rgba(0, 0, 0, 0.7)"}},\
+                    "backgroundColor":"rgba(0,0,0,0.7)"}},\
             "playerId":"player%(session_id)s",\
             "playlist":[{\
-                "url":"https%%3A//saucelabs.com/jobs/%(session_id)s/video.flv",\
+                "url":"https://assets.saucelabs.com/jobs/%(session_id)s/video.flv",\
                 "provider":"streamer",\
                 "autoPlay":false,\
                 "autoBuffering":true}]}' % {'session_id': self.session_id}
@@ -124,19 +129,19 @@ class Job(object):
             html.param(value='true', name='allowfullscreen'),
             html.param(value='always', name='allowscriptaccess'),
             html.param(value='high', name='quality'),
-            html.param(value='true', name='cachebusting'),
             html.param(value='#000000', name='bgcolor'),
             html.param(
                 value=flash_vars.replace(' ', ''),
                 name='flashvars'),
-                width='100%',
-                height='100%',
-                type='application/x-shockwave-flash',
-                data='https://saucelabs.com/flowplayer/flowplayer-3.2.5.swf?0.2930636672245027',
-                name='player_api',
-                id='player_api'),
+            width='100%',
+            height='100%',
+            type='application/x-shockwave-flash',
+            data='https://cdn1.saucelabs.com/sauce_skin_deprecated/lib/flowplayer/flowplayer-3.2.17.swf',
+            name='player_api',
+            id='player_api'),
             id='player%s' % self.session_id,
-            class_='video')
+            style='border:1px solid #e6e6e6; float:right; height:240px;'
+                  'margin-left:5px; overflow:hidden; width:320px')
 
     def send_result(self, result, credentials):
         requests.put('http://saucelabs.com/rest/v1/%s/jobs/%s' % (

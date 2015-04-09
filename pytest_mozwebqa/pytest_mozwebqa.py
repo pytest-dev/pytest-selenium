@@ -5,10 +5,11 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import py
 import re
 import ConfigParser
 
+import py
+import pytest
 import requests
 
 import credentials
@@ -17,7 +18,35 @@ __version__ = '2.0'
 REQUESTS_TIMEOUT = 10
 
 
+class DeferPlugin(object):
+    """Simple plugin to defer pytest-html hook functions."""
+
+    def pytest_html_environment(self, config):
+        server = config.option.sauce_labs_credentials_file and \
+            'Sauce Labs' or 'http://%s:%s' % (config.option.host,
+                                              config.option.port)
+        browser = config.option.browser_name and \
+            config.option.browser_version and \
+            config.option.platform and \
+            '%s %s on %s' % (str(config.option.browser_name).title(),
+                             config.option.browser_version,
+                             str(config.option.platform).title())
+        return {'Base URL': config.option.base_url,
+                'Build': config.option.build,
+                'Driver': config.option.driver,
+                'Firefox Path': config.option.firefox_path,
+                'Google Chrome Path': config.option.chrome_path,
+                'Selenium Server': server,
+                'Browser': browser,
+                'Timeout': config.option.webqatimeout,
+                'Credentials': config.option.credentials_file,
+                'Sauce Labs Credentials': config.option.sauce_labs_credentials_file}
+
+
 def pytest_configure(config):
+    if config.pluginmanager.hasplugin('html'):
+        config.pluginmanager.register(DeferPlugin())
+
     if not hasattr(config, 'slaveinput'):
 
         config.addinivalue_line(
@@ -26,23 +55,11 @@ def pytest_configure(config):
             'present. This reduces the risk of running destructive tests '
             'accidentally.')
 
-        if config.option.webqa_report_path:
-            from html_report import HTMLReport
-            config._html = HTMLReport(config)
-            config.pluginmanager.register(config._html)
-
         if not config.option.run_destructive:
             if config.option.markexpr:
                 config.option.markexpr = 'nondestructive and (%s)' % config.option.markexpr
             else:
                 config.option.markexpr = 'nondestructive'
-
-
-def pytest_unconfigure(config):
-    html = getattr(config, '_html', None)
-    if html:
-        del config._html
-        config.pluginmanager.unregister(html)
 
 
 def pytest_sessionstart(session):
@@ -71,10 +88,6 @@ def pytest_sessionstart(session):
 
 
 def pytest_runtest_setup(item):
-    item.debug = {
-        'urls': [],
-        'screenshots': [],
-        'html': []}
     TestSetup.base_url = item.config.option.base_url
 
     # configure test proxies
@@ -139,7 +152,10 @@ def pytest_runtest_teardown(item):
 
 
 def pytest_runtest_makereport(__multicall__, item, call):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    extra_summary = []
     report = __multicall__.execute()
+    extra = getattr(report, 'extra', [])
     try:
         report.public = item.keywords['privacy'].args[0] == 'public'
     except (IndexError, KeyError):
@@ -148,22 +164,30 @@ def pytest_runtest_makereport(__multicall__, item, call):
     if report.when == 'call':
         report.session_id = getattr(item, 'session_id', None)
         if hasattr(TestSetup, 'selenium') and TestSetup.selenium and 'skip_selenium' not in item.keywords:
-            xfail = hasattr(report, "wasxfail")
+            xfail = hasattr(report, 'wasxfail')
             if (report.skipped and xfail) or (report.failed and not xfail):
                 url = TestSetup.selenium.current_url
-                url and item.debug['urls'].append(url)
+                if url is not None:
+                    extra_summary.append('Failing URL: %s' % url)
+                    if pytest_html is not None:
+                        extra.append(pytest_html.extras.url(url))
                 screenshot = TestSetup.selenium.get_screenshot_as_base64()
-                screenshot and item.debug['screenshots'].append(screenshot)
+                if screenshot is not None and pytest_html is not None:
+                    extra.append(pytest_html.extras.image(screenshot, 'Screenshot'))
                 html = TestSetup.selenium.page_source.encode('utf-8')
-                html and item.debug['html'].append(html)
-                report.sections.append(('pytest-mozwebqa', _debug_summary(item.debug)))
-            report.debug = item.debug
+                if html is not None and pytest_html is not None:
+                    extra.append(pytest_html.extras.text(html, 'HTML'))
             if hasattr(item, 'sauce_labs_credentials') and report.session_id:
                 result = {'passed': report.passed or (report.failed and 'xfail' in report.keywords)}
                 import sauce_labs
-                sauce_labs.Job(report.session_id).send_result(
-                    result,
-                    item.sauce_labs_credentials)
+                sauce_labs_job = sauce_labs.Job(report.session_id)
+                extra_summary.append('Sauce Labs Job: %s' % sauce_labs_job.url)
+                if pytest_html is not None:
+                    extra.append(pytest_html.extras.url(sauce_labs_job.url, 'Sauce Labs Job'))
+                    extra.append(pytest_html.extras.html(sauce_labs_job.video_html))
+                sauce_labs_job.send_result(result, item.sauce_labs_credentials)
+        report.sections.append(('pytest-mozwebqa', '\n'.join(extra_summary)))
+        report.extra = extra
     return report
 
 
@@ -335,14 +359,6 @@ def pytest_addoption(parser):
                      metavar='path',
                      help='credendials file containing sauce labs username and api key.')
 
-    group = parser.getgroup("terminal reporting")
-    group.addoption('--webqareport',
-                    action='store',
-                    dest='webqa_report_path',
-                    metavar='path',
-                    default='results/index.html',
-                    help='create mozilla webqa custom report file at given path. (default: %default)')
-
 
 def split_class_and_test_names(nodeid):
     names = nodeid.split("::")
@@ -352,13 +368,6 @@ def split_class_and_test_names(nodeid):
     classname = ".".join(classnames)
     name = names[-1]
     return (classname, name)
-
-
-def _debug_summary(debug):
-    summary = []
-    if debug['urls']:
-        summary.append('Failing URL: %s' % debug['urls'][-1])
-    return '\n'.join(summary)
 
 
 class TestSetup:
