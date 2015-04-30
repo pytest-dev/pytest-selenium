@@ -7,7 +7,6 @@ Requires:
 
   * py.test
   * selenium
-  * pyyaml
   * requests
 
 Continuous Integration
@@ -145,18 +144,6 @@ If you're using Google Chrome it's possible to install extensions when starting 
 ### Example (install the extensions located at /path/to/ext1/ext1.crx and /path/to/ext2/ext2.crx)
 
     --extension='/path/to/ext1/ext1.crx' --extension='/path/to/ext2/ext2.crx'
-
-Using credentials files
------------------------
-
-The credentials files use YAML syntax, and the usage will vary depending on the project. A typical file will contain at least one user with a unique identifier and login credentials:
-
-### Example
-
-    # admin:
-    #   email: admin@example.com
-    #   username: admin
-    #   password: password
 
 HTML report
 -----------

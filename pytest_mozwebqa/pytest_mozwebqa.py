@@ -13,7 +13,6 @@ import pytest
 import requests
 
 import cloud
-import credentials
 
 __version__ = '2.0'
 REQUESTS_TIMEOUT = 10
@@ -42,8 +41,7 @@ class DeferPlugin(object):
                 'Google Chrome Path': config.option.chrome_path,
                 'Server': server,
                 'Browser': browser,
-                'Timeout': config.option.webqatimeout,
-                'Credentials': config.option.credentials_file}
+                'Timeout': config.option.webqatimeout}
 
 
 @pytest.mark.tryfirst
@@ -118,9 +116,6 @@ def pytest_runtest_setup(item):
                      'considered a sensitive environment. If this test is '
                      'not destructive, add the \'nondestructive\' marker to '
                      'it. Sensitive URL: %s' % first_match.string)
-
-    if item.config.option.credentials_file:
-        TestSetup.credentials = credentials.read(item.config.option.credentials_file)
 
     test_id = '.'.join(split_class_and_test_names(item.nodeid))
 
@@ -322,13 +317,6 @@ def pytest_addoption(parser):
                      dest='run_destructive',
                      default=False,
                      help='include destructive tests (tests not explicitly marked as \'nondestructive\'). (default: %default)')
-
-    group = parser.getgroup('credentials', 'credentials')
-    group._addoption("--credentials",
-                     action="store",
-                     dest='credentials_file',
-                     metavar='path',
-                     help="location of yaml file containing user credentials.")
 
 
 def split_class_and_test_names(nodeid):
