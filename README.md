@@ -209,10 +209,9 @@ with. Check the
 accepted values. If not set, this defaults to
 [public restricted](https://saucelabs.com/docs/additional-config#restricted).
 
-## Running tests
+### Running tests
 
-Once configured, to run your automated tests using [Sauce Labs](https://saucelabs.com/),
-specify `SauceLabs` as your driver:
+To run your automated tests, simply specify `SauceLabs` as your driver:
 
 ```shell
 py.test --driver=SauceLabs --browsername=Firefox --platform="Windows 8"
@@ -253,12 +252,25 @@ For the full list of accepted values, check the
 ## BrowserStack integration
 
 To run your automated tests using [BrowserStack](https://www.browserstack.com/),
-specify `BrowserStack` as your driver and set the `BROWSERSTACK_USERNAME` and
-`BROWSERSTACK_ACCESS_KEY` environment variables:
+you must provide a valid username and access key. This can be done either by
+creating a `setup.cfg` file with a `[browserstack]` section or by setting the
+`BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` environment variables.
+
+### Configuration
+
+Below is an example `setup.cfg` showing the configuration options:
+
+```ini
+[browserstack]
+username = username
+access-key = secret
+```
+
+### Running tests
+
+To run your automated tests, simply specify `BrowserStack` as your driver:
 
 ```shell
-export BROWSERSTACK_USERNAME=Username
-export BROWSERSTACK_ACCESS_KEY=Secret
 py.test --driver=BrowserStack --browsername=firefox --platform=WIN8
 ```
 

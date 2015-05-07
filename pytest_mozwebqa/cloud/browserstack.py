@@ -2,13 +2,38 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from ConfigParser import ConfigParser
+import os
+
 import requests
 from selenium import webdriver
 
 
 class BrowserStack(object):
 
-    def __init__(self, username, access_key):
+    def __init__(self):
+        username = None
+        access_key = None
+
+        config = ConfigParser()
+        # TODO support reading from ~/.browserstack
+        config.read('setup.cfg')
+
+        section = 'browserstack'
+        if config.has_section(section):
+            if config.has_option(section, 'username'):
+                username = config.get(section, 'username')
+            if config.has_option(section, 'access-key'):
+                access_key = config.get(section, 'access-key')
+
+        self.username = os.getenv('BROWSERSTACK_USERNAME', username)
+        self.access_key = os.getenv('BROWSERSTACK_ACCESS_KEY', access_key)
+
+        if self.username is None:
+            raise ValueError('BrowserStack username must be set!')
+        if self.access_key is None:
+            raise ValueError('BrowserStack access key must be set!')
+
         self.username = username
         self.access_key = access_key
 
@@ -19,8 +44,6 @@ class BrowserStack(object):
             'platform': options.platform})
         if options.browser_version is not None:
             capabilities['version'] = options.browser_version
-        # TODO: Add support for os/version
-        # TODO: Add support for devices
         if options.build is not None:
             capabilities['build'] = options.build
         executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % (

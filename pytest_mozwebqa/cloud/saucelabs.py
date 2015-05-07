@@ -56,16 +56,12 @@ class SauceLabs(object):
             'name': test_id,
             'public': privacy,
             'browserName': options.browser_name})
-
         if options.build is not None:
             capabilities['build'] = options.build
-
-        if tags:
+        if tags is not None and len(tags) > 0:
             capabilities['tags'] = tags
-
         if options.platform is not None:
             capabilities['platform'] = options.platform
-
         if options.browser_version is not None:
             capabilities['version'] = options.browser_version
 

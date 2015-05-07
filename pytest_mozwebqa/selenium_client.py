@@ -5,7 +5,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import json
-import os
 
 import pytest
 from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
@@ -144,16 +143,15 @@ class Client(object):
             self.selenium = webdriver.Opera(executable_path=self.opera_path,
                                             desired_capabilities=capabilities)
         elif self.driver.upper() == 'BROWSERSTACK':
-            # TODO support reading configuration from .browserstack
             from cloud import BrowserStack
-            username = os.getenv('BROWSERSTACK_USERNAME')
-            access_key = os.getenv('BROWSERSTACK_ACCESS_KEY')
-            self.cloud = BrowserStack(username, access_key)
-            self.selenium = self.cloud.driver(self.test_id, capabilities, self.options)
+            self.cloud = BrowserStack()
+            self.selenium = self.cloud.driver(
+                self.test_id, capabilities, self.options)
         elif self.driver.upper() == 'SAUCELABS':
             from cloud import SauceLabs
             self.cloud = SauceLabs()
-            self.selenium = self.cloud.driver(self.test_id, capabilities, self.options, self.keywords)
+            self.selenium = self.cloud.driver(
+                self.test_id, capabilities, self.options, self.keywords)
         else:
             self.selenium = getattr(webdriver, self.driver)()
 
