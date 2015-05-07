@@ -208,6 +208,20 @@ appopriately in Sauce Labs jobs.
 For the full list of accepted values, check the
 [Sauce Labs documentation](https://saucelabs.com/docs/additional-config#sharing).
 
+## Appium
+
+To use [Appium](http://appium.io/) instead of Selenium, simply specify the
+[appropriate capabilities](http://appium.io/slate/en/master/?python#appium-server-capabilities).
+For example, to run web application tests against Safari on an iPhone simulator:
+
+```shell
+py.test --browsername=Safari \
+--capability=platformName:iOS \
+--capability=platformVersion:8.2 \
+--capability="deviceName:iPhone Simulator" \
+--capability=appiumVersion:1.3.7
+```
+
 Cloud integration
 -----------------
 
@@ -253,17 +267,3 @@ If you want the browser launched to use a proxy (currently only supported by Fir
 ### Example (proxy is running on localhost port 8080)
 
     --proxyhost=localhost --proxyport=8080
-
-Testing with Appium on Saucelabs
---------------------------------
-
-If you want, you have the option to use Appium to drive your Mobile Web Application tests instead of using the deprecated AndroidDriver.
-
-	self.desired_capabilities = {}
-	self.desired_capabilities['platformName'] = 'android'
-	self.desired_capabilities['platformVersion'] = '4.4'
-	self.desired_capabilities['browserName'] = 'browser'
-	self.desired_capabilities['deviceName'] = 'Android'
-	self.desired_capabilities['appiumVersion'] = '1.2.2'
-
-Note that this will only work with the latest Appium version  (i.e version 1.2.2) and the latest Android emulators (i.e Android 4.4 or later). The deviceName must be 'Android' and be careful because it is case sensitive. Also if you would like to specify the Chrome browser instead of the Android default browser you can modify the browserName desired capability as follows: self.desired_capabilities['browserName'] = 'chrome'

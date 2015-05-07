@@ -187,13 +187,6 @@ def pytest_addoption(parser):
     config = ConfigParser.ConfigParser(defaults={'baseurl': ''})
     config.read('mozwebqa.cfg')
 
-    group = parser.getgroup('appium', 'appium')
-    group._addoption('--appium',
-                     action='store',
-                     dest='appium_version',
-                     metavar='str',
-                     help='target appium version.')
-
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--baseurl',
                      action='store',
@@ -206,16 +199,6 @@ def pytest_addoption(parser):
                      dest='skip_url_check',
                      default=False,
                      help='skip the base url and sensitivity checks. (default: %default)')
-    group._addoption('--device',
-                     action='store',
-                     dest='device_name',
-                     metavar='str',
-                     help='target device type/name.')
-    group._addoption('--platformver',
-                     action='store',
-                     dest='platform_version',
-                     metavar='str',
-                     help='target platform version.')
     group._addoption('--host',
                      action='store',
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),

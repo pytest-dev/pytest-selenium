@@ -37,15 +37,8 @@ class SauceLabs(object):
             'public': privacy,
             'browserName': options.browser_name})
 
-        if options.appium_version is not None:
-            capabilities.update({
-                'platformName': options.platform,
-                'platformVersion': options.platform_version,
-                'deviceName': options.device_name,
-                'appiumVersion': options.appium_version})
-        else:
-            capabilities.update({
-                'platform': options.platform})
+        if options.platform is not None:
+            capabilities['platform'] = options.platform
 
         if options.browser_version is not None:
             capabilities['version'] = options.browser_version
