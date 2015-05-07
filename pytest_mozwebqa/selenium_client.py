@@ -151,14 +151,8 @@ class Client(object):
             self.cloud = BrowserStack(username, access_key)
             self.selenium = self.cloud.driver(self.test_id, capabilities, self.options)
         elif self.driver.upper() == 'SAUCELABS':
-            # TODO support reading configuration from .saucelabs
             from cloud import SauceLabs
-            for v in ['SAUCELABS_USERNAME', 'SAUCELABS_API_KEY']:
-                if v not in os.environ:
-                    raise ValueError('Mandatory environment variable undefined: %s' % v)
-            username = os.environ['SAUCELABS_USERNAME']
-            api_key = os.environ['SAUCELABS_API_KEY']
-            self.cloud = SauceLabs(username, api_key)
+            self.cloud = SauceLabs()
             self.selenium = self.cloud.driver(self.test_id, capabilities, self.options, self.keywords)
         else:
             self.selenium = getattr(webdriver, self.driver)()

@@ -35,18 +35,6 @@ be project specific.
 
     [DEFAULT]
     baseurl: 'http://www.example.com'
-    tags: 'tag1, tag2'
-    privacy: 'public restricted'
-
-The `tags` entry is an optional comma separated list of tags that are set when
-using Sauce Labs. This is useful for filtering the list of jobs based on the
-application under test or similar.
-
-The `privacy` entry is used to determine who you share your Sauce Labs jobs
-with. Check the
-[documentation](https://saucelabs.com/docs/additional-config#sharing) for the
-accepted values. This defaults to
-[public restricted](https://saucelabs.com/docs/additional-config#restricted).
 
 ### Examples
 
@@ -179,35 +167,6 @@ For Sauce Labs, a link to the job and inline video will also be included. Check
 the [pytest-html documentation](https://pypi.python.org/pypi/pytest-html) for
 how to install the plugin and generate HTML reports.
 
-Privacy
--------
-
-You can specify the job sharing level for Sauce Labs jobs.
-
-Privacy marks have higher priority than the `privacy` entry in `mozwebqa.cfg`.
-
-### Example
-
-    import pytest
-    
-    @pytest.mark.privacy('public')
-    def test_public(self, mozwebqa):
-        home_pg = home_page.HomePage(mozwebqa)
-
-You can also explicitly mark the test as private, which sets the test
-appopriately in Sauce Labs jobs.
-
-### Example
-
-    import pytest
-    
-    @pytest.mark.privacy('private')
-    def test_private(self, mozwebqa):
-        home_pg = home_page.HomePage(mozwebqa)
-
-For the full list of accepted values, check the
-[Sauce Labs documentation](https://saucelabs.com/docs/additional-config#sharing).
-
 ## Appium
 
 To use [Appium](http://appium.io/) instead of Selenium, simply specify the
@@ -222,18 +181,40 @@ py.test --browsername=Safari \
 --capability=appiumVersion:1.3.7
 ```
 
-Cloud integration
------------------
+## Sauce Labs integration
 
-### Sauce Labs
+To run your automated tests using [Sauce Labs](https://saucelabs.com/), you
+must provide a valid username and API key. This can be done either by creating
+a `setup.cfg` file with a `[saucelabs]` section or by setting the
+`SAUCELABS_USERNAME` and `SAUCELABS_API_KEY` environment variables.
 
-To run your automated tests using [Sauce Labs](https://saucelabs.com/), specify
-`SauceLabs` as your driver and set the `SAUCELABS_USERNAME` and
-`SAUCELABS_API_KEY` environment variables:
+### Configuration
+
+Below is an example `setup.cfg` showing the configuration options:
+
+```ini
+[saucelabs]
+username = username
+api-key = secret
+tags = tag1, tag2
+privacy = public
+```
+
+The `tags` entry is an optional comma separated list of tags that can be used
+to filter the jobs in the Sauce Labs dashboard.
+
+The `privacy` entry is used to determine who you share your Sauce Labs jobs
+with. Check the
+[documentation](https://saucelabs.com/docs/additional-config#sharing) for the
+accepted values. If not set, this defaults to
+[public restricted](https://saucelabs.com/docs/additional-config#restricted).
+
+## Running tests
+
+Once configured, to run your automated tests using [Sauce Labs](https://saucelabs.com/),
+specify `SauceLabs` as your driver:
 
 ```shell
-export SAUCELABS_USERNAME=Username
-export SAUCELABS_API_KEY=Secret
 py.test --driver=SauceLabs --browsername=Firefox --platform="Windows 8"
 ```
 
@@ -243,7 +224,33 @@ the `--capability` comand line arguments. See the
 [test configuration documentation](https://docs.saucelabs.com/reference/test-configuration/)
 for full details of what can be configured.
 
-### BrowserStack
+### Privacy
+
+You can specify the job sharing level for individual tests by setting a mark on
+the test method. This takes priority over the `privacy` entry in the
+configuration file:
+
+```python
+import pytest
+@pytest.mark.privacy('public')
+def test_public(self, mozwebqa):
+    home_pg = home_page.HomePage(mozwebqa)
+```
+
+You can also explicitly mark the test as private:
+
+
+```python
+import pytest
+@pytest.mark.privacy('private')
+def test_private(self, mozwebqa):
+    home_pg = home_page.HomePage(mozwebqa)
+```
+
+For the full list of accepted values, check the
+[Sauce Labs documentation](https://saucelabs.com/docs/additional-config#sharing).
+
+## BrowserStack integration
 
 To run your automated tests using [BrowserStack](https://www.browserstack.com/),
 specify `BrowserStack` as your driver and set the `BROWSERSTACK_USERNAME` and

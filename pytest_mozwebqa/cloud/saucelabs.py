@@ -2,9 +2,10 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from ConfigParser import ConfigParser
+import os
 import json
 
-import ConfigParser
 from py.xml import html
 import requests
 from selenium import webdriver
@@ -12,30 +13,55 @@ from selenium import webdriver
 
 class SauceLabs(object):
 
-    def __init__(self, username, api_key):
-        self.username = username
-        self.api_key = api_key
+    def __init__(self):
+        username = None
+        api_key = None
+
+        self.tags = []
+        self.privacy = 'public restricted'
+
+        config = ConfigParser()
+        # TODO support reading from ~/.saucelabs
+        config.read('setup.cfg')
+
+        section = 'saucelabs'
+        if config.has_section(section):
+            if config.has_option(section, 'username'):
+                username = config.get(section, 'username')
+            if config.has_option(section, 'api-key'):
+                api_key = config.get(section, 'api-key')
+            if config.has_option(section, 'tags'):
+                self.tags = config.get(section, 'tags').split(',')
+            if config.has_option(section, 'privacy'):
+                self.privacy = config.get(section, 'privacy')
+
+        self.username = os.getenv('SAUCELABS_USERNAME', username)
+        self.api_key = os.getenv('SAUCELABS_API_KEY', api_key)
+
+        if self.username is None:
+            raise ValueError('Sauce Labs username must be set!')
+        if self.api_key is None:
+            raise ValueError('Sauce Labs API key must be set!')
 
     def driver(self, test_id, capabilities, options, keywords):
-        config = ConfigParser.ConfigParser(defaults={
-            'tags': '',
-            'privacy': 'public restricted'})
-        config.read('mozwebqa.cfg')
-        tags = config.get('DEFAULT', 'tags').split(',')
         from _pytest.mark import MarkInfo
-        tags.extend([m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)])
+        tags = self.tags + [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
         try:
             privacy = keywords['privacy'].args[0]
         except (IndexError, KeyError):
             # privacy mark is not present or has no value
-            privacy = config.get('DEFAULT', 'privacy')
+            privacy = self.privacy
 
         capabilities.update({
-            'build': options.build,
             'name': test_id,
-            'tags': tags,
             'public': privacy,
             'browserName': options.browser_name})
+
+        if options.build is not None:
+            capabilities['build'] = options.build
+
+        if tags:
+            capabilities['tags'] = tags
 
         if options.platform is not None:
             capabilities['platform'] = options.platform
