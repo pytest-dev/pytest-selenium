@@ -19,7 +19,8 @@ setup(name='pytest-mozwebqa',
       entry_points={'pytest11': [
           'pytest_mozwebqa = pytest_mozwebqa.pytest_mozwebqa']},
       license='Mozilla Public License 2.0 (MPL 2.0)',
-      keywords='py.test pytest selenium saucelabs mozwebqa webqa qa mozilla',
+      keywords='py.test pytest selenium saucelabs browserstack mozwebqa webqa '
+               'qa mozilla',
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
