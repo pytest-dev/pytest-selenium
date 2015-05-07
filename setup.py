@@ -6,11 +6,7 @@ setup(name='pytest-mozwebqa',
       author='Dave Hunt',
       author_email='dhunt@mozilla.com',
       url='https://github.com/mozilla/pytest-mozwebqa',
-      packages=['pytest_mozwebqa'],
-      py_modules=[
-          'pytest_mozwebqa.pytest_mozwebqa',
-          'pytest_mozwebqa.credentials',
-          'pytest_mozwebqa.selenium_client'],
+      packages=['pytest_mozwebqa', 'pytest_mozwebqa.cloud'],
       install_requires=[
           'pytest>=2.2.4',
           'selenium>=2.26.0',

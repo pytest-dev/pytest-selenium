@@ -11,12 +11,13 @@ from selenium import webdriver
 
 class BrowserStack(object):
 
+    name = 'BrowserStack'
+
     def __init__(self):
         username = None
         access_key = None
 
         config = ConfigParser()
-        # TODO support reading from ~/.browserstack
         config.read('setup.cfg')
 
         section = 'browserstack'
@@ -51,10 +52,6 @@ class BrowserStack(object):
         return webdriver.Remote(
             command_executor=executor,
             desired_capabilities=capabilities)
-
-    @property
-    def name(self):
-        return 'BrowserStack'
 
     def url(self, session):
         r = requests.get('https://www.browserstack.com/automate/sessions/%s.json' % session,

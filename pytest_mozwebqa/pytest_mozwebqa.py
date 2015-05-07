@@ -11,6 +11,7 @@ import ConfigParser
 import py
 import requests
 
+import cloud
 import credentials
 
 __version__ = '2.0'
@@ -21,10 +22,12 @@ class DeferPlugin(object):
     """Simple plugin to defer pytest-html hook functions."""
 
     def pytest_html_environment(self, config):
-        # TODO remove reference to Sauce Labs
-        server = config.option.sauce_labs_credentials_file and \
-            'Sauce Labs' or 'http://%s:%s' % (config.option.host,
-                                              config.option.port)
+        driver = config.option.driver
+        if hasattr(cloud, driver.lower()):
+            server = getattr(cloud, driver.lower()).name
+        else:
+            server = 'http://%s:%s' % (config.option.host,
+                                       config.option.port)
         browser = config.option.browser_name and \
             config.option.browser_version and \
             config.option.platform and \
@@ -36,7 +39,7 @@ class DeferPlugin(object):
                 'Driver': config.option.driver,
                 'Firefox Path': config.option.firefox_path,
                 'Google Chrome Path': config.option.chrome_path,
-                'Selenium Server': server,
+                'Server': server,
                 'Browser': browser,
                 'Timeout': config.option.webqatimeout,
                 'Credentials': config.option.credentials_file}

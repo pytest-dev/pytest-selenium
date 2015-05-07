@@ -13,6 +13,8 @@ from selenium import webdriver
 
 class SauceLabs(object):
 
+    name = 'Sauce Labs'
+
     def __init__(self):
         username = None
         api_key = None
@@ -21,7 +23,6 @@ class SauceLabs(object):
         self.privacy = 'public restricted'
 
         config = ConfigParser()
-        # TODO support reading from ~/.saucelabs
         config.read('setup.cfg')
 
         section = 'saucelabs'
@@ -69,10 +70,6 @@ class SauceLabs(object):
             self.username, self.api_key)
         return webdriver.Remote(command_executor=executor,
                                 desired_capabilities=capabilities)
-
-    @property
-    def name(self):
-        return 'Sauce Labs'
 
     def url(self, session):
         return 'http://saucelabs.com/jobs/%s' % session
