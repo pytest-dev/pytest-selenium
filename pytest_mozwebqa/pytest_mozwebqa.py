@@ -9,6 +9,7 @@ import re
 import ConfigParser
 
 import py
+import pytest
 import requests
 
 import cloud
@@ -45,6 +46,7 @@ class DeferPlugin(object):
                 'Credentials': config.option.credentials_file}
 
 
+@pytest.mark.tryfirst
 def pytest_configure(config):
     if config.pluginmanager.hasplugin('html'):
         config.pluginmanager.register(DeferPlugin())
