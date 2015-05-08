@@ -53,6 +53,9 @@ class SauceLabs(object):
             # privacy mark is not present or has no value
             privacy = self.privacy
 
+        if options.browser_name is None:
+            raise ValueError('Sauce Labs requires a browser name!')
+
         capabilities.update({
             'name': test_id,
             'public': privacy,

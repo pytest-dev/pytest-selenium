@@ -18,8 +18,7 @@ def test_should_fail_without_username(testdir):
     reprec = testdir.inline_run(
         '--driver=saucelabs',
         '--baseurl=http://localhost',
-        '--browsername=firefox',
-        '--platform=windows', file_test)
+        '--browsername=firefox', file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
@@ -37,8 +36,7 @@ def test_should_fail_without_api_key(testdir, monkeypatch):
     reprec = testdir.inline_run(
         '--driver=saucelabs',
         '--baseurl=http://localhost',
-        '--browsername=firefox',
-        '--platform=windows', file_test)
+        '--browsername=firefox', file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
@@ -57,9 +55,26 @@ def test_should_fail_with_invalid_credentials(testdir, monkeypatch):
     reprec = testdir.inline_run(
         '--driver=saucelabs',
         '--baseurl=http://localhost',
-        '--browsername=firefox',
-        '--platform=windows', file_test)
+        '--browsername=firefox', file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
     assert 'auth failed' in out
+
+
+def test_should_fail_without_browser_name(testdir, monkeypatch):
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_selenium(mozwebqa):
+            assert True
+    """)
+    reprec = testdir.inline_run(
+        '--driver=saucelabs',
+        '--baseurl=http://localhost', file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(failed) == 1
+    out = failed[0].longrepr.reprcrash.message
+    assert out == 'ValueError: Sauce Labs requires a browser name!'
