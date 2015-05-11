@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import re
+
 import pytest
 
 pytestmark = pytestmark = [pytest.mark.skip_selenium,
@@ -62,7 +64,7 @@ def test_should_fail_with_invalid_credentials(testdir, monkeypatch):
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
-    assert 'auth failed' in out
+    assert re.search('(auth failed)|(Sauce Labs Authentication Error)', out)
 
 
 def test_should_fail_without_browser_name(testdir, monkeypatch):
