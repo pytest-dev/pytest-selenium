@@ -17,6 +17,7 @@ def test_should_fail_without_username(testdir):
     """)
     reprec = testdir.inline_run(
         '--driver=saucelabs',
+        '--skipurlcheck',
         '--baseurl=http://localhost',
         '--browsername=firefox', file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -35,6 +36,7 @@ def test_should_fail_without_api_key(testdir, monkeypatch):
     """)
     reprec = testdir.inline_run(
         '--driver=saucelabs',
+        '--skipurlcheck',
         '--baseurl=http://localhost',
         '--browsername=firefox', file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -54,6 +56,7 @@ def test_should_fail_with_invalid_credentials(testdir, monkeypatch):
     """)
     reprec = testdir.inline_run(
         '--driver=saucelabs',
+        '--skipurlcheck',
         '--baseurl=http://localhost',
         '--browsername=firefox', file_test)
     passed, skipped, failed = reprec.listoutcomes()
@@ -73,6 +76,7 @@ def test_should_fail_without_browser_name(testdir, monkeypatch):
     """)
     reprec = testdir.inline_run(
         '--driver=saucelabs',
+        '--skipurlcheck',
         '--baseurl=http://localhost', file_test)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1

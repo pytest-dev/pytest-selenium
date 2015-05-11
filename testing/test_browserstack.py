@@ -17,6 +17,7 @@ def test_should_fail_without_username(testdir):
     """)
     reprec = testdir.inline_run(
         '--driver=browserstack',
+        '--skipurlcheck',
         '--baseurl=http://localhost',
         '--browsername=firefox',
         '--platform=windows', file_test)
@@ -36,6 +37,7 @@ def test_should_fail_without_access_key(testdir, monkeypatch):
     """)
     reprec = testdir.inline_run(
         '--driver=browserstack',
+        '--skipurlcheck',
         '--baseurl=http://localhost',
         '--browsername=firefox',
         '--platform=windows', file_test)
@@ -56,6 +58,7 @@ def test_should_fail_with_invalid_credentials(testdir, monkeypatch):
     """)
     reprec = testdir.inline_run(
         '--driver=browserstack',
+        '--skipurlcheck',
         '--baseurl=http://localhost',
         '--browsername=firefox',
         '--platform=windows', file_test)
