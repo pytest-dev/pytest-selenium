@@ -35,9 +35,6 @@ class BrowserStack(object):
         if self.access_key is None:
             raise ValueError('BrowserStack access key must be set!')
 
-        self.username = username
-        self.access_key = access_key
-
     def driver(self, test_id, capabilities, options):
         capabilities.update({
             'name': test_id,
