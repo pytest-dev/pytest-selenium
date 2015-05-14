@@ -1,5 +1,2 @@
-from browserstack import BrowserStack
-from saucelabs import SauceLabs
-
-browserstack = BrowserStack
-saucelabs = SauceLabs
+from browserstack import *
+from saucelabs import *

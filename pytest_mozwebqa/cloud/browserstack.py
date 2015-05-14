@@ -5,62 +5,75 @@
 from ConfigParser import ConfigParser
 import os
 
+import pytest
 import requests
 from selenium import webdriver
 
 
-class BrowserStack(object):
+name = 'BrowserStack'
 
-    name = 'BrowserStack'
 
-    def __init__(self):
-        username = None
-        access_key = None
+def _get_config(option):
+    config = ConfigParser()
+    config.read('setup.cfg')
+    section = 'browserstack'
+    if config.has_section(section) and config.has_option(section, option):
+        return config.get(section, option)
 
-        config = ConfigParser()
-        config.read('setup.cfg')
 
-        section = 'browserstack'
-        if config.has_section(section):
-            if config.has_option(section, 'username'):
-                username = config.get(section, 'username')
-            if config.has_option(section, 'access-key'):
-                access_key = config.get(section, 'access-key')
+def _credentials():
+    username = os.getenv('BROWSERSTACK_USERNAME', _get_config('username'))
+    access_key = os.getenv('BROWSERSTACK_ACCESS_KEY',
+                           _get_config('access-key'))
+    if not username:
+        raise pytest.UsageError('BrowserStack username must be set')
+    if not access_key:
+        raise pytest.UsageError('BrowserStack access key must be set')
+    return username, access_key
 
-        self.username = os.getenv('BROWSERSTACK_USERNAME', username)
-        self.access_key = os.getenv('BROWSERSTACK_ACCESS_KEY', access_key)
 
-        if self.username is None:
-            raise ValueError('BrowserStack username must be set!')
-        if self.access_key is None:
-            raise ValueError('BrowserStack access key must be set!')
+def _split_class_and_test_names(nodeid):
+    # TODO remove duplication of shared code
+    names = nodeid.split("::")
+    names[0] = names[0].replace("/", '.')
+    names = [x.replace(".py", "") for x in names if x != "()"]
+    classnames = names[:-1]
+    classname = ".".join(classnames)
+    name = names[-1]
+    return (classname, name)
 
-    def driver(self, test_id, capabilities, options):
-        capabilities.update({
-            'name': test_id,
-            'browserName': options.browser_name,
-            'platform': options.platform})
-        if options.browser_version is not None:
-            capabilities['version'] = options.browser_version
-        if options.build is not None:
-            capabilities['build'] = options.build
-        executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % (
-            self.username, self.access_key)
-        return webdriver.Remote(
-            command_executor=executor,
-            desired_capabilities=capabilities)
 
-    def url(self, session):
-        r = requests.get('https://www.browserstack.com/automate/sessions/%s.json' % session,
-                         auth=(self.username, self.access_key))
-        return r.json()['automation_session']['browser_url']
+def start_driver(item, options, capabilities):
+    test_id = '.'.join(_split_class_and_test_names(item.nodeid))
+    capabilities.update({
+        'name': test_id,
+        'browserName': options.browser_name})
+    if options.platform is not None:
+        capabilities['platform'] = options.platform
+    if options.browser_version is not None:
+        capabilities['version'] = options.browser_version
+    if options.build is not None:
+        capabilities['build'] = options.build
+    executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % _credentials()
+    return webdriver.Remote(command_executor=executor,
+                            desired_capabilities=capabilities)
 
-    def additional_html(self, session):
-        return []
 
-    def update_status(self, session, passed):
-        status = {'status': 'completed' if passed else 'error'}
-        requests.put('https://www.browserstack.com/automate/sessions/%s.json' % session,
-                     headers={'Content-Type': 'application/json'},
-                     params=status,
-                     auth=(self.username, self.access_key))
+def url(session):
+    response = requests.get(
+        'https://www.browserstack.com/automate/sessions/%s.json' % session,
+        auth=_credentials())
+    return response.json()['automation_session']['browser_url']
+
+
+def additional_html(session):
+    return []
+
+
+def update_status(session, passed):
+    status = {'status': 'completed' if passed else 'error'}
+    requests.put(
+        'https://www.browserstack.com/automate/sessions/%s.json' % session,
+        headers={'Content-Type': 'application/json'},
+        params=status,
+        auth=_credentials())

@@ -1,39 +1,27 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
 
-pytestmark = pytestmark = [pytest.mark.skip_selenium,
-                           pytest.mark.nondestructive]
+pytestmark = pytest.mark.nondestructive
 
 
-def testDefaultTimeout(testdir, webserver):
+def test_default_timeout(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_timeout(mozwebqa):
             assert mozwebqa.timeout == 60
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--driver=firefox',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(passed) == 1
+    testdir.quick_qa(file_test, passed=1)
 
 
-def testCustomTimeout(testdir, webserver):
+def test_custom_timeout(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_timeout(mozwebqa):
             assert mozwebqa.timeout == 30
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--driver=firefox',
-                                '--webqatimeout=30',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(passed) == 1
+    testdir.quick_qa('--webqatimeout=30', file_test, passed=1)

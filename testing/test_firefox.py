@@ -1,0 +1,105 @@
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+
+import pytest
+
+pytestmark = pytest.mark.nondestructive
+
+
+def test_launch(testdir):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(webtext):
+            assert webtext == u'Success!'
+    """)
+    testdir.quick_qa(file_test, passed=1)
+
+
+def test_profile(testdir):
+    """Test that specified profile is used when starting Firefox.
+
+    The profile changes the colors in the browser, which are then reflected
+    when calling value_of_css_property.
+    """
+    profile = testdir.tmpdir.mkdir('profile')
+    profile.join('prefs.js').write(
+        'user_pref("browser.anchor_color", "#FF69B4");'
+        'user_pref("browser.display.foreground_color", "#FF0000");'
+        'user_pref("browser.display.use_document_colors", false);')
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_profile(base_url, mozwebqa):
+            mozwebqa.selenium.get(base_url)
+            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+            anchor = mozwebqa.selenium.find_element_by_tag_name('a')
+            header_color = header.value_of_css_property('color')
+            anchor_color = anchor.value_of_css_property('color')
+            assert header_color == 'rgba(255, 0, 0, 1)'
+            assert anchor_color == 'rgba(255, 105, 180, 1)'
+    """)
+    testdir.quick_qa('--profilepath=%s' % profile, file_test, passed=1)
+
+
+def test_profile_with_preferences(testdir):
+    """Test that preferences override profile when starting Firefox.
+
+    The profile changes the colors in the browser, which are then reflected
+    when calling value_of_css_property. The test checks that the color of the
+    h1 tag is overridden by the profile, while the color of the a tag is
+    overridden by the preference.
+    """
+    profile = testdir.tmpdir.mkdir('profile')
+    profile.join('prefs.js').write(
+        'user_pref("browser.anchor_color", "#FF69B4");'
+        'user_pref("browser.display.foreground_color", "#FF0000");'
+        'user_pref("browser.display.use_document_colors", false);')
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_preferences(mozwebqa):
+            mozwebqa.selenium.get(mozwebqa.base_url)
+            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+            anchor = mozwebqa.selenium.find_element_by_tag_name('a')
+            header_color = header.value_of_css_property('color')
+            anchor_color = anchor.value_of_css_property('color')
+            assert header_color == 'rgba(255, 0, 0, 1)'
+            assert anchor_color == 'rgba(255, 0, 0, 1)'
+    """)
+    testdir.quick_qa('--firefoxpref=browser.anchor_color:#FF0000',
+                     '--profilepath=%s' % profile, file_test, passed=1)
+
+
+def test_extension(testdir):
+    """Test that a firefox extension can be added when starting Firefox."""
+    import os
+    path = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'testing')
+    extension = os.path.join(path, 'empty.xpi')
+    file_test = testdir.makepyfile("""
+        import time
+        import pytest
+        @pytest.mark.nondestructive
+        def test_extension(mozwebqa):
+            mozwebqa.selenium.get('about:support')
+            time.sleep(1)
+            extensions = mozwebqa.selenium.find_element_by_id(
+                'extensions-tbody').text
+            assert 'Test Extension (empty)' in extensions
+    """)
+    testdir.quick_qa('--extension=%s' % extension, file_test, passed=1)
+
+
+def test_proxy(testdir, webserver_base_url, webserver):
+    """Test that a proxy can be set for Firefox."""
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_proxy(mozwebqa):
+            mozwebqa.selenium.get('http://example.com')
+            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+            assert header.text == 'Success!'
+    """)
+    testdir.quick_qa(webserver_base_url, '--proxyhost=localhost',
+                     '--proxyport=%s' % webserver.port, file_test, passed=1)

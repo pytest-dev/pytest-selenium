@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from functools import partial
 import re
 
 import pytest
@@ -10,77 +11,49 @@ pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
 
 
-def test_should_fail_without_username(testdir):
-    file_test = testdir.makepyfile("""
+@pytest.fixture
+def testfile(testdir):
+    return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            assert True
+        def test_pass(mozwebqa): pass
     """)
-    reprec = testdir.inline_run(
-        '--driver=saucelabs',
-        '--skipurlcheck',
-        '--baseurl=http://localhost',
-        '--browsername=firefox', file_test)
+
+
+def failure_with_output(testdir, *args, **kwargs):
+    reprec = testdir.inline_run(*args, **kwargs)
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
-    assert out == 'ValueError: Sauce Labs username must be set!'
+    return out
 
 
-def test_should_fail_without_api_key(testdir, monkeypatch):
-    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run(
-        '--driver=saucelabs',
-        '--skipurlcheck',
-        '--baseurl=http://localhost',
-        '--browsername=firefox', file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(failed) == 1
-    out = failed[0].longrepr.reprcrash.message
-    assert out == 'ValueError: Sauce Labs API key must be set!'
+@pytest.fixture
+def failure(testdir, testfile, webserver_base_url):
+    return partial(failure_with_output, testdir, testfile, webserver_base_url,
+                   '--driver=saucelabs')
 
 
-def test_should_fail_with_invalid_credentials(testdir, monkeypatch):
+def test_missing_browser_name(failure, monkeypatch):
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
     monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run(
-        '--driver=saucelabs',
-        '--skipurlcheck',
-        '--baseurl=http://localhost',
-        '--browsername=firefox', file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(failed) == 1
-    out = failed[0].longrepr.reprcrash.message
+    out = failure()
+    assert out == 'UsageError: Sauce Labs requires a browser name'
+
+
+def test_missing_username(failure):
+    out = failure('--browsername=firefox')
+    assert out == 'UsageError: Sauce Labs username must be set'
+
+
+def test_missing_api_key(failure, monkeypatch):
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    out = failure('--browsername=firefox')
+    assert out == 'UsageError: Sauce Labs API key must be set'
+
+
+def test_invalid_credentials(failure, monkeypatch):
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+    out = failure('--browsername=firefox')
     assert re.search('(auth failed)|(Sauce Labs Authentication Error)', out)
-
-
-def test_should_fail_without_browser_name(testdir, monkeypatch):
-    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run(
-        '--driver=saucelabs',
-        '--skipurlcheck',
-        '--baseurl=http://localhost', file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(failed) == 1
-    out = failed[0].longrepr.reprcrash.message
-    assert out == 'ValueError: Sauce Labs requires a browser name!'

@@ -1,100 +1,47 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
 
-pytestmark = pytestmark = [pytest.mark.skip_selenium,
-                           pytest.mark.nondestructive]
+pytestmark = pytest.mark.nondestructive
 
 
-def testDestructiveTestsNotRunByDefault(testdir, webserver):
+def test_skip_destructive_by_default(testdir):
+    file_test = testdir.makepyfile('def test_pass(): pass')
+    testdir.quick_qa(file_test, passed=0, failed=0, skipped=0)
+
+
+def test_run_non_destructive_by_default(testdir):
     file_test = testdir.makepyfile("""
         import pytest
-        @pytest.mark.skip_selenium
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port, file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(passed) == 0
-
-
-def testNonDestructiveTestsRunByDefault(testdir, webserver):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.skip_selenium
         @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            assert True
+        def test_pass(): pass
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port, file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(passed) == 1
+    testdir.quick_qa(file_test, passed=1)
 
 
-def testDestructiveTestsRunWhenForced(testdir, webserver):
+def test_run_destructive_when_forced(testdir):
+    file_test = testdir.makepyfile('def test_pass(): pass')
+    testdir.quick_qa('--destructive', file_test, passed=1)
+
+
+def test_run_destructive_and_non_destructive_when_forced(testdir):
     file_test = testdir.makepyfile("""
         import pytest
-        @pytest.mark.skip_selenium
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--destructive',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(passed) == 1
-
-
-def testBothDestructiveAndNonDestructiveTestsRunWhenForced(testdir, webserver):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.skip_selenium
         @pytest.mark.nondestructive
-        def test_selenium1(mozwebqa):
-            assert True
-        @pytest.mark.skip_selenium
-        def test_selenium2(mozwebqa):
-            assert True
+        def test_pass1(): pass
+        def test_pass2(): pass
     """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--destructive',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(passed) == 2
+    testdir.quick_qa('--destructive', file_test, passed=2)
 
 
-def testSkipDestructiveTestsIfForcedAndRunningAgainstSensitiveURL(testdir, webserver):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.skip_selenium
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run('--baseurl=http://localhost:%s' % webserver.port,
-                                '--sensitiveurl=localhost',
-                                '--destructive',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(skipped) == 1
+def test_skip_destructive_when_forced_and_sensitive(testdir):
+    file_test = testdir.makepyfile('def test_pass(_sensitive_skipping): pass')
+    testdir.quick_qa('--destructive', file_test, skipped=1)
 
 
-@pytest.mark.parametrize('baseurl', [
-    'http://addons.mozilla.org',
-    'http://www.mozilla.com',
-    'http://marketplace.firefox.com'])
-def testSkipDestructiveTestsIfForcedAndRunningAgainstDefaultSensitiveURL(testdir, baseurl):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.skip_selenium
-        def test_selenium(mozwebqa):
-            assert True
-    """)
-    reprec = testdir.inline_run('--baseurl=%s' % baseurl,
-                                '--destructive',
-                                file_test)
-    passed, skipped, failed = reprec.listoutcomes()
-    assert len(skipped) == 1
+def test_run_destructive_when_forced_and_not_sensitive(testdir):
+    file_test = testdir.makepyfile('def test_pass(_sensitive_skipping): pass')
+    testdir.quick_qa('--destructive', '--sensitiveurl=foo', file_test,
+                     passed=1)

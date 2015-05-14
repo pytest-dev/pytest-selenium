@@ -1,14 +1,10 @@
-#!/usr/bin/env python
-
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import re
 import ConfigParser
 
-import py
 import pytest
 import requests
 
@@ -49,95 +45,64 @@ def pytest_configure(config):
     if config.pluginmanager.hasplugin('html'):
         config.pluginmanager.register(DeferPlugin())
 
-    if not hasattr(config, 'slaveinput'):
-
-        config.addinivalue_line(
-            'markers', 'nondestructive: mark the test as nondestructive. '
-            'Tests are assumed to be destructive unless this marker is '
-            'present. This reduces the risk of running destructive tests '
-            'accidentally.')
-
-        if not config.option.run_destructive:
-            if config.option.markexpr:
-                config.option.markexpr = 'nondestructive and (%s)' % config.option.markexpr
-            else:
-                config.option.markexpr = 'nondestructive'
-
 
 def pytest_sessionstart(session):
-    if hasattr(session.config, 'slaveinput') or \
-            session.config.option.skip_url_check or \
-            session.config.option.collectonly:
-        return
-
-    if session.config.option.base_url:
-        r = requests.get(session.config.option.base_url, verify=False, timeout=REQUESTS_TIMEOUT)
-        assert r.status_code in (200, 401), ('Base URL did not return status code 200 or 401. '
-                                             '(URL: %s, Response: %s, Headers: %s)' %
-                                             (session.config.option.base_url, r.status_code, r.headers))
-
     # configure session proxies
+    option = session.config.option
     if hasattr(session.config, 'browsermob_session_proxy'):
-        session.config.option.proxy_host = session.config.option.bmp_host
-        session.config.option.proxy_port = session.config.browsermob_session_proxy.port
+        option.proxy_host = option.bmp_host
+        option.proxy_port = session.config.browsermob_session_proxy.port
 
-    if hasattr(session.config, 'zap'):
-        if all([session.config.option.proxy_host, session.config.option.proxy_port]):
-            session.config.zap.core.set_option_proxy_chain_name(session.config.option.proxy_host)
-            session.config.zap.core.set_option_proxy_chain_port(session.config.option.proxy_port)
-        session.config.option.proxy_host = session.config.option.zap_host
-        session.config.option.proxy_port = session.config.option.zap_port
+    zap = getattr(session.config, 'zap', None)
+    if zap is not None:
+        if option.proxy_host and option.proxy_port:
+            zap.core.set_option_proxy_chain_name(option.proxy_host)
+            zap.core.set_option_proxy_chain_port(option.proxy_port)
+        option.proxy_host = option.zap_host
+        option.proxy_port = option.zap_port
+
+
+@pytest.fixture(scope='session')
+def base_url(request):
+    url = request.config.option.base_url
+    if not url:
+        raise pytest.UsageError('--baseurl must be specified.')
+    return url
+
+
+@pytest.fixture(scope='session', autouse=True)
+def _verify_base_url(request, base_url):
+    option = request.config.option
+    if base_url and not option.skip_url_check:
+        response = requests.get(base_url, timeout=REQUESTS_TIMEOUT)
+        if response.status_code not in (200, 401):
+            raise pytest.UsageError(
+                'Base URL did not return status code 200 or 401. '
+                '(URL: %s, Response: %s, Headers: %s)' % (
+                    base_url, response.status_code, response.headers))
+
+
+@pytest.fixture
+def driver(request):
+    from .driver import make_driver
+
+    driver = make_driver(request.node)
+    request.node._driver = driver
+    request.addfinalizer(lambda: driver.quit())
+    return driver
+
+
+@pytest.fixture
+def mozwebqa(request, _sensitive_skipping, driver, base_url):
+    return TestSetup(request, driver, base_url)
 
 
 def pytest_runtest_setup(item):
-    TestSetup.base_url = item.config.option.base_url
-
     # configure test proxies
+    option = item.config.option
     if hasattr(item.config, 'browsermob_test_proxy'):
-        item.config.option.proxy_host = item.config.option.bmp_host
-        item.config.option.proxy_port = item.config.browsermob_test_proxy.port
-
-    # consider this environment sensitive if the base url or any redirection
-    # history matches the regular expression
-    sensitive = False
-    if TestSetup.base_url and not item.config.option.skip_url_check:
-        r = requests.get(TestSetup.base_url, verify=False, timeout=REQUESTS_TIMEOUT)
-        urls = [h.url for h in r.history] + [r.url]
-        matches = [re.search(item.config.option.sensitive_url, u) for u in urls]
-        sensitive = any(matches)
-
-    destructive = 'nondestructive' not in item.keywords
-
-    if (sensitive and destructive):
-        first_match = matches[next(i for i, match in enumerate(matches) if match)]
-
-        # skip the test with an appropriate message
-        py.test.skip('This test is destructive and the target URL is '
-                     'considered a sensitive environment. If this test is '
-                     'not destructive, add the \'nondestructive\' marker to '
-                     'it. Sensitive URL: %s' % first_match.string)
-
-    test_id = '.'.join(split_class_and_test_names(item.nodeid))
-
-    if 'skip_selenium' not in item.keywords:
-        from selenium_client import Client
-        TestSetup.selenium_client = Client(
-            test_id,
-            item.config.option,
-            item.keywords)
-        TestSetup.selenium_client.start()
-        item.session_id = TestSetup.selenium_client.session_id
-        TestSetup.selenium = TestSetup.selenium_client.selenium
-        TestSetup.timeout = TestSetup.selenium_client.timeout
-        TestSetup.default_implicit_wait = TestSetup.selenium_client.default_implicit_wait
-    else:
-        TestSetup.timeout = item.config.option.webqatimeout
-        TestSetup.selenium = None
-
-
-def pytest_runtest_teardown(item):
-    if hasattr(TestSetup, 'selenium') and TestSetup.selenium and 'skip_selenium' not in item.keywords:
-        TestSetup.selenium.quit()
+        option.proxy_host = item.config.option.bmp_host
+        option.proxy_port = item.config.browsermob_test_proxy.port
 
 
 def pytest_runtest_makereport(__multicall__, item, call):
@@ -151,36 +116,38 @@ def pytest_runtest_makereport(__multicall__, item, call):
         # privacy mark is not present or has no value
         report.public = False
     if report.when == 'call':
-        report.session_id = getattr(item, 'session_id', None)
-        if hasattr(TestSetup, 'selenium') and TestSetup.selenium and 'skip_selenium' not in item.keywords:
+        driver = getattr(item, '_driver', None)
+        if driver is not None:
             xfail = hasattr(report, 'wasxfail')
             if (report.skipped and xfail) or (report.failed and not xfail):
-                url = TestSetup.selenium.current_url
+                url = driver.current_url
                 if url is not None:
                     extra_summary.append('Failing URL: %s' % url)
                     if pytest_html is not None:
                         extra.append(pytest_html.extras.url(url))
-                screenshot = TestSetup.selenium.get_screenshot_as_base64()
+                screenshot = driver.get_screenshot_as_base64()
                 if screenshot is not None and pytest_html is not None:
-                    extra.append(pytest_html.extras.image(screenshot, 'Screenshot'))
-                html = TestSetup.selenium.page_source.encode('utf-8')
+                    extra.append(pytest_html.extras.image(
+                        screenshot, 'Screenshot'))
+                html = driver.page_source.encode('utf-8')
                 if html is not None and pytest_html is not None:
                     extra.append(pytest_html.extras.text(html, 'HTML'))
-            if TestSetup.selenium_client.cloud is not None and report.session_id:
-                cloud = TestSetup.selenium_client.cloud
-                extra_summary.append('%s Job: %s' % (cloud.name, cloud.url(report.session_id)))
+            driver_name = item.config.option.driver
+            if hasattr(cloud, driver_name.lower()) and driver.session_id:
+                provider = getattr(cloud, driver_name.lower())
+                extra_summary.append('%s Job: %s' % (
+                    provider.name, provider.url(driver.session_id)))
                 if pytest_html is not None:
-                    extra.append(pytest_html.extras.url(cloud.url, '%s Job' % cloud.name))
-                    extra.append(pytest_html.extras.html(cloud.additional_html(report.session_id)))
+                    extra.append(pytest_html.extras.url(
+                        provider.url(driver.session_id),
+                        '%s Job' % provider.name))
+                    extra.append(pytest_html.extras.html(
+                        provider.additional_html(driver.session_id)))
                 passed = report.passed or (report.failed and xfail)
-                cloud.update_status(report.session_id, passed)
+                provider.update_status(driver.session_id, passed)
         report.sections.append(('pytest-mozwebqa', '\n'.join(extra_summary)))
         report.extra = extra
     return report
-
-
-def pytest_funcarg__mozwebqa(request):
-    return TestSetup(request)
 
 
 def pytest_addoption(parser):
@@ -305,33 +272,15 @@ def pytest_addoption(parser):
                      metavar='str',
                      help='selenium eventlistener class, e.g. package.module.EventListenerClassName.')
 
-    group = parser.getgroup('safety', 'safety')
-    group._addoption('--sensitiveurl',
-                     action='store',
-                     dest='sensitive_url',
-                     default='(firefox\.com)|(mozilla\.(com|org))',
-                     metavar='str',
-                     help='regular expression for identifying sensitive urls. (default: %default)')
-    group._addoption('--destructive',
-                     action='store_true',
-                     dest='run_destructive',
-                     default=False,
-                     help='include destructive tests (tests not explicitly marked as \'nondestructive\'). (default: %default)')
-
-
-def split_class_and_test_names(nodeid):
-    names = nodeid.split("::")
-    names[0] = names[0].replace("/", '.')
-    names = [x.replace(".py", "") for x in names if x != "()"]
-    classnames = names[:-1]
-    classname = ".".join(classnames)
-    name = names[-1]
-    return (classname, name)
-
 
 class TestSetup:
-    '''
-        This class is just used for monkey patching
-    '''
-    def __init__(self, request):
+
+    default_implicit_wait = 10
+
+    def __init__(self, request, driver, base_url):
         self.request = request
+        self.selenium = driver
+        self.base_url = base_url
+
+        self.timeout = request.node.config.option.webqatimeout
+        self.selenium.implicitly_wait(self.default_implicit_wait)

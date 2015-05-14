@@ -1,5 +1,4 @@
-pytest_mozwebqa
-===============
+# pytest_mozwebqa
 
 pytest_mozwebqa is a plugin for [py.test](http://pytest.org/) that provides additional features needed for Mozilla's WebQA projects.
 
@@ -13,76 +12,88 @@ Continuous Integration
 ----------------------
 [![Build Status](https://travis-ci.org/mozilla/pytest-mozwebqa.svg?branch=master)](http://travis-ci.org/mozilla/pytest-mozwebqa)
 
-Installation
-------------
+## Installation
 
-    $ python setup.py install
+To install pytest-mozwebqa:
 
-Running tests with pytest_mozwebqa
-----------------------------------
+```bash
+pip install pytest-mozwebqa
+```
 
-    Usage: py.test [options] [file_or_dir] [file_or_dir] [...]
+## Usage
 
-For full usage details run `py.test --help`.
+The basic usage of this plugin comes from specifying the `mozwebqa` argument
+in your test methods. Doing this will launch a web browser based on your
+command line options. You will then have access to the
+[Selenium WebDriver](http://selenium.googlecode.com/git/docs/api/py/webdriver_remote/selenium.webdriver.remote.webdriver.html)
+client that controls the browser instance:
 
-### Configuration
+```python
+def test_example(mozwebqa):
+mozwebqa.selenium.get('http://www.example.com/')
+assert mozwebqa.selenium.title == 'Example Domain'
+```
 
-You can also create a `mozwebqa.cfg` file that will be used to set defaults.
-This is so that projects can keep this alongside the tests to simplify running
-them via the command line. The options are currently limited to those that could
-be project specific.
+For the full list of command line options, run `py.test --help`.
 
-    [DEFAULT]
-    baseurl: 'http://www.example.com'
+### Specifying a base URL
 
-### Examples
+The base URL is the location for the application under test. It can be
+specified in a number of ways. The simplest of these is the `--baseurl`
+command line option, however it can be more convenient to create a
+`mozwebqa.cfg` file:
 
-Run tests against a local webdriver using Firefox:
+```INI
+[DEFAULT]
+baseurl: 'http://www.example.com'
+```
 
-    $ py.test --baseurl=http://example.com --driver=firefox --firefoxpath=/Applications/Firefox.app/Contents/MacOS/firefox-bin
+Alternatively, you can reimplement the `base_url` py.test fixture. This allows
+the value of the base URL to be controlled by your tests. A common use for
+this is when you want to run tests against a local copy of your application
+that's started by your test framework:
 
-Run tests against a local webdriver using Google Chrome:
+```python
+import pytest
+@pytest.fixture(scope='session')
+def base_url(live_server):
+    return live_server.url
+```
 
-    $ py.test --baseurl=http://example.com --driver=chrome --chromepath=/Applications/chromedriver
+### Accessing the base URL
 
-Run tests against a remote webdriver server either directly or via grid:
+If you want to access the base URL from your test, you can do so by specifying
+the `base_url` argument in your test method. This can be useful if you want to
+run tests that do not require a browser instance against your application:
 
-    $ py.test --baseurl=http://example.com --browsername=firefox --browserver=5 --platform=mac
+```python
+def test_status_code(base_url):
+    from urllib2 import urlopen
+    assert urlopen(base_url).getcode() == 200
+```
 
-Writing tests for pytest_mozwebqa
----------------------------------
+### Destructive tests
 
-You will need to include the `mozwebqa` in the method signature for your tests, and pass it when constructing page objects.
+In order to prevent accidentally running destructive tests, only tests marked
+as nondestructive will run by default. If you want to mark a test as
+nondestructive then add the appropriate marker as shown below:
 
-### Example
+```python
+import pytest
+@pytest.mark.nondestructive
+def test_safely(mozwebqa):
+    assert True
+```
 
-    def test_new_user_can_register(self, mozwebqa):
-        home_pg = home_page.HomePage(mozwebqa)
-        home_pg.go_to_home_page()
-        home_pg.login_region.click_sign_up()
+If you want to run destructive tests then you can specify the `--destructive`
+command line option.
 
-        registration_pg = registration_page.RegistrationPage(mozwebqa)
-        registration_pg.register_new_user()
-        Assert.equal(registration_pg.page_title, "Sign Up Complete!")
+### Sensitive environments
 
-Destructive tests
------------------
-
-In order to prevent accidentally running destructive tests, only tests marked as nondestructive will run by default. If you want to mark a test as nondestructive then add the appropriate marker as shown below:
-
-### Example (mark test as nondestructive)
-
-    import pytest
-    @pytest.mark.nondestructive
-    def test_safely(self, mozwebqa):
-        ...
-
-If you want to run destructive tests then you can specify the `--destructive` command line option.
-
-Sensitive environments
-----------------------
-
-If running against a sensitive (production) environment any destructive tests will be skipped with an appropriate error message. You can specify a regular expression that matches your sensitive environments using the `--sensitiveurl` command line option.
+If running against a sensitive (production) environment, any destructive tests
+will be skipped with an appropriate error message. You can specify a regular
+expression that matches your sensitive environments using the `--sensitiveurl`
+command line option. By default all URLs are considered sensitive.
 
 Setting capabilities
 --------------------
@@ -145,8 +156,7 @@ If you're using Google Chrome it's possible to install extensions when starting 
 
     --extension='/path/to/ext1/ext1.crx' --extension='/path/to/ext2/ext2.crx'
 
-HTML report
------------
+## HTML report
 
 If the pytest-html plugin is installed then the HTML reports will include
 additional information such as the failing URL, screenshot, and page source.
@@ -179,7 +189,7 @@ a `setup.cfg` file with a `[saucelabs]` section or by setting the
 
 Below is an example `setup.cfg` showing the configuration options:
 
-```ini
+```INI
 [saucelabs]
 username = username
 api-key = secret
@@ -219,8 +229,8 @@ configuration file:
 ```python
 import pytest
 @pytest.mark.privacy('public')
-def test_public(self, mozwebqa):
-    home_pg = home_page.HomePage(mozwebqa)
+def test_public(mozwebqa):
+    assert True
 ```
 
 You can also explicitly mark the test as private:
@@ -229,8 +239,8 @@ You can also explicitly mark the test as private:
 ```python
 import pytest
 @pytest.mark.privacy('private')
-def test_private(self, mozwebqa):
-    home_pg = home_page.HomePage(mozwebqa)
+def test_private(mozwebqa):
+    assert True
 ```
 
 For the full list of accepted values, check the
@@ -238,10 +248,11 @@ For the full list of accepted values, check the
 
 ## BrowserStack integration
 
-To run your automated tests using [BrowserStack](https://www.browserstack.com/),
-you must provide a valid username and access key. This can be done either by
-creating a `setup.cfg` file with a `[browserstack]` section or by setting the
-`BROWSERSTACK_USERNAME` and `BROWSERSTACK_ACCESS_KEY` environment variables.
+To run your automated tests using
+[BrowserStack](https://www.browserstack.com/), you must provide a valid
+username and access key. This can be done either by creating a `setup.cfg`
+file with a `[browserstack]` section or by setting the `BROWSERSTACK_USERNAME`
+and `BROWSERSTACK_ACCESS_KEY` environment variables.
 
 ### Configuration
 
