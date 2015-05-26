@@ -36,13 +36,14 @@ def make_driver(item):
     proxy = proxy_from_options(options)
     if proxy is not None:
         proxy.add_to_capabilities(capabilities)
-    return start_driver(item, options, capabilities)
+    return start_driver(item, capabilities)
 
 
-def start_driver(item, options, capabilities):
+def start_driver(item, capabilities):
+    options = item.config.option
     specific_driver = '%s_driver' % options.driver.lower()
     driver_method = globals().get(specific_driver, generic_driver)
-    driver = driver_method(item, options, capabilities)
+    driver = driver_method(item, capabilities)
     if options.event_listener is not None:
         mod_name, class_name = options.event_listener.rsplit('.', 1)
         mod = __import__(mod_name, fromlist=[class_name])
@@ -52,16 +53,17 @@ def start_driver(item, options, capabilities):
     return driver
 
 
-def generic_driver(item, options, capabilities):
-    return getattr(webdriver, options.driver)()
+def generic_driver(item, capabilities):
+    return getattr(webdriver, item.config.option.driver)()
 
 
-def browserstack_driver(item, options, capabilities):
+def browserstack_driver(item, capabilities):
     from cloud import browserstack
-    return browserstack.start_driver(item, options, capabilities)
+    return browserstack.start_driver(item, capabilities)
 
 
-def chrome_driver(item, options, capabilities):
+def chrome_driver(item, capabilities):
+    options = item.config.option
     chrome_options = _create_chrome_options(options)
     extra = {}
     if options.chrome_path:
@@ -72,7 +74,8 @@ def chrome_driver(item, options, capabilities):
         **extra)
 
 
-def firefox_driver(item, options, capabilities):
+def firefox_driver(item, capabilities):
+    options = item.config.option
     if options.firefox_path:
         binary = FirefoxBinary(options.firefox_path)
     else:
@@ -84,22 +87,24 @@ def firefox_driver(item, options, capabilities):
         capabilities=capabilities or None)
 
 
-def ie_driver(item, options, capabilities):
+def ie_driver(item, capabilities):
     return webdriver.Ie()
 
 
-def opera_driver(item, options, capabilities):
+def opera_driver(item, capabilities):
     capabilities.update(webdriver.DesiredCapabilities.OPERA)
     return webdriver.Opera(
-        executable_path=options.opera_path,
+        executable_path=item.config.option.opera_path,
         desired_capabilities=capabilities)
 
 
-def phantomjs_driver(item, options, capabilities):
+def phantomjs_driver(item, capabilities):
     return webdriver.PhantomJS()
 
 
-def remote_driver(item, options, capabilities):
+def remote_driver(item, capabilities):
+    options = item.config.option
+
     if not options.browser_name:
         raise pytest.UsageError(
             '--browsername must be specified when using a server.')
@@ -133,9 +138,9 @@ def remote_driver(item, options, capabilities):
             (options.browser_name, ', '.join(valid_browsers)))
 
 
-def saucelabs_driver(item, options, capabilities):
+def saucelabs_driver(item, capabilities):
     from cloud import saucelabs
-    return saucelabs.start_driver(item, options, capabilities)
+    return saucelabs.start_driver(item, capabilities)
 
 
 def _create_chrome_options(options):

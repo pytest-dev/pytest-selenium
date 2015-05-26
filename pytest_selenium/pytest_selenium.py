@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import ConfigParser
 
 import pytest
 import requests
@@ -64,7 +63,8 @@ def pytest_sessionstart(session):
 
 @pytest.fixture(scope='session')
 def base_url(request):
-    url = request.config.option.base_url
+    config = request.config
+    url = config.option.base_url or config.getini('selenium_base_url')
     if not url:
         raise pytest.UsageError('--baseurl must be specified.')
     return url
@@ -110,11 +110,6 @@ def pytest_runtest_makereport(__multicall__, item, call):
     extra_summary = []
     report = __multicall__.execute()
     extra = getattr(report, 'extra', [])
-    try:
-        report.public = item.keywords['privacy'].args[0] == 'public'
-    except (IndexError, KeyError):
-        # privacy mark is not present or has no value
-        report.public = False
     if report.when == 'call':
         driver = getattr(item, '_driver', None)
         if driver is not None:
@@ -136,29 +131,50 @@ def pytest_runtest_makereport(__multicall__, item, call):
             if hasattr(cloud, driver_name.lower()) and driver.session_id:
                 provider = getattr(cloud, driver_name.lower())
                 extra_summary.append('%s Job: %s' % (
-                    provider.name, provider.url(driver.session_id)))
+                    provider.name, provider.url(
+                        item.config, driver.session_id)))
                 if pytest_html is not None:
                     extra.append(pytest_html.extras.url(
-                        provider.url(driver.session_id),
+                        provider.url(item.config, driver.session_id),
                         '%s Job' % provider.name))
                     extra.append(pytest_html.extras.html(
                         provider.additional_html(driver.session_id)))
                 passed = report.passed or (report.failed and xfail)
-                provider.update_status(driver.session_id, passed)
+                provider.update_status(item.config, driver.session_id, passed)
         report.sections.append(('pytest-selenium', '\n'.join(extra_summary)))
         report.extra = extra
     return report
 
 
 def pytest_addoption(parser):
-    config = ConfigParser.ConfigParser(defaults={'baseurl': ''})
-    config.read('mozwebqa.cfg')
+    parser.addini('selenium_base_url', 'base url for selenium')
+
+    # browserstack configuration
+    parser.addini('browserstack_username',
+                  'browserstack username',
+                  default=os.getenv('BROWSERSTACK_USERNAME'))
+    parser.addini('browserstack_access_key',
+                  'browserstack access key',
+                  default=os.getenv('BROWSERSTACK_ACCESS_KEY'))
+
+    # sauce labs configuration
+    parser.addini('sauce_labs_username',
+                  help='sauce labs username',
+                  default=os.getenv('SAUCELABS_USERNAME'))
+    parser.addini('sauce_labs_api_key',
+                  help='sauce labs api key',
+                  default=os.getenv('SAUCELABS_API_KEY'))
+    parser.addini('sauce_labs_job_visibility',
+                  help='default visibility for jobs',
+                  default='public restricted')
+    parser.addini('sauce_labs_tags',
+                  help='space separated tags for filtering and grouping',
+                  type='args')
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--baseurl',
                      action='store',
                      dest='base_url',
-                     default=config.get('DEFAULT', 'baseurl'),
                      metavar='url',
                      help='base url for the application under test.')
     group._addoption('--skipurlcheck',

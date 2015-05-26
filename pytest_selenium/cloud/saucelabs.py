@@ -2,10 +2,9 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from ConfigParser import ConfigParser
-import os
 import json
 
+from _pytest.mark import MarkInfo
 from py.xml import html
 import pytest
 import requests
@@ -15,29 +14,14 @@ from selenium import webdriver
 name = 'Sauce Labs'
 
 
-def _get_config(option):
-    config = ConfigParser()
-    config.read('setup.cfg')
-    section = 'saucelabs'
-    if config.has_section(section) and config.has_option(section, option):
-        return config.get(section, option)
-
-
-def _credentials():
-    username = os.getenv('SAUCELABS_USERNAME', _get_config('username'))
-    api_key = os.getenv('SAUCELABS_API_KEY', _get_config('api-key'))
+def _credentials(config):
+    username = config.getini('sauce_labs_username')
+    api_key = config.getini('sauce_labs_api_key')
     if not username:
         raise pytest.UsageError('Sauce Labs username must be set')
     if not api_key:
         raise pytest.UsageError('Sauce Labs API key must be set')
     return username, api_key
-
-
-def _tags():
-    tags = _get_config('tags')
-    if tags:
-        return tags.split(',')
-    return []
 
 
 def _split_class_and_test_names(nodeid):
@@ -51,15 +35,16 @@ def _split_class_and_test_names(nodeid):
     return (classname, name)
 
 
-def start_driver(item, options, capabilities):
-    from _pytest.mark import MarkInfo
-    tags = _tags() + [m for m in item.keywords.keys() if isinstance(
-        item.keywords[m], MarkInfo)]
+def start_driver(item, capabilities):
+    options = item.config.option
+    keywords = item.keywords
+    marks = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
+    tags = item.config.getini('sauce_labs_tags') + marks
     try:
-        privacy = item.keywords['privacy'].args[0]
+        job_visibility = item.keywords['sauce_labs_job_visibility'].args[0]
     except (IndexError, KeyError):
-        # privacy mark is not present or has no value
-        privacy = _get_config('privacy')
+        # mark is not present or has no value
+        job_visibility = item.config.getini('sauce_labs_job_visibility')
 
     if options.browser_name is None:
         raise pytest.UsageError('Sauce Labs requires a browser name')
@@ -67,7 +52,7 @@ def start_driver(item, options, capabilities):
     test_id = '.'.join(_split_class_and_test_names(item.nodeid))
     capabilities.update({
         'name': test_id,
-        'public': privacy,
+        'public': job_visibility,
         'browserName': options.browser_name})
     if options.build is not None:
         capabilities['build'] = options.build
@@ -77,12 +62,13 @@ def start_driver(item, options, capabilities):
         capabilities['platform'] = options.platform
     if options.browser_version is not None:
         capabilities['version'] = options.browser_version
-    executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % _credentials()
+    executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % \
+        _credentials(item.config)
     return webdriver.Remote(command_executor=executor,
                             desired_capabilities=capabilities)
 
 
-def url(session):
+def url(config, session):
     return 'http://saucelabs.com/jobs/%s' % session
 
 
@@ -90,8 +76,8 @@ def additional_html(session):
     return [_video_html(session)]
 
 
-def update_status(session, passed):
-    username, api_key = _credentials()
+def update_status(config, session, passed):
+    username, api_key = _credentials(config)
     status = {'passed': passed}
     requests.put(
         'http://saucelabs.com//rest/v1/%s/jobs/%s' % (username, session),
