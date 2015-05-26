@@ -2,9 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from ConfigParser import ConfigParser
-import os
-
 import pytest
 import requests
 from selenium import webdriver
@@ -13,18 +10,9 @@ from selenium import webdriver
 name = 'BrowserStack'
 
 
-def _get_config(option):
-    config = ConfigParser()
-    config.read('setup.cfg')
-    section = 'browserstack'
-    if config.has_section(section) and config.has_option(section, option):
-        return config.get(section, option)
-
-
-def _credentials():
-    username = os.getenv('BROWSERSTACK_USERNAME', _get_config('username'))
-    access_key = os.getenv('BROWSERSTACK_ACCESS_KEY',
-                           _get_config('access-key'))
+def _credentials(config):
+    username = config.getini('browserstack_username')
+    access_key = config.getini('browserstack_access_key')
     if not username:
         raise pytest.UsageError('BrowserStack username must be set')
     if not access_key:
@@ -43,7 +31,8 @@ def _split_class_and_test_names(nodeid):
     return (classname, name)
 
 
-def start_driver(item, options, capabilities):
+def start_driver(item, capabilities):
+    options = item.config.option
     test_id = '.'.join(_split_class_and_test_names(item.nodeid))
     capabilities.update({
         'name': test_id,
@@ -54,15 +43,16 @@ def start_driver(item, options, capabilities):
         capabilities['version'] = options.browser_version
     if options.build is not None:
         capabilities['build'] = options.build
-    executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % _credentials()
+    executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % \
+        _credentials(item.config)
     return webdriver.Remote(command_executor=executor,
                             desired_capabilities=capabilities)
 
 
-def url(session):
+def url(config, session):
     response = requests.get(
         'https://www.browserstack.com/automate/sessions/%s.json' % session,
-        auth=_credentials())
+        auth=_credentials(config))
     return response.json()['automation_session']['browser_url']
 
 
@@ -70,10 +60,10 @@ def additional_html(session):
     return []
 
 
-def update_status(session, passed):
+def update_status(config, session, passed):
     status = {'status': 'completed' if passed else 'error'}
     requests.put(
         'https://www.browserstack.com/automate/sessions/%s.json' % session,
         headers={'Content-Type': 'application/json'},
         params=status,
-        auth=_credentials())
+        auth=_credentials(config))
