@@ -10,7 +10,6 @@ import requests
 
 import cloud
 
-__version__ = '1.0'
 REQUESTS_TIMEOUT = 10
 
 
