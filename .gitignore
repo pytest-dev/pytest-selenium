@@ -1,7 +1,5 @@
-*.swp
-*.komodoproject
-*.pyc
 *.egg-info/
+*.pyc
+.DS_Store
 build
 dist
-results

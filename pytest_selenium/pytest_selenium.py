@@ -10,7 +10,7 @@ import requests
 
 import cloud
 
-__version__ = '2.0'
+__version__ = '1.0'
 REQUESTS_TIMEOUT = 10
 
 
@@ -145,7 +145,7 @@ def pytest_runtest_makereport(__multicall__, item, call):
                         provider.additional_html(driver.session_id)))
                 passed = report.passed or (report.failed and xfail)
                 provider.update_status(driver.session_id, passed)
-        report.sections.append(('pytest-mozwebqa', '\n'.join(extra_summary)))
+        report.sections.append(('pytest-selenium', '\n'.join(extra_summary)))
         report.extra = extra
     return report
 
@@ -165,18 +165,21 @@ def pytest_addoption(parser):
                      action='store_true',
                      dest='skip_url_check',
                      default=False,
-                     help='skip the base url and sensitivity checks. (default: %default)')
+                     help='skip the base url and sensitivity checks. '
+                          '(default: %default)')
     group._addoption('--host',
                      action='store',
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),
                      metavar='str',
-                     help='host that selenium server is listening on. (default: %default)')
+                     help='host that selenium server is listening on. '
+                          '(default: %default)')
     group._addoption('--port',
                      action='store',
                      type='int',
                      default=os.environ.get('SELENIUM_PORT', 4444),
                      metavar='num',
-                     help='port that selenium server is listening on. (default: %default)')
+                     help='port that selenium server is listening on. '
+                          '(default: %default)')
     group._addoption('--driver',
                      action='store',
                      dest='driver',
@@ -187,7 +190,8 @@ def pytest_addoption(parser):
                      action='append',
                      dest='capabilities',
                      metavar='str',
-                     help='additional capability to set in format "name:value".')
+                     help='additional capability to set in format '
+                          '"name:value".')
     group._addoption('--chromepath',
                      action='store',
                      dest='chrome_path',
@@ -202,7 +206,8 @@ def pytest_addoption(parser):
                      action='append',
                      dest='firefox_preferences',
                      metavar='str',
-                     help='firefox preference name and value to set in format "name:value".')
+                     help='firefox preference name and value to set in format '
+                          '"name:value".')
     group._addoption('--profilepath',
                      action='store',
                      dest='profile_path',
@@ -245,7 +250,8 @@ def pytest_addoption(parser):
                      type='int',
                      default=60,
                      metavar='num',
-                     help='timeout (in seconds) for page loads, etc. (default: %default)')
+                     help='timeout (in seconds) for page loads, etc. '
+                          '(default: %default)')
     group._addoption('--build',
                      action='store',
                      dest='build',
@@ -255,7 +261,8 @@ def pytest_addoption(parser):
                      action='store_true',
                      dest='assume_untrusted',
                      default=False,
-                     help='assume that all certificate issuers are untrusted. (default: %default)')
+                     help='assume that all certificate issuers are untrusted. '
+                          '(default: %default)')
     group._addoption('--proxyhost',
                      action='store',
                      dest='proxy_host',
@@ -270,7 +277,8 @@ def pytest_addoption(parser):
                      action='store',
                      dest='event_listener',
                      metavar='str',
-                     help='selenium eventlistener class, e.g. package.module.EventListenerClassName.')
+                     help='selenium eventlistener class, e.g. '
+                          'package.module.EventListenerClassName.')
 
 
 class TestSetup:

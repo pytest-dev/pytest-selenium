@@ -1,19 +1,20 @@
 from setuptools import setup
 
-setup(name='pytest-mozwebqa',
-      version='2.0',
-      description='Mozilla WebQA plugin for py.test.',
+setup(name='pytest-selenium',
+      version='1.0',
+      description='pytest plugin for Selenium',
+      long_description=open('README.rst').read(),
       author='Dave Hunt',
       author_email='dhunt@mozilla.com',
-      url='https://github.com/mozilla/pytest-mozwebqa',
-      packages=['pytest_mozwebqa', 'pytest_mozwebqa.cloud'],
+      url='https://github.com/davehunt/pytest-selenium',
+      packages=['pytest_selenium', 'pytest_selenium.cloud'],
       install_requires=[
           'pytest>=2.2.4',
           'selenium>=2.26.0',
           'requests==2.6.0'],
       entry_points={'pytest11': [
-          'mozwebqa = pytest_mozwebqa.pytest_mozwebqa',
-          'mozwebqa_safety = pytest_mozwebqa.safety']},
+          'selenium = pytest_selenium.pytest_selenium',
+          'selenium_safety = pytest_selenium.safety']},
       license='Mozilla Public License 2.0 (MPL 2.0)',
       keywords='py.test pytest selenium saucelabs browserstack mozwebqa webqa '
                'qa mozilla',
