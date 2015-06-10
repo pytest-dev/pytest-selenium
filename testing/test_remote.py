@@ -14,7 +14,7 @@ def testfile(testdir):
     return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_pass(mozwebqa): pass
+        def test_pass(selenium): pass
     """)
 
 

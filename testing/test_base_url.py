@@ -19,7 +19,7 @@ def test_missing_base_url(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_pass(mozwebqa): pass
+        def test_pass(selenium): pass
     """)
     out = failure_with_output(testdir, file_test)
     assert out == 'UsageError: --baseurl must be specified.'

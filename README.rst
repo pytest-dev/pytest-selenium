@@ -75,7 +75,7 @@ configuration file:
 
   import pytest
   @pytest.mark.sauce_labs_job_visibility('public')
-  def test_public(mozwebqa):
+  def test_public(selenium):
       assert True
 
 You can also explicitly mark the test as private:
@@ -84,7 +84,7 @@ You can also explicitly mark the test as private:
 
   import pytest
   @pytest.mark.sauce_labs_job_visibility('private')
-  def test_private(mozwebqa):
+  def test_private(selenium):
       assert True
 
 For the full list of accepted values, check the
