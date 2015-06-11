@@ -80,12 +80,16 @@ def test_extension(testdir):
     file_test = testdir.makepyfile("""
         import time
         import pytest
+        from selenium.common.exceptions import StaleElementReferenceException
+        from selenium.webdriver.support.ui import WebDriverWait
         @pytest.mark.nondestructive
         def test_extension(mozwebqa):
             mozwebqa.selenium.get('about:support')
-            time.sleep(1)
-            extensions = mozwebqa.selenium.find_element_by_id(
-                'extensions-tbody').text
+            extensions = WebDriverWait(
+                mozwebqa.selenium, timeout=10,
+                ignored_exceptions=StaleElementReferenceException).until(
+                    lambda s: s.find_element_by_id(
+                        'extensions-tbody').text)
             assert 'Test Extension (empty)' in extensions
     """)
     testdir.quick_qa('--extension=%s' % extension, file_test, passed=1)
