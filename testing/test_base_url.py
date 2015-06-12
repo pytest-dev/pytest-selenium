@@ -22,7 +22,7 @@ def test_missing_base_url(testdir):
         def test_pass(mozwebqa): pass
     """)
     out = failure_with_output(testdir, file_test)
-    assert out == 'UsageError: --baseurl must be specified.'
+    assert out == 'UsageError: --base-url must be specified.'
 
 
 def test_fixture(testdir):
