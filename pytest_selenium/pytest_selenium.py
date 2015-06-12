@@ -70,7 +70,6 @@ def base_url(request):
 
 @pytest.fixture(scope='session', autouse=True)
 def _verify_base_url(request, base_url):
-    option = request.config.option
     if base_url:
         response = requests.get(base_url, timeout=REQUESTS_TIMEOUT)
         if response.status_code not in (200, 401):
