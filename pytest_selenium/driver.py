@@ -66,8 +66,8 @@ def chrome_driver(item, capabilities):
     options = item.config.option
     chrome_options = _create_chrome_options(options)
     extra = {}
-    if options.chrome_path:
-        extra['executable_path'] = options.chrome_path
+    if options.driver_path:
+        extra['executable_path'] = options.driver_path
     return webdriver.Chrome(
         chrome_options=chrome_options,
         desired_capabilities=capabilities or None,
@@ -76,8 +76,8 @@ def chrome_driver(item, capabilities):
 
 def firefox_driver(item, capabilities):
     options = item.config.option
-    if options.firefox_path:
-        binary = FirefoxBinary(options.firefox_path)
+    if options.driver_path:
+        binary = FirefoxBinary(options.driver_path)
     else:
         binary = None
     profile = _create_firefox_profile(options)
@@ -94,7 +94,7 @@ def ie_driver(item, capabilities):
 def opera_driver(item, capabilities):
     capabilities.update(webdriver.DesiredCapabilities.OPERA)
     return webdriver.Opera(
-        executable_path=item.config.option.opera_path,
+        executable_path=item.config.option.driver_path,
         desired_capabilities=capabilities)
 
 

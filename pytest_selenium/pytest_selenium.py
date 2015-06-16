@@ -221,11 +221,12 @@ def pytest_addoption(parser):
                      dest='extension_paths',
                      metavar='str',
                      help='path to browser extension to install.')
-    group._addoption('--chrome-option',
+    group._addoption('--chromeopts',
+                     action='store',
                      action='append',
-                     dest='chrome_option',
+                     dest='chrome_options',
                      metavar='str',
-                     help='google chrome option to set.')
+                     help='json string of google chrome options to set.')
     group._addoption('--webqatimeout',
                      action='store',
                      type='int',
