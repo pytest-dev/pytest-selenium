@@ -223,7 +223,6 @@ def pytest_addoption(parser):
                      help='path to browser extension to install.')
     group._addoption('--chromeopts',
                      action='store',
-                     action='append',
                      dest='chrome_options',
                      metavar='str',
                      help='json string of google chrome options to set.')
