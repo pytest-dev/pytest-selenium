@@ -32,7 +32,6 @@ def _split_class_and_test_names(nodeid):
 
 
 def start_driver(item, capabilities):
-    options = item.config.option
     test_id = '.'.join(_split_class_and_test_names(item.nodeid))
     capabilities['name'] = test_id
     executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % \

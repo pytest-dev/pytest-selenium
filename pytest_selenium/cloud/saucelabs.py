@@ -36,7 +36,6 @@ def _split_class_and_test_names(nodeid):
 
 
 def start_driver(item, capabilities):
-    options = item.config.option
     keywords = item.keywords
     marks = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     tags = item.config.getini('sauce_labs_tags') + marks
