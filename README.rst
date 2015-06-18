@@ -21,6 +21,38 @@ plugin is still in development. Please check back for updates.
    :target: https://requires.io/github/davehunt/pytest-selenium/requirements/?branch=master
    :alt: Requirements
 
+Selenium server integration (Grid)
+----------------------------------
+
+Use --driver=remote to specify that the tests will be running on a remote server.
+
+Specify host and port when running on a remote server.
+
+.. code-block:: ini
+
+  --host=? --port=?
+
+Capabilities allow you to control certain aspects, such as browserName. While all others are optional,
+browserName is required.
+
+Specifying a capability:
+
+.. code-block:: ini
+
+  --capability=browserName:Firefox
+
+To specify multiple capabilities, repeat the code above for each option:
+
+.. code-block:: ini
+
+  --capability=browserName:Firefox --capability=tags:["tag1", "tag2", "tag3"]
+
+Example of running tests on a Selenium server:
+
+.. code-block:: ini
+
+  py.test --driver=remote --host=localhost --port=4444 --capability=browserName:Firefox
+
 Sauce Labs integration
 ----------------------
 
@@ -56,11 +88,11 @@ Running tests
 
 To run your automated tests, simply specify ``SauceLabs`` as your driver::
 
-  py.test --driver=SauceLabs --browsername=Firefox --platform="Windows 8"
+  py.test --driver=SauceLabs --capability=browserName:Firefox
 
 See the `supported platforms <https://docs.saucelabs.com/reference/platforms-configurator/>`_
 to help you with your configuration. Additional capabilities can be set using
-the ``--capability`` comand line arguments. See the
+the ``--capability`` command line arguments. See the
 `test configuration documentation <https://docs.saucelabs.com/reference/test-configuration/>`_
 for full details of what can be configured.
 

@@ -31,8 +31,7 @@ class DeferPlugin(object):
         return {'Base URL': config.option.base_url,
                 'Build': config.option.build,
                 'Driver': config.option.driver,
-                'Firefox Path': config.option.firefox_path,
-                'Google Chrome Path': config.option.chrome_path,
+                'Driver Path': config.option.driver_path,
                 'Server': server,
                 'Browser': browser}
 
@@ -64,14 +63,13 @@ def base_url(request):
     config = request.config
     url = config.option.base_url or config.getini('selenium_base_url')
     if not url:
-        raise pytest.UsageError('--baseurl must be specified.')
+        raise pytest.UsageError('--base-url must be specified.')
     return url
 
 
 @pytest.fixture(scope='session', autouse=True)
 def _verify_base_url(request, base_url):
-    option = request.config.option
-    if base_url and not option.skip_url_check:
+    if base_url:
         response = requests.get(base_url, timeout=REQUESTS_TIMEOUT)
         if response.status_code not in (200, 401):
             raise pytest.UsageError(
@@ -170,17 +168,12 @@ def pytest_addoption(parser):
                   type='args')
 
     group = parser.getgroup('selenium', 'selenium')
-    group._addoption('--baseurl',
+    group._addoption('--base-url',
                      action='store',
                      dest='base_url',
                      metavar='url',
                      help='base url for the application under test.')
-    group._addoption('--skipurlcheck',
-                     action='store_true',
-                     dest='skip_url_check',
-                     default=False,
-                     help='skip the base url and sensitivity checks. '
-                          '(default: %default)')
+
     group._addoption('--host',
                      action='store',
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),
@@ -206,28 +199,23 @@ def pytest_addoption(parser):
                      metavar='str',
                      help='additional capability to set in format '
                           '"name:value".')
-    group._addoption('--chromepath',
+    group._addoption('--driver-path',
                      action='store',
-                     dest='chrome_path',
+                     dest='driver_path',
                      metavar='path',
-                     help='path to the google chrome driver executable.')
-    group._addoption('--firefoxpath',
-                     action='store',
-                     dest='firefox_path',
-                     metavar='path',
-                     help='path to the target firefox binary.')
-    group._addoption('--firefoxpref',
+                     help='path to the driver.')
+    group._addoption('--firefox-pref',
                      action='append',
                      dest='firefox_preferences',
                      metavar='str',
                      help='firefox preference name and value to set in format '
                           '"name:value".')
-    group._addoption('--profilepath',
+    group._addoption('--firefox-profile',
                      action='store',
                      dest='profile_path',
                      metavar='str',
                      help='path to the firefox profile to use.')
-    group._addoption('--extension',
+    group._addoption('--browser-extension',
                      action='append',
                      dest='extension_paths',
                      metavar='str',
@@ -237,50 +225,17 @@ def pytest_addoption(parser):
                      dest='chrome_options',
                      metavar='str',
                      help='json string of google chrome options to set.')
-    group._addoption('--operapath',
-                     action='store',
-                     dest='opera_path',
-                     metavar='path',
-                     help='path to the opera driver.')
-    group._addoption('--browsername',
-                     action='store',
-                     dest='browser_name',
-                     default=os.environ.get('SELENIUM_BROWSER'),
-                     metavar='str',
-                     help='target browser name (default: %default).')
-    group._addoption('--browserver',
-                     action='store',
-                     dest='browser_version',
-                     default=os.environ.get('SELENIUM_VERSION'),
-                     metavar='str',
-                     help='target browser version (default: %default).')
-    group._addoption('--platform',
-                     action='store',
-                     default=os.environ.get('SELENIUM_PLATFORM'),
-                     metavar='str',
-                     help='target platform (default: %default).')
-    group._addoption('--build',
-                     action='store',
-                     dest='build',
-                     metavar='str',
-                     help='build identifier (for continuous integration).')
-    group._addoption('--untrusted',
-                     action='store_true',
-                     dest='assume_untrusted',
-                     default=False,
-                     help='assume that all certificate issuers are untrusted. '
-                          '(default: %default)')
-    group._addoption('--proxyhost',
+    group._addoption('--proxy-host',
                      action='store',
                      dest='proxy_host',
                      metavar='str',
                      help='use a proxy running on this host.')
-    group._addoption('--proxyport',
+    group._addoption('--proxy-port',
                      action='store',
                      dest='proxy_port',
                      metavar='int',
                      help='use a proxy running on this port.')
-    group._addoption('--eventlistener',
+    group._addoption('--event-listener',
                      action='store',
                      dest='event_listener',
                      metavar='str',

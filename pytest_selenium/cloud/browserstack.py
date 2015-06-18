@@ -32,17 +32,8 @@ def _split_class_and_test_names(nodeid):
 
 
 def start_driver(item, capabilities):
-    options = item.config.option
     test_id = '.'.join(_split_class_and_test_names(item.nodeid))
-    capabilities.update({
-        'name': test_id,
-        'browserName': options.browser_name})
-    if options.platform is not None:
-        capabilities['platform'] = options.platform
-    if options.browser_version is not None:
-        capabilities['version'] = options.browser_version
-    if options.build is not None:
-        capabilities['build'] = options.build
+    capabilities['name'] = test_id
     executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % \
         _credentials(item.config)
     return webdriver.Remote(command_executor=executor,
