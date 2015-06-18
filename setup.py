@@ -16,8 +16,8 @@ setup(name='pytest-selenium',
           'selenium = pytest_selenium.pytest_selenium',
           'selenium_safety = pytest_selenium.safety']},
       license='Mozilla Public License 2.0 (MPL 2.0)',
-      keywords='py.test pytest selenium saucelabs browserstack mozwebqa webqa '
-               'qa mozilla',
+      keywords='py.test pytest selenium saucelabs browserstack webqa qa '
+               'mozilla',
       classifiers=[
           'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',

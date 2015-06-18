@@ -32,9 +32,9 @@ def testdir(request, webserver_base_url):
     testdir.makepyfile(conftest="""
         import pytest
         @pytest.fixture
-        def webtext(base_url, mozwebqa):
-            mozwebqa.selenium.get(base_url)
-            return mozwebqa.selenium.find_element_by_tag_name('h1').text
+        def webtext(base_url, selenium):
+            selenium.get(base_url)
+            return selenium.find_element_by_tag_name('h1').text
         """)
 
     def inline_runqa(*args, **kwargs):

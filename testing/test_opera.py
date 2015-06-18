@@ -13,9 +13,9 @@ def test_proxy(testdir, webserver_base_url, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            mozwebqa.selenium.get('http://example.com')
-            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+        def test_selenium(selenium):
+            selenium.get('http://example.com')
+            header = selenium.find_element_by_tag_name('h1')
             assert header.text == 'Success!'
     """)
     testdir.quick_qa(webserver_base_url,

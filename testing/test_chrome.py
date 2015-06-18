@@ -14,7 +14,7 @@ def testfile(testdir):
     return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_pass(mozwebqa): pass
+        def test_pass(selenium): pass
     """)
 
 
@@ -37,7 +37,7 @@ def test_missing_chrome_binary(failure):
     if 'ChromeDriver executable needs to be available in the path' in out:
         pytest.fail('You must have Chrome Driver installed on your path for '
                     'this test to run correctly. For further information see '
-                    'pytest-mozwebqa documentation.')
+                    'pytest-selenium documentation.')
     assert 'Could not find Chrome binary at: foo' in out
 
 
@@ -47,9 +47,9 @@ def test_proxy(testdir, webserver_base_url, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_selenium(mozwebqa):
-            mozwebqa.selenium.get('http://example.com')
-            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+        def test_selenium(selenium):
+            selenium.get('http://example.com')
+            header = selenium.find_element_by_tag_name('h1')
             assert header.text == 'Success!'
     """)
     testdir.quick_qa(webserver_base_url,

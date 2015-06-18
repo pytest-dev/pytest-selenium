@@ -16,10 +16,10 @@ def test_event_listening_webdriver(testdir, webserver):
             EventFiringWebDriver
 
         @pytest.mark.nondestructive
-        def test_selenium(base_url, mozwebqa):
-            assert isinstance(mozwebqa.selenium, EventFiringWebDriver)
+        def test_selenium(base_url, selenium):
+            assert isinstance(selenium, EventFiringWebDriver)
             with pytest.raises(Exception) as e:
-                mozwebqa.selenium.get(base_url)
+                selenium.get(base_url)
             assert 'before_navigate_to' in e.exconly()
     """)
     testdir.quick_qa('--event-listener=test_webdriver.ConcreteEventListener',

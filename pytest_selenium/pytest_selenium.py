@@ -33,8 +33,7 @@ class DeferPlugin(object):
                 'Driver': config.option.driver,
                 'Driver Path': config.option.driver_path,
                 'Server': server,
-                'Browser': browser,
-                'Timeout': config.option.webqatimeout}
+                'Browser': browser}
 
 
 @pytest.mark.tryfirst
@@ -90,8 +89,8 @@ def driver(request):
 
 
 @pytest.fixture
-def mozwebqa(request, _sensitive_skipping, driver, base_url):
-    return TestSetup(request, driver, base_url)
+def selenium(_sensitive_skipping, driver):
+    return driver
 
 
 def pytest_runtest_setup(item):
@@ -226,13 +225,6 @@ def pytest_addoption(parser):
                      dest='chrome_options',
                      metavar='str',
                      help='json string of google chrome options to set.')
-    group._addoption('--webqatimeout',
-                     action='store',
-                     type='int',
-                     default=60,
-                     metavar='num',
-                     help='timeout (in seconds) for page loads, etc. '
-                          '(default: %default)')
     group._addoption('--proxy-host',
                      action='store',
                      dest='proxy_host',
@@ -249,16 +241,3 @@ def pytest_addoption(parser):
                      metavar='str',
                      help='selenium eventlistener class, e.g. '
                           'package.module.EventListenerClassName.')
-
-
-class TestSetup:
-
-    default_implicit_wait = 10
-
-    def __init__(self, request, driver, base_url):
-        self.request = request
-        self.selenium = driver
-        self.base_url = base_url
-
-        self.timeout = request.node.config.option.webqatimeout
-        self.selenium.implicitly_wait(self.default_implicit_wait)

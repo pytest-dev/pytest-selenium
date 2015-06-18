@@ -31,10 +31,10 @@ def test_profile(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_profile(base_url, mozwebqa):
-            mozwebqa.selenium.get(base_url)
-            header = mozwebqa.selenium.find_element_by_tag_name('h1')
-            anchor = mozwebqa.selenium.find_element_by_tag_name('a')
+        def test_profile(base_url, selenium):
+            selenium.get(base_url)
+            header = selenium.find_element_by_tag_name('h1')
+            anchor = selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgba(255, 0, 0, 1)'
@@ -59,10 +59,10 @@ def test_profile_with_preferences(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_preferences(mozwebqa):
-            mozwebqa.selenium.get(mozwebqa.base_url)
-            header = mozwebqa.selenium.find_element_by_tag_name('h1')
-            anchor = mozwebqa.selenium.find_element_by_tag_name('a')
+        def test_preferences(base_url, selenium):
+            selenium.get(base_url)
+            header = selenium.find_element_by_tag_name('h1')
+            anchor = selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgba(255, 0, 0, 1)'
@@ -83,10 +83,10 @@ def test_extension(testdir):
         from selenium.common.exceptions import StaleElementReferenceException
         from selenium.webdriver.support.ui import WebDriverWait
         @pytest.mark.nondestructive
-        def test_extension(mozwebqa):
-            mozwebqa.selenium.get('about:support')
+        def test_extension(selenium):
+            selenium.get('about:support')
             extensions = WebDriverWait(
-                mozwebqa.selenium, timeout=10,
+                selenium, timeout=10,
                 ignored_exceptions=StaleElementReferenceException).until(
                     lambda s: s.find_element_by_id(
                         'extensions-tbody').text)
@@ -100,9 +100,9 @@ def test_proxy(testdir, webserver_base_url, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_proxy(mozwebqa):
-            mozwebqa.selenium.get('http://example.com')
-            header = mozwebqa.selenium.find_element_by_tag_name('h1')
+        def test_proxy(selenium):
+            selenium.get('http://example.com')
+            header = selenium.find_element_by_tag_name('h1')
             assert header.text == 'Success!'
     """)
     testdir.quick_qa(webserver_base_url, '--proxy-host=localhost',
