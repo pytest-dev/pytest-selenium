@@ -171,7 +171,6 @@ def _create_firefox_profile(options):
             elif value.lower() in ['true', 'false']:
                 value = value.lower() == 'true'
             profile.set_preference(name, value)
-    profile.assume_untrusted_cert_issuer = options.assume_untrusted
     profile.update_preferences()
     if options.extension_paths is not None:
         for extension in options.extension_paths:

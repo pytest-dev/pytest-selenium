@@ -54,5 +54,5 @@ def test_proxy(testdir, webserver_base_url, webserver):
     """)
     testdir.quick_qa(webserver_base_url,
                      '--driver=chrome',
-                     '--proxyhost=localhost',
-                     '--proxyport=%s' % webserver.port, file_test, passed=1)
+                     '--proxy-host=localhost',
+                     '--proxy-port=%s' % webserver.port, file_test, passed=1)

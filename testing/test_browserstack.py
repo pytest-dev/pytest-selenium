@@ -47,5 +47,5 @@ def test_missing_access_key(failure, monkeypatch):
 def test_invalid_credentials(failure, monkeypatch):
     monkeypatch.setenv('BROWSERSTACK_USERNAME', 'foo')
     monkeypatch.setenv('BROWSERSTACK_ACCESS_KEY', 'bar')
-    out = failure('--browsername=firefox', '--platform=windows')
+    out = failure()
     assert 'Invalid username or password' in out

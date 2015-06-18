@@ -216,7 +216,7 @@ def pytest_addoption(parser):
                      dest='profile_path',
                      metavar='str',
                      help='path to the firefox profile to use.')
-    group._addoption('--browser_extension',
+    group._addoption('--browser-extension',
                      action='append',
                      dest='extension_paths',
                      metavar='str',

@@ -34,26 +34,19 @@ def failure(testdir, testfile, webserver_base_url):
                    '--driver=saucelabs')
 
 
-def test_missing_browser_name(failure, monkeypatch):
-    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
-    out = failure()
-    assert out == 'UsageError: Sauce Labs requires a browser name'
-
-
 def test_missing_username(failure):
-    out = failure('--browsername=firefox')
+    out = failure()
     assert out == 'UsageError: Sauce Labs username must be set'
 
 
 def test_missing_api_key(failure, monkeypatch):
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    out = failure('--browsername=firefox')
+    out = failure()
     assert out == 'UsageError: Sauce Labs API key must be set'
 
 
 def test_invalid_credentials(failure, monkeypatch):
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
     monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
-    out = failure('--browsername=firefox')
+    out = failure('--capability=browserName:firefox')
     assert re.search('(auth failed)|(Sauce Labs Authentication Error)', out)
