@@ -21,37 +21,35 @@ plugin is still in development. Please check back for updates.
    :target: https://requires.io/github/davehunt/pytest-selenium/requirements/?branch=master
    :alt: Requirements
 
-Selenium server integration (Grid)
-----------------------------------
+Server and Grid integration
+---------------------------
 
-Use --driver=remote to specify that the tests will be running on a remote server.
+To run your automated tests against a
+`Selenium server <https://github.com/SeleniumHQ/selenium/wiki/RemoteWebDriverServer>`_
+or or `Selenium Grid <https://github.com/SeleniumHQ/selenium/wiki/Grid2>`_ you
+must have a server running and know the host and port of the server.
 
-Specify host and port when running on a remote server.
+By default Selenium will listen on host 127.0.0.1 and port 4444. This is also
+the default when running tests against a remote driver.
 
-.. code-block:: ini
+Running tests
+^^^^^^^^^^^^^
 
-  --host=? --port=?
+To run your automated tests, simply specify ``Remote`` as your driver and
+provide the ``browserName`` capability for the browser you want to launch::
 
-Capabilities allow you to control certain aspects, such as browserName. While all others are optional,
-browserName is required.
+  py.test --driver=Remote --capability=browserName:firefox
 
-Specifying a capability:
+Browser selection is determined using capabilities. Check the
+`documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`_
+for details of accepted values. There are also a number of
+`browser specific capabilities <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#browser-specific-capabilities>`_
+that can be set. Be sure to also check the documentation for your chosen
+driver, as the accepted capabilities may differ.
 
-.. code-block:: ini
-
-  --capability=browserName:Firefox
-
-To specify multiple capabilities, repeat the code above for each option:
-
-.. code-block:: ini
-
-  --capability=browserName:Firefox --capability=tags:["tag1", "tag2", "tag3"]
-
-Example of running tests on a Selenium server:
-
-.. code-block:: ini
-
-  py.test --driver=remote --host=localhost --port=4444 --capability=browserName:Firefox
+Note that if your server is not running locally or is running on an alternate
+port you will need to specify the ``--host`` and ``--port`` command line
+options.
 
 Sauce Labs integration
 ----------------------

@@ -173,7 +173,6 @@ def pytest_addoption(parser):
                      dest='base_url',
                      metavar='url',
                      help='base url for the application under test.')
-
     group._addoption('--host',
                      action='store',
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),
