@@ -11,6 +11,15 @@ from selenium.webdriver.common.proxy import Proxy
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import webdriver
 
+SUPPORTED_DRIVERS = ['BrowserStack',
+                     'Chrome',
+                     'Firefox',
+                     'IE',
+                     'Opera',
+                     'PhantomJS',
+                     'Remote',
+                     'SauceLabs']
+
 
 def proxy_from_options(options):
     if options.proxy_host and options.proxy_port:
@@ -44,9 +53,12 @@ def make_driver(item):
 
 def start_driver(item, capabilities):
     options = item.config.option
-    specific_driver = '%s_driver' % options.driver.lower()
-    driver_method = globals().get(specific_driver, generic_driver)
-    driver = driver_method(item, capabilities)
+    if str(options.driver).lower() not in map(str.lower, SUPPORTED_DRIVERS):
+        raise pytest.UsageError(
+            '--driver must be specified. '
+            'Valid values are: %s.' % ', '.join(SUPPORTED_DRIVERS))
+    driver = globals().get(
+        '%s_driver' % options.driver.lower())(item, capabilities)
     if options.event_listener is not None:
         mod_name, class_name = options.event_listener.rsplit('.', 1)
         mod = __import__(mod_name, fromlist=[class_name])
@@ -54,10 +66,6 @@ def start_driver(item, capabilities):
         if not isinstance(driver, EventFiringWebDriver):
             driver = EventFiringWebDriver(driver, event_listener())
     return driver
-
-
-def generic_driver(item, capabilities):
-    return getattr(webdriver, item.config.option.driver)()
 
 
 def browserstack_driver(item, capabilities):

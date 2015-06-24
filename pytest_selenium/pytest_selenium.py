@@ -8,6 +8,7 @@ import pytest
 import requests
 
 import cloud
+from driver import SUPPORTED_DRIVERS
 
 REQUESTS_TIMEOUT = 10
 
@@ -189,9 +190,10 @@ def pytest_addoption(parser):
     group._addoption('--driver',
                      action='store',
                      dest='driver',
-                     default=os.environ.get('SELENIUM_DRIVER', 'Remote'),
                      metavar='str',
-                     help='webdriver implementation. (default: %default)')
+                     help='webdriver implementation. '
+                          'Valid values are: %s.' %
+                          ', '.join(SUPPORTED_DRIVERS))
     group._addoption('--capability',
                      action='append',
                      dest='capabilities',
