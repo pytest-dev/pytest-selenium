@@ -21,6 +21,36 @@ plugin is still in development. Please check back for updates.
    :target: https://requires.io/github/davehunt/pytest-selenium/requirements/?branch=master
    :alt: Requirements
 
+Server and Grid integration
+---------------------------
+
+To run your automated tests against a
+`Selenium server <https://github.com/SeleniumHQ/selenium/wiki/RemoteWebDriverServer>`_
+or or `Selenium Grid <https://github.com/SeleniumHQ/selenium/wiki/Grid2>`_ you
+must have a server running and know the host and port of the server.
+
+By default Selenium will listen on host 127.0.0.1 and port 4444. This is also
+the default when running tests against a remote driver.
+
+Running tests
+^^^^^^^^^^^^^
+
+To run your automated tests, simply specify ``Remote`` as your driver and
+provide the ``browserName`` capability for the browser you want to launch::
+
+  py.test --driver=Remote --capability=browserName:firefox
+
+Browser selection is determined using capabilities. Check the
+`documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`_
+for details of accepted values. There are also a number of
+`browser specific capabilities <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#browser-specific-capabilities>`_
+that can be set. Be sure to also check the documentation for your chosen
+driver, as the accepted capabilities may differ.
+
+Note that if your server is not running locally or is running on an alternate
+port you will need to specify the ``--host`` and ``--port`` command line
+options.
+
 Sauce Labs integration
 ----------------------
 
@@ -56,11 +86,11 @@ Running tests
 
 To run your automated tests, simply specify ``SauceLabs`` as your driver::
 
-  py.test --driver=SauceLabs --browsername=Firefox --platform="Windows 8"
+  py.test --driver=SauceLabs --capability=browserName:Firefox
 
 See the `supported platforms <https://docs.saucelabs.com/reference/platforms-configurator/>`_
 to help you with your configuration. Additional capabilities can be set using
-the ``--capability`` comand line arguments. See the
+the ``--capability`` command line arguments. See the
 `test configuration documentation <https://docs.saucelabs.com/reference/test-configuration/>`_
 for full details of what can be configured.
 
@@ -115,7 +145,7 @@ Running tests
 
 To run your automated tests, simply specify ``BrowserStack`` as your driver::
 
-  py.test --driver=BrowserStack --browsername=firefox --platform=WIN8
+  py.test --driver=BrowserStack --capability=browserName:firefox
 
 See the `capabilities documentation <https://www.browserstack.com/automate/capabilities>`_
 for additional configuration that can be set using ``--capability`` command line

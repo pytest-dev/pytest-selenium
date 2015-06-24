@@ -12,7 +12,7 @@ import requests
 
 def pytest_addoption(parser):
     group = parser.getgroup('safety', 'safety')
-    group._addoption('--sensitiveurl',
+    group._addoption('--sensitive-url',
                      dest='sensitive_url',
                      default=os.environ.get('SELENIUM_SENSITIVE_URL', '.*'),
                      help='regular expression for identifying sensitive urls.'
@@ -44,9 +44,6 @@ def pytest_configure(config):
 
 @pytest.fixture
 def _sensitive_skipping(request, base_url):
-    if request.config.option.skip_url_check:
-        return
-
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
     response = requests.get(base_url)

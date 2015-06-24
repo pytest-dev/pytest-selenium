@@ -36,7 +36,6 @@ def _split_class_and_test_names(nodeid):
 
 
 def start_driver(item, capabilities):
-    options = item.config.option
     keywords = item.keywords
     marks = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     tags = item.config.getini('sauce_labs_tags') + marks
@@ -46,22 +45,12 @@ def start_driver(item, capabilities):
         # mark is not present or has no value
         job_visibility = item.config.getini('sauce_labs_job_visibility')
 
-    if options.browser_name is None:
-        raise pytest.UsageError('Sauce Labs requires a browser name')
-
     test_id = '.'.join(_split_class_and_test_names(item.nodeid))
     capabilities.update({
         'name': test_id,
-        'public': job_visibility,
-        'browserName': options.browser_name})
-    if options.build is not None:
-        capabilities['build'] = options.build
+        'public': job_visibility})
     if tags is not None and len(tags) > 0:
         capabilities['tags'] = tags
-    if options.platform is not None:
-        capabilities['platform'] = options.platform
-    if options.browser_version is not None:
-        capabilities['version'] = options.browser_version
     executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % \
         _credentials(item.config)
     return webdriver.Remote(command_executor=executor,

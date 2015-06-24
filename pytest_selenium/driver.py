@@ -24,6 +24,9 @@ def make_driver(item):
     options = item.config.option
     capabilities = {}
     if options.capabilities is not None:
+        # FIXME: this is too restrictive - we may need to set
+        # strings with digit or boolean values, or we might want
+        # to set the value to be a list or dictionary
         for c in options.capabilities:
             name, value = c.split(':')
             # handle integer capabilities
@@ -66,8 +69,8 @@ def chrome_driver(item, capabilities):
     options = item.config.option
     chrome_options = _create_chrome_options(options)
     extra = {}
-    if options.chrome_path:
-        extra['executable_path'] = options.chrome_path
+    if options.driver_path:
+        extra['executable_path'] = options.driver_path
     return webdriver.Chrome(
         chrome_options=chrome_options,
         desired_capabilities=capabilities or None,
@@ -76,8 +79,8 @@ def chrome_driver(item, capabilities):
 
 def firefox_driver(item, capabilities):
     options = item.config.option
-    if options.firefox_path:
-        binary = FirefoxBinary(options.firefox_path)
+    if options.driver_path:
+        binary = FirefoxBinary(options.driver_path)
     else:
         binary = None
     profile = _create_firefox_profile(options)
@@ -94,7 +97,7 @@ def ie_driver(item, capabilities):
 def opera_driver(item, capabilities):
     capabilities.update(webdriver.DesiredCapabilities.OPERA)
     return webdriver.Opera(
-        executable_path=item.config.option.opera_path,
+        executable_path=item.config.option.driver_path,
         desired_capabilities=capabilities)
 
 
@@ -104,38 +107,23 @@ def phantomjs_driver(item, capabilities):
 
 def remote_driver(item, capabilities):
     options = item.config.option
-
-    if not options.browser_name:
-        raise pytest.UsageError(
-            '--browsername must be specified when using a server.')
-
-    if not options.platform:
-        raise pytest.UsageError(
-            '--platform must be specified when using a server.')
-
-    capabilities.update(getattr(webdriver.DesiredCapabilities,
-                                options.browser_name.upper()))
-    if json.loads(options.chrome_options) or options.extension_paths:
+    if 'browserName' not in capabilities:
+        raise pytest.UsageError('The \'browserName\' capability must be '
+                                'specified when using the remote driver.')
+    # TODO replace chrome options with raw capabilties?
+    if options.chrome_options or options.extension_paths:
         capabilities = _create_chrome_options(options).to_capabilities()
-    if options.browser_name.lower() == 'firefox':
-        profile = _create_firefox_profile(options)
-    if options.browser_version:
-        capabilities['version'] = options.browser_version
-    capabilities['platform'] = options.platform.upper()
+    if 'version' in capabilities:
+        # FIXME: This is a workaround for when the value of version is an int
+        capabilities['version'] = str(capabilities['version'])
+    else:
+        capabilities['version'] = ''
+    capabilities.setdefault('platform', 'ANY')
     executor = 'http://%s:%s/wd/hub' % (options.host, options.port)
-    try:
-        return webdriver.Remote(
-            command_executor=executor,
-            desired_capabilities=capabilities or None,
-            browser_profile=profile)
-    except AttributeError:
-        valid_browsers = [
-            attr for attr in dir(webdriver.DesiredCapabilities)
-            if not attr.startswith('__')
-        ]
-        raise AttributeError(
-            "Invalid browser name: '%s'. Valid options are: %s" %
-            (options.browser_name, ', '.join(valid_browsers)))
+    return webdriver.Remote(
+        command_executor=executor,
+        desired_capabilities=capabilities,
+        browser_profile=_create_firefox_profile(options))
 
 
 def saucelabs_driver(item, capabilities):
@@ -171,7 +159,6 @@ def _create_firefox_profile(options):
             elif value.lower() in ['true', 'false']:
                 value = value.lower() == 'true'
             profile.set_preference(name, value)
-    profile.assume_untrusted_cert_issuer = options.assume_untrusted
     profile.update_preferences()
     if options.extension_paths is not None:
         for extension in options.extension_paths:

@@ -33,11 +33,5 @@ def failure(testdir, testfile, webserver_base_url):
 
 def test_missing_browser_name(failure):
     out = failure()
-    assert out == ('UsageError: --browsername must be specified '
-                   'when using a server.')
-
-
-def test_missing_platform(failure):
-    out = failure('--browsername=firefox')
-    assert out == ('UsageError: --platform must be specified '
-                   'when using a server.')
+    assert out == ('UsageError: The \'browserName\' capability must be '
+                   'specified when using the remote driver.')
