@@ -33,4 +33,4 @@ def failure(testdir, testfile, webserver_base_url):
 
 def test_missing_driver(failure):
     out = failure()
-    assert 'UsageError: --driver must be specified.' in out
+    assert 'UsageError: --driver must be specified' in out

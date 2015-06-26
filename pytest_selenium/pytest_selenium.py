@@ -8,9 +8,16 @@ import pytest
 import requests
 
 import cloud
-from driver import SUPPORTED_DRIVERS
 
 REQUESTS_TIMEOUT = 10
+SUPPORTED_DRIVERS = [
+    'BrowserStack',
+    'Chrome',
+    'Firefox',
+    'IE',
+    'PhantomJS',
+    'Remote',
+    'SauceLabs']
 
 
 class DeferPlugin(object):
@@ -190,11 +197,10 @@ def pytest_addoption(parser):
                           '(default: %default)')
     group._addoption('--driver',
                      action='store',
+                     choices=SUPPORTED_DRIVERS,
                      dest='driver',
-                     metavar='str',
-                     help='webdriver implementation. '
-                          'Valid values are: %s.' %
-                          ', '.join(SUPPORTED_DRIVERS))
+                     help='webdriver implementation.',
+                     metavar='str')
     group._addoption('--driver-path',
                      action='store',
                      dest='driver_path',

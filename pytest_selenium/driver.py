@@ -10,21 +10,11 @@ from selenium.webdriver.support.event_firing_webdriver import \
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import webdriver
 
-SUPPORTED_DRIVERS = ['BrowserStack',
-                     'Chrome',
-                     'Firefox',
-                     'IE',
-                     'PhantomJS',
-                     'Remote',
-                     'SauceLabs']
-
 
 def start_driver(item, capabilities):
     options = item.config.option
-    if str(options.driver).lower() not in map(str.lower, SUPPORTED_DRIVERS):
-        raise pytest.UsageError(
-            '--driver must be specified. '
-            'Valid values are: %s.' % ', '.join(SUPPORTED_DRIVERS))
+    if options.driver is None:
+        raise pytest.UsageError('--driver must be specified')
     driver = globals().get(
         '%s_driver' % options.driver.lower())(item, capabilities)
     if options.event_listener is not None:
