@@ -43,6 +43,28 @@ If ChromeDriver is not on your path, use ``--driver-path`` to specify the locati
 For more information relating to ChromeDriver, you may read its documentation
 `here <https://sites.google.com/a/chromium.org/chromedriver/>`_.
 
+PhantomJS
+------------
+
+To use PhantomJS as the driver, you need to have it installed. You can download
+it `here <http://phantomjs.org/download.html>`_.
+You may either download PhantomJS to a location in your PATH, or utilize
+the option to specify the driver path during test execution.
+
+Running tests
+^^^^^^^^^^^^^
+
+To run your automated tests, specify ``PhantomJS`` as your driver::
+
+  py.test --driver=PhantomJS
+
+If PhantomJS is not on your path, use ``--driver-path`` to specify the location::
+
+  py.test --driver=PhantomJS --driver-path=/path/to/phantomjs
+
+For more information relating to PhantomJS, you may read its documentation
+`here <http://phantomjs.org/quick-start.html>`_.
+
 Server and Grid integration
 ---------------------------
 

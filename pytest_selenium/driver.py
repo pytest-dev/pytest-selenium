@@ -102,7 +102,9 @@ def ie_driver(item, capabilities):
 
 
 def phantomjs_driver(item, capabilities):
-    return webdriver.PhantomJS()
+    return webdriver.PhantomJS(
+        executable_path=item.config.option.driver_path or 'phantomjs',
+        desired_capabilities=capabilties)
 
 
 def remote_driver(item, capabilities):
