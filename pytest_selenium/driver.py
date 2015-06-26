@@ -15,7 +15,6 @@ SUPPORTED_DRIVERS = ['BrowserStack',
                      'Chrome',
                      'Firefox',
                      'IE',
-                     'Opera',
                      'PhantomJS',
                      'Remote',
                      'SauceLabs']
@@ -100,13 +99,6 @@ def firefox_driver(item, capabilities):
 
 def ie_driver(item, capabilities):
     return webdriver.Ie()
-
-
-def opera_driver(item, capabilities):
-    capabilities.update(webdriver.DesiredCapabilities.OPERA)
-    return webdriver.Opera(
-        executable_path=item.config.option.driver_path,
-        desired_capabilities=capabilities)
 
 
 def phantomjs_driver(item, capabilities):
