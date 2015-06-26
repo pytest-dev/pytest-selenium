@@ -21,6 +21,28 @@ plugin is still in development. Please check back for updates.
    :target: https://requires.io/github/davehunt/pytest-selenium/requirements/?branch=master
    :alt: Requirements
 
+ChromeDriver
+------------
+
+To use Chrome as the driver, you need to have ChromeDriver installed. You can download
+it `here <https://sites.google.com/a/chromium.org/chromedriver/downloads>`_.
+You may either download ChromeDriver to a location in your PATH, or utilize
+the option to specify the driver path during test execution.
+
+Running tests
+^^^^^^^^^^^^^
+
+To run your automated tests, specify ``Chrome`` as your driver::
+
+  py.test --driver=Chrome
+
+If ChromeDriver is not on your path, use ``--driver-path`` to specify the location::
+
+  py.test --driver=Chrome --driver-path=/path/to/chromedriver
+
+For more information relating to ChromeDriver, you may read its documentation
+`here <https://sites.google.com/a/chromium.org/chromedriver/>`_.
+
 Server and Grid integration
 ---------------------------
 
