@@ -38,7 +38,7 @@ def _split_class_and_test_names(nodeid):
 def start_driver(item, capabilities):
     keywords = item.keywords
     marks = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
-    tags = item.config.getini('sauce_labs_tags') + marks
+    tags = capabilities.get('tags', []) + marks
     try:
         job_visibility = item.keywords['sauce_labs_job_visibility'].args[0]
     except (IndexError, KeyError):
@@ -49,7 +49,7 @@ def start_driver(item, capabilities):
     capabilities.update({
         'name': test_id,
         'public': job_visibility})
-    if tags is not None and len(tags) > 0:
+    if tags:
         capabilities['tags'] = tags
     executor = 'http://%s:%s@ondemand.saucelabs.com:80/wd/hub' % \
         _credentials(item.config)

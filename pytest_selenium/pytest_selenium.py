@@ -80,10 +80,14 @@ def _verify_base_url(request, base_url):
 
 
 @pytest.fixture
-def driver(request):
-    from .driver import make_driver
+def capabilities(variables):
+    return variables.get('capabilities', {})
 
-    driver = make_driver(request.node)
+
+@pytest.fixture
+def driver(request, capabilities):
+    from .driver import start_driver
+    driver = start_driver(request.node, capabilities)
     request.node._driver = driver
     request.addfinalizer(lambda: driver.quit())
     return driver
@@ -164,9 +168,6 @@ def pytest_addoption(parser):
     parser.addini('sauce_labs_job_visibility',
                   help='default visibility for jobs',
                   default='public restricted')
-    parser.addini('sauce_labs_tags',
-                  help='space separated tags for filtering and grouping',
-                  type='args')
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--base-url',
@@ -194,12 +195,6 @@ def pytest_addoption(parser):
                      help='webdriver implementation. '
                           'Valid values are: %s.' %
                           ', '.join(SUPPORTED_DRIVERS))
-    group._addoption('--capability',
-                     action='append',
-                     dest='capabilities',
-                     metavar='str',
-                     help='additional capability to set in format '
-                          '"name:value".')
     group._addoption('--driver-path',
                      action='store',
                      dest='driver_path',
@@ -221,21 +216,6 @@ def pytest_addoption(parser):
                      dest='extension_paths',
                      metavar='str',
                      help='path to browser extension to install.')
-    group._addoption('--chromeopts',
-                     action='store',
-                     dest='chrome_options',
-                     metavar='str',
-                     help='json string of google chrome options to set.')
-    group._addoption('--proxy-host',
-                     action='store',
-                     dest='proxy_host',
-                     metavar='str',
-                     help='use a proxy running on this host.')
-    group._addoption('--proxy-port',
-                     action='store',
-                     dest='proxy_port',
-                     metavar='int',
-                     help='use a proxy running on this port.')
     group._addoption('--event-listener',
                      action='store',
                      dest='event_listener',
