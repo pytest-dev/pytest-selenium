@@ -93,17 +93,3 @@ def test_extension(testdir):
             assert 'Test Extension (empty)' in extensions
     """)
     testdir.quick_qa('--browser-extension=%s' % extension, file_test, passed=1)
-
-
-def test_proxy(testdir, webserver_base_url, webserver):
-    """Test that a proxy can be set for Firefox."""
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_proxy(selenium):
-            selenium.get('http://example.com')
-            header = selenium.find_element_by_tag_name('h1')
-            assert header.text == 'Success!'
-    """)
-    testdir.quick_qa(webserver_base_url, '--proxy-host=localhost',
-                     '--proxy-port=%s' % webserver.port, file_test, passed=1)

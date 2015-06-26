@@ -45,8 +45,14 @@ def test_missing_api_key(failure, monkeypatch):
     assert out == 'UsageError: Sauce Labs API key must be set'
 
 
-def test_invalid_credentials(failure, monkeypatch):
+def test_invalid_credentials(testdir, failure, monkeypatch):
+    testdir.makeconftest("""
+        import pytest
+        @pytest.fixture
+        def capabilities():
+            return {'browserName': 'Firefox'}
+    """)
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
     monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
-    out = failure('--capability=browserName:firefox')
+    out = failure()
     assert re.search('(auth failed)|(Sauce Labs Authentication Error)', out)

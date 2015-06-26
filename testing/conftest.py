@@ -40,7 +40,7 @@ def testdir(request, webserver_base_url):
     def inline_runqa(*args, **kwargs):
         return testdir.inline_run(
             webserver_base_url,
-            '--driver=firefox',
+            '--driver=Firefox',
             *args, **kwargs)
 
     testdir.inline_runqa = inline_runqa

@@ -21,6 +21,34 @@ plugin is still in development. Please check back for updates.
    :target: https://requires.io/github/davehunt/pytest-selenium/requirements/?branch=master
    :alt: Requirements
 
+Capabilities
+------------
+
+Configuration options are specified using a capabilities dictionary. This is
+required when using a Selenium server to specify the target environment, but
+can also be used to configure local drivers.
+
+To specify capabilities you can provide a JSON file on the command line. For
+example:
+
+.. code-block:: json
+
+  { "capabilities": {
+      "browserName": "Firefox",
+      "platform": "MAC" }
+  }
+
+You can also add or change capabilities by overwriting the `capabilities`
+fixture:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.fixture
+  def capabilities(capabilities):
+      capabilities['tags'] = ['tag1', 'tag2', 'tag3']
+      return capabilities
+
 ChromeDriver
 ------------
 
@@ -79,12 +107,8 @@ the default when running tests against a remote driver.
 Running tests
 ^^^^^^^^^^^^^
 
-To run your automated tests, simply specify ``Remote`` as your driver and
-provide the ``browserName`` capability for the browser you want to launch::
-
-  py.test --driver=Remote --capability=browserName:firefox
-
-Browser selection is determined using capabilities. Check the
+To run your automated tests, simply specify ``Remote`` as your driver. Browser
+selection is determined using capabilities. Check the
 `documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`_
 for details of accepted values. There are also a number of
 `browser specific capabilities <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#browser-specific-capabilities>`_
@@ -114,16 +138,12 @@ Below is an example ``setup.cfg`` showing the configuration options:
   sauce_labs_username = username
   sauce_labs_api_key = secret
   sauce_labs_job_visibility = public
-  sauce_labs_tags = tag1 tag2
 
 The `sauce_labs_job_visibility` entry is used to determine who you share your
 Sauce Labs jobs with. Check the
 `documentation <https://saucelabs.com/docs/additional-config#sharing>`_ for the
 accepted values. If not set, this defaults to
 `public restricted <https://saucelabs.com/docs/additional-config#restricted>`_.
-
-The ``sauce_labs_tags`` entry is an optional space separated list of tags that
-can be used to filter the jobs in the Sauce Labs dashboard.
 
 Running tests
 ^^^^^^^^^^^^^

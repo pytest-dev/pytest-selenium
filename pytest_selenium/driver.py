@@ -7,7 +7,6 @@ import json
 import pytest
 from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
-from selenium.webdriver.common.proxy import Proxy
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium import webdriver
 
@@ -18,36 +17,6 @@ SUPPORTED_DRIVERS = ['BrowserStack',
                      'PhantomJS',
                      'Remote',
                      'SauceLabs']
-
-
-def proxy_from_options(options):
-    if options.proxy_host and options.proxy_port:
-        proxy_str = '%(proxy_host)s:%(proxy_port)s' % vars(options)
-        proxy = Proxy()
-        proxy.ssl_proxy = proxy.http_proxy = proxy_str
-        return proxy
-
-
-def make_driver(item):
-    options = item.config.option
-    capabilities = {}
-    if options.capabilities is not None:
-        # FIXME: this is too restrictive - we may need to set
-        # strings with digit or boolean values, or we might want
-        # to set the value to be a list or dictionary
-        for c in options.capabilities:
-            name, value = c.split(':')
-            # handle integer capabilities
-            if value.isdigit():
-                value = int(value)
-            # handle boolean capabilities
-            elif value.lower() in ['true', 'false']:
-                value = value.lower() == 'true'
-            capabilities[name] = value
-    proxy = proxy_from_options(options)
-    if proxy is not None:
-        proxy.add_to_capabilities(capabilities)
-    return start_driver(item, capabilities)
 
 
 def start_driver(item, capabilities):
@@ -73,15 +42,7 @@ def browserstack_driver(item, capabilities):
 
 
 def chrome_driver(item, capabilities):
-    options = item.config.option
-    chrome_options = _create_chrome_options(options)
-    extra = {}
-    if options.driver_path:
-        extra['executable_path'] = options.driver_path
-    return webdriver.Chrome(
-        chrome_options=chrome_options,
-        desired_capabilities=capabilities or None,
-        **extra)
+    return webdriver.Chrome(desired_capabilities=capabilities)
 
 
 def firefox_driver(item, capabilities):
@@ -112,14 +73,7 @@ def remote_driver(item, capabilities):
     if 'browserName' not in capabilities:
         raise pytest.UsageError('The \'browserName\' capability must be '
                                 'specified when using the remote driver.')
-    # TODO replace chrome options with raw capabilties?
-    if options.chrome_options or options.extension_paths:
-        capabilities = _create_chrome_options(options).to_capabilities()
-    if 'version' in capabilities:
-        # FIXME: This is a workaround for when the value of version is an int
-        capabilities['version'] = str(capabilities['version'])
-    else:
-        capabilities['version'] = ''
+    capabilities.setdefault('version', '')
     capabilities.setdefault('platform', 'ANY')
     executor = 'http://%s:%s/wd/hub' % (options.host, options.port)
     return webdriver.Remote(
