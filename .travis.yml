@@ -26,4 +26,4 @@ install:
 before_script:
   - sh -e /etc/init.d/xvfb start
   - flake8 .
-script: py.test testing
+script: py.test testing -m 'not chrome'
