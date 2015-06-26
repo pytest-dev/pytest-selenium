@@ -28,11 +28,9 @@ def failure_with_output(testdir, *args, **kwargs):
 
 @pytest.fixture
 def failure(testdir, testfile, webserver_base_url):
-    return partial(failure_with_output, testdir, testfile, webserver_base_url,
-                   '--driver=Remote')
+    return partial(failure_with_output, testdir, testfile, webserver_base_url)
 
 
-def test_missing_browser_name(failure):
+def test_missing_driver(failure):
     out = failure()
-    assert out == ('UsageError: The \'browserName\' capability must be '
-                   'specified when using the remote driver.')
+    assert 'UsageError: --driver must be specified.' in out
