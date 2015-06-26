@@ -12,5 +12,5 @@ before_script:
   - export PATH=$PWD:$PATH
   - sh -e /etc/init.d/xvfb start
   - sleep 10
-script: py.test testing -m 'not (chrome or opera)'
+script: py.test testing -m 'not chrome'
 env: DISPLAY=':99.0'
