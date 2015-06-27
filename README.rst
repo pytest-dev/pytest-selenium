@@ -38,6 +38,10 @@ example:
       "platform": "MAC" }
   }
 
+Simple capabilities can be set or overridden on the command line::
+
+  py.test --driver Remote --capability browserName Firefox
+
 You can also add or change capabilities by overwriting the `capabilities`
 fixture:
 
@@ -62,11 +66,11 @@ Running tests
 
 To run your automated tests, specify ``Chrome`` as your driver::
 
-  py.test --driver=Chrome
+  py.test --driver Chrome
 
 If ChromeDriver is not on your path, use ``--driver-path`` to specify the location::
 
-  py.test --driver=Chrome --driver-path=/path/to/chromedriver
+  py.test --driver Chrome --driver-path /path/to/chromedriver
 
 For more information relating to ChromeDriver, you may read its documentation
 `here <https://sites.google.com/a/chromium.org/chromedriver/>`_.
@@ -150,7 +154,7 @@ Running tests
 
 To run your automated tests, simply specify ``SauceLabs`` as your driver::
 
-  py.test --driver=SauceLabs --capability=browserName:Firefox
+  py.test --driver SauceLabs --capability browserName Firefox
 
 See the `supported platforms <https://docs.saucelabs.com/reference/platforms-configurator/>`_
 to help you with your configuration. Additional capabilities can be set using
@@ -209,7 +213,7 @@ Running tests
 
 To run your automated tests, simply specify ``BrowserStack`` as your driver::
 
-  py.test --driver=BrowserStack --capability=browserName:firefox
+  py.test --driver BrowserStack --capability browserName Firefox
 
 See the `capabilities documentation <https://www.browserstack.com/automate/capabilities>`_
 for additional configuration that can be set using ``--capability`` command line

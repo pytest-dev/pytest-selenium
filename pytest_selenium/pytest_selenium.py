@@ -87,8 +87,11 @@ def _verify_base_url(request, base_url):
 
 
 @pytest.fixture
-def capabilities(variables):
-    return variables.get('capabilities', {})
+def capabilities(request, variables):
+    capabilities = variables.get('capabilities', {})
+    for capability in request.config.option.capabilities:
+        capabilities[capability[0]] = capability[1]
+    return capabilities
 
 
 @pytest.fixture
@@ -206,6 +209,13 @@ def pytest_addoption(parser):
                      dest='driver_path',
                      metavar='path',
                      help='path to the driver.')
+    group._addoption('--capability',
+                     action='append',
+                     default=[],
+                     dest='capabilities',
+                     metavar=('key', 'value'),
+                     nargs=2,
+                     help='additional capabilities.')
     group._addoption('--firefox-pref',
                      action='append',
                      dest='firefox_preferences',

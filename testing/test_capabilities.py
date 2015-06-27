@@ -7,28 +7,30 @@ import pytest
 pytestmark = pytest.mark.nondestructive
 
 
-def test_file(testdir):
-    variables = testdir.makefile('.json', '{"capabilities": {"foo": "bar"}}')
-    file_test = testdir.makepyfile("""
+@pytest.fixture
+def testfile(testdir):
+    return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_capabilities(capabilities):
             assert capabilities['foo'] == 'bar'
     """)
-    testdir.quick_qa('--variables', variables, file_test, passed=1)
 
 
-def test_fixture(testdir):
+def test_command_line(testfile, testdir):
+    testdir.quick_qa('--capability', 'foo', 'bar', testfile, passed=1)
+
+
+def test_file(testfile, testdir):
+    variables = testdir.makefile('.json', '{"capabilities": {"foo": "bar"}}')
+    testdir.quick_qa('--variables', variables, testfile, passed=1)
+
+
+def test_fixture(testfile, testdir):
     testdir.makeconftest("""
         import pytest
         @pytest.fixture
         def capabilities():
             return {'foo': 'bar'}
     """)
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_capabilities(capabilities):
-            assert True
-    """)
-    testdir.quick_qa(file_test, passed=1)
+    testdir.quick_qa(testfile, passed=1)
