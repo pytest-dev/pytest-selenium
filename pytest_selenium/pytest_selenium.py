@@ -110,7 +110,8 @@ def pytest_runtest_makereport(__multicall__, item, call):
         driver = getattr(item, '_driver', None)
         if driver is not None:
             xfail = hasattr(report, 'wasxfail')
-            if (report.skipped and xfail) or (report.failed and not xfail):
+            debug = (report.skipped and xfail) or (report.failed and not xfail)
+            if debug:
                 url = driver.current_url
                 if url is not None:
                     extra_summary.append('Failing URL: %s' % url)
@@ -133,8 +134,9 @@ def pytest_runtest_makereport(__multicall__, item, call):
                     extra.append(pytest_html.extras.url(
                         provider.url(item.config, driver.session_id),
                         '%s Job' % provider.name))
-                    extra.append(pytest_html.extras.html(
-                        provider.additional_html(driver.session_id)))
+                    if debug:
+                        extra.append(pytest_html.extras.html(
+                            provider.additional_html(driver.session_id)))
                 passed = report.passed or (report.failed and xfail)
                 provider.update_status(item.config, driver.session_id, passed)
         report.sections.append(('pytest-selenium', '\n'.join(extra_summary)))
