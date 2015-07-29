@@ -20,36 +20,6 @@ SUPPORTED_DRIVERS = [
     'SauceLabs']
 
 
-class DeferPlugin(object):
-    """Simple plugin to defer pytest-html hook functions."""
-
-    def pytest_html_environment(self, config):
-        driver = config.option.driver
-        if hasattr(cloud, driver.lower()):
-            server = getattr(cloud, driver.lower()).name
-        else:
-            server = 'http://%s:%s' % (config.option.host,
-                                       config.option.port)
-        browser = config.option.browser_name and \
-            config.option.browser_version and \
-            config.option.platform and \
-            '%s %s on %s' % (str(config.option.browser_name).title(),
-                             config.option.browser_version,
-                             str(config.option.platform).title())
-        return {'Base URL': config.option.base_url,
-                'Build': config.option.build,
-                'Driver': config.option.driver,
-                'Driver Path': config.option.driver_path,
-                'Server': server,
-                'Browser': browser}
-
-
-@pytest.mark.tryfirst
-def pytest_configure(config):
-    if config.pluginmanager.hasplugin('html'):
-        config.pluginmanager.register(DeferPlugin())
-
-
 def pytest_sessionstart(session):
     # configure session proxies
     option = session.config.option
@@ -64,6 +34,21 @@ def pytest_sessionstart(session):
             zap.core.set_option_proxy_chain_port(option.proxy_port)
         option.proxy_host = option.zap_host
         option.proxy_port = option.zap_port
+
+
+@pytest.fixture(autouse=True)
+def environment(request, base_url, capabilities):
+    """Provide environment details to pytest-html report"""
+    config = request.config
+    if hasattr(config, '_html'):
+        config._html.environment.append({
+            'Base URL': base_url,
+            'Capabilities': capabilities,
+            'Driver': config.option.driver,
+            'Driver Path': config.option.driver_path})
+        if not hasattr(cloud, config.option.driver.lower()):
+            config._html.environment.append({
+                'Server': 'http://{0.host}:{0.port}'.format(config.option)})
 
 
 @pytest.fixture(scope='session')
