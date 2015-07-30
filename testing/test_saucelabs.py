@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from functools import partial
-import re
 
 import pytest
 
@@ -48,5 +47,4 @@ def test_missing_api_key(failure, monkeypatch):
 def test_invalid_credentials(failure, monkeypatch):
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
     monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
-    out = failure('--capability', 'browserName', 'Firefox')
-    assert re.search('(auth failed)|(Sauce Labs Authentication Error)', out)
+    failure('--capability', 'browserName', 'Firefox')
