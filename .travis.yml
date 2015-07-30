@@ -2,12 +2,20 @@ language: python
 python:
   - 2.6
   - 2.7
+env:
+  global:
+    - DISPLAY=':99.0'
+  matrix:
+    - PYTEST=2.4.2
+    - PYTEST=2.5.2
+    - PYTEST=2.6.4
+    - PYTEST=2.7.2
 install:
   - pip install flake8
-  - python setup.py install
+  - pip install -q pytest==$PYTEST
+  - pip install -q -e .
 before_script:
-  - flake8 .
   - sh -e /etc/init.d/xvfb start
-  - sleep 10
-script: py.test testing
-env: DISPLAY=':99.0'
+  - flake8 .
+script:
+  - py.test testing
