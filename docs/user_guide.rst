@@ -41,12 +41,12 @@ the option to specify the driver path during test execution.
 
 To run your automated tests, specify ``PhantomJS`` as your driver::
 
-  py.test --driver=PhantomJS
+  py.test --driver PhantomJS
 
 If PhantomJS is not on your path, use ``--driver-path`` to specify the
 location::
 
-  py.test --driver=PhantomJS --driver-path=/path/to/phantomjs
+  py.test --driver PhantomJS --driver-path /path/to/phantomjs
 
 For more information relating to PhantomJS, you may read its documentation
 `here <http://phantomjs.org/quick-start.html>`_.
@@ -68,11 +68,16 @@ selection is determined using capabilities. Check the
 for details of accepted values. There are also a number of
 `browser specific capabilities <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#browser-specific-capabilities>`_
 that can be set. Be sure to also check the documentation for your chosen
-driver, as the accepted capabilities may differ.
+driver, as the accepted capabilities may differ::
+
+  py.test --driver Remote --capability browserName firefox
 
 Note that if your server is not running locally or is running on an alternate
 port you will need to specify the ``--host`` and ``--port`` command line
-options.
+options::
+
+  py.test --driver Remote --host selenium.hostname --port 5555 --capability browserName firefox
+
 
 Sauce Labs
 **********
@@ -180,7 +185,7 @@ can also be used to configure local drivers.
 
 To specify capabilities, you can provide a JSON file on the command line using
 the `pytest-variables <https://github.com/davehunt/pytest-variables>`_ plugin.
-For example if you had a ```capabilties.json`` containing your capabilities, you
+For example if you had a ``capabilties.json`` containing your capabilities, you
 would need to include ``--variables capabilities.json`` on your command line.
 
 The following is an example of a variables file including capabilities:
