@@ -1,1 +1,1 @@
-from pytest_selenium import *  # noqa
+from .pytest_selenium import *  # noqa

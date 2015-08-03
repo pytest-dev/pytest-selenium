@@ -21,7 +21,10 @@ import logging
 import socket
 import threading
 import urllib
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+try:
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+except ImportError:
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 LOGGER = logging.getLogger(__name__)
 
