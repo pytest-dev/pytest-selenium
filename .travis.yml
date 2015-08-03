@@ -1,7 +1,12 @@
 language: python
+sudo: false
 python:
   - 2.6
   - 2.7
+  - 3.3
+  - 3.4
+  - pypy
+  - pypy3
 env:
   global:
     - DISPLAY=':99.0'
@@ -10,6 +15,13 @@ env:
     - PYTEST=2.5.2
     - PYTEST=2.6.4
     - PYTEST=2.7.2
+matrix:
+  fast_finish: true
+  allow_failures:
+    - python: 3.3
+    - python: 3.4
+    - python: pypy
+    - python: pypy3
 install:
   - pip install flake8
   - pip install -q pytest==$PYTEST
