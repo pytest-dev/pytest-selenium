@@ -41,7 +41,7 @@ Here's the earlier example with the addition of ``base_url``:
 .. code-block:: python
 
   def test_example(base_url, selenium):
-      selenium.get('%{0}'.format(base_url))
+      selenium.get('{0}'.format(base_url))
 
 The associated command line would be:
 
@@ -68,7 +68,7 @@ application and ``live_server.url`` returns the base URL of the site.
       return live_server.url
 
   def test_search(base_url, selenium):
-      selenium.get('%{0}/search'.format(base_url))
+      selenium.get('{0}/search'.format(base_url))
 
 Available Live Servers
 ~~~~~~~~~~~~~~~~~~~~~~
