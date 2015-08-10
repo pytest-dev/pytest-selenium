@@ -9,10 +9,14 @@ pytest-selenium requires Python 2.6 or 2.7.
 Install pytest-selenium
 -----------------------
 
-To install pytest-selenium using `pip <https://pip.pypa.io/>`_::
+To install pytest-selenium using `pip <https://pip.pypa.io/>`_:
 
-  pip install pytest-selenium
+.. code-block:: bash
 
-To install from source::
+  $ pip install pytest-selenium
 
-  python setup.py develop
+To install from source:
+
+.. code-block:: bash
+
+  $ python setup.py develop

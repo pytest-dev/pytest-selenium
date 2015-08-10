@@ -17,6 +17,8 @@ another change to the pull branch.
 Running Tests
 -------------
 
-You will need `pytest <http://pytest.org/>`_ installed to run the tests::
+You will need `pytest <http://pytest.org/>`_ installed to run the tests:
 
-  py.test testing
+.. code-block:: bash
+
+  $ py.test testing
