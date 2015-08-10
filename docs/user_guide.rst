@@ -22,22 +22,21 @@ Here's a simple example test that opens a website using Selenium:
 To run the above test you will need to specify the browser instance to be
 invoked. For example, to run it using Firefox installed in a default location:
 
-
 .. code-block:: bash
 
   $ py.test --driver Firefox
 
-For full details of the Selenium API you can refer to the official
-documentation. [LINK TO SELENIUM API]
+For full details of the Selenium API you can refer to the
+`documentation <http://seleniumhq.github.io/selenium/docs/api/py/api.html>`_.
 
 Specifying a Base URL
 *********************
 
 Rather than repeating or abstracting the base URL in your tests, pytest-selenium
-also provides a base_url fixture that by default will return a value specified
-on the command line.
+also provides a ``base_url`` fixture that by default will return a value
+specified on the command line.
 
-Here's the earlier example with the addition of base_url:
+Here's the earlier example with the addition of ``base_url``:
 
 .. code-block:: python
 
@@ -55,21 +54,35 @@ Dynamic Base URLs
 
 If your test harness takes care of launching an instance of your application
 under test, you may not have a predictable base URL to provide on the command
-line. Fortunately, it's easy to override the base_url fixture and return the
+line. Fortunately, it's easy to override the ``base_url`` fixture and return the
 correct URL to your test.
+
+In the following example a ``live_server`` fixture is used to start the
+application and ``live_server.url`` returns the base URL of the site.
 
 .. code-block:: python
 
   import pytest
   @pytest.fixture
-  def base_url(liveserver):
-      # liveserver is a fixture that takes care of starting your application,
-      # your chosen framework may already provide one of these for your
-      # integration tests
-      return liveserver.url
+  def base_url(live_server):
+      return live_server.url
 
   def test_search(base_url, selenium):
       selenium.get('%{0}/search'.format(base_url))
+
+Available Live Servers
+~~~~~~~~~~~~~~~~~~~~~~
+
+It's relatively simple to create your own ``live_server`` fixture, however you
+may be able to take advantage of one of the following:
+
+* Django applications can use
+  `pytest-django <http://pytest-django.readthedocs.org/en/latest/>`_, which
+  provides a ``live_server`` fixture.
+
+* Flask applications can use
+  `pytest-flask <http://pytest-flask.readthedocs.org/>`_, which provides a
+  ``live_server`` fixture.
 
 Specifying a Browser
 ********************
