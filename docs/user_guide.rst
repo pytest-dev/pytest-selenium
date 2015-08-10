@@ -77,8 +77,8 @@ It's relatively simple to create your own ``live_server`` fixture, however you
 may be able to take advantage of one of the following:
 
 * Django applications can use
-  `pytest-django <http://pytest-django.readthedocs.org/en/latest/>`_, which
-  provides a ``live_server`` fixture.
+  `pytest-django <http://pytest-django.readthedocs.org/>`_, which provides a
+  ``live_server`` fixture.
 
 * Flask applications can use
   `pytest-flask <http://pytest-flask.readthedocs.org/>`_, which provides a
