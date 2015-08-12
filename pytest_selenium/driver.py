@@ -48,7 +48,7 @@ def firefox_driver(item, capabilities):
 
 
 def ie_driver(item, capabilities):
-    return webdriver.Ie()
+    return webdriver.Ie(capabilities=capabilities)
 
 
 def phantomjs_driver(item, capabilities):
