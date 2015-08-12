@@ -29,7 +29,7 @@ def environment(request, base_url, capabilities):
             'Base URL': base_url,
             'Capabilities': capabilities,
             'Driver': config.option.driver})
-        if not hasattr(cloud, config.option.driver.lower()):
+        if config.option.driver == 'Remote':
             config._html.environment.append({
                 'Server': 'http://{0.host}:{0.port}'.format(config.option)})
 
