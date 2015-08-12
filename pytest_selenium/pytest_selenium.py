@@ -7,7 +7,7 @@ import os
 import pytest
 import requests
 
-import cloud
+from . import cloud
 
 REQUESTS_TIMEOUT = 10
 SUPPORTED_DRIVERS = [

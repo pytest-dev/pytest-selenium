@@ -6,7 +6,7 @@
 
 import pytest
 
-from webserver import SimpleWebServer
+from .webserver import SimpleWebServer
 
 pytest_plugins = 'pytester'
 

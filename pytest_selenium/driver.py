@@ -27,7 +27,7 @@ def start_driver(item, capabilities):
 
 
 def browserstack_driver(item, capabilities):
-    from cloud import browserstack
+    from .cloud import browserstack
     return browserstack.start_driver(item, capabilities)
 
 

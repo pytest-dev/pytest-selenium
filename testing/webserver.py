@@ -21,7 +21,10 @@ import logging
 import socket
 import threading
 import urllib
-from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
+try:
+    from http.server import BaseHTTPRequestHandler, HTTPServer
+except ImportError:
+    from BaseHTTPServer import BaseHTTPRequestHandler, HTTPServer
 
 LOGGER = logging.getLogger(__name__)
 
@@ -109,7 +112,7 @@ def main(argv=None):
 
     server = SimpleWebServer(opts.port)
     server.start()
-    print "Server started on port %s, hit CTRL-C to quit" % opts.port
+    print("Server started on port %s, hit CTRL-C to quit" % opts.port)
     try:
         while 1:
             sleep(0.1)
