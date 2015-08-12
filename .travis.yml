@@ -11,8 +11,6 @@ env:
   global:
     - DISPLAY=':99.0'
   matrix:
-    - PYTEST=2.4.2
-    - PYTEST=2.5.2
     - PYTEST=2.6.4
     - PYTEST=2.7.2
 matrix:
@@ -29,5 +27,4 @@ install:
 before_script:
   - sh -e /etc/init.d/xvfb start
   - flake8 .
-script:
-  - py.test testing
+script: py.test testing
