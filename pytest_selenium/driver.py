@@ -73,7 +73,7 @@ def remote_driver(item, capabilities):
 
 
 def saucelabs_driver(item, capabilities):
-    from cloud import saucelabs
+    from .cloud import saucelabs
     return saucelabs.start_driver(item, capabilities)
 
 
