@@ -35,13 +35,13 @@ def failure(testdir, testfile, webserver_base_url):
 
 def test_missing_username(failure):
     out = failure()
-    assert out == 'UsageError: Sauce Labs username must be set'
+    assert 'UsageError: Sauce Labs username must be set' in out
 
 
 def test_missing_api_key(failure, monkeypatch):
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
     out = failure()
-    assert out == 'UsageError: Sauce Labs API key must be set'
+    assert 'UsageError: Sauce Labs API key must be set' in out
 
 
 def test_invalid_credentials(failure, monkeypatch):

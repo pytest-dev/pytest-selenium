@@ -22,7 +22,7 @@ def test_missing_base_url(testdir):
         def test_pass(selenium): pass
     """)
     out = failure_with_output(testdir, file_test)
-    assert out == 'UsageError: --base-url must be specified.'
+    assert 'UsageError: --base-url must be specified.' in out
 
 
 def test_fixture(testdir):

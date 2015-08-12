@@ -34,5 +34,5 @@ def failure(testdir, testfile, webserver_base_url):
 
 def test_missing_browser_name(failure):
     out = failure()
-    assert out == ('UsageError: The \'browserName\' capability must be '
-                   'specified when using the remote driver.')
+    assert ('UsageError: The \'browserName\' capability must be specified when '
+            'using the remote driver.') in out
