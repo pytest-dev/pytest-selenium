@@ -99,14 +99,20 @@ To run your automated tests with Firefox, specify ``Firefox`` as your driver:
 
   $ py.test --driver Firefox
 
+Configuration
+~~~~~~~~~~~~~
+
+The current implementation of the Firefox driver does not allow you to specify
+the binary path, preferences, profile path, or extensions via capabilities.
+There are therefore additional command line options for each of these. Check
+``--help`` for further details.
+
 Chrome
 ------
 
-To use Chrome as the driver, you need to have ChromeDriver installed. You can
-download it
+To use Chrome as the driver, you need to have ChromeDriver installed and
+available in your PATH. You can download it
 `here <https://sites.google.com/a/chromium.org/chromedriver/downloads>`_.
-You may either download ChromeDriver to a location in your PATH, or utilize
-the option to specify the driver path during test execution.
 
 To run your automated tests, specify ``Chrome`` as your driver:
 
@@ -114,36 +120,20 @@ To run your automated tests, specify ``Chrome`` as your driver:
 
   $ py.test --driver Chrome
 
-If ChromeDriver is not on your path, use ``--driver-path`` to specify the
-location:
-
-.. code-block:: bash
-
-  $ py.test --driver Chrome --driver-path /path/to/chromedriver
-
 For more information relating to ChromeDriver, you may read its documentation
 `here <https://sites.google.com/a/chromium.org/chromedriver/>`_.
 
 PhantomJS
 ---------
 
-To use PhantomJS as the driver, you need to have it installed. You can download
-it `here <http://phantomjs.org/download.html>`_.
-You may either download PhantomJS to a location in your PATH, or utilize
-the option to specify the driver path during test execution.
+To use PhantomJS as the driver, you need to have it installed and available in
+your PATH. You can download it `here <http://phantomjs.org/download.html>`_.
 
 To run your automated tests, specify ``PhantomJS`` as your driver:
 
 .. code-block:: bash
 
   $ py.test --driver PhantomJS
-
-If PhantomJS is not on your path, use ``--driver-path`` to specify the
-location:
-
-.. code-block:: bash
-
-  $ py.test --driver PhantomJS --driver-path /path/to/phantomjs
 
 For more information relating to PhantomJS, you may read its documentation
 `here <http://phantomjs.org/quick-start.html>`_.
