@@ -64,7 +64,8 @@ class SimpleWebServer(object):
                 self.port = port
                 break
             except socket.error:
-                LOGGER.debug('port %d is in use, trying next one' % port)
+                LOGGER.debug('port {0} is in use, trying {1}'.format(
+                    port, port + 1))
                 port += 1
 
         self.thread = threading.Thread(target=self._run_web_server)
@@ -85,7 +86,7 @@ class SimpleWebServer(object):
         self.stop_serving = True
         try:
             # This is to force stop the server loop
-            urllib.URLopener().open("http://localhost:%d" % self.port)
+            urllib.URLopener().open("http://localhost:{0}".format(self.port))
         except Exception:
             pass
         LOGGER.info("Shutting down the webserver")
@@ -103,7 +104,7 @@ def main(argv=None):
     parser = OptionParser("%prog [options]")
     parser.add_option(
         '-p', '--port', dest='port', type='int',
-        help="port to listen (default: %s)" % DEFAULT_PORT,
+        help='port to listen (default: {0})'.format(DEFAULT_PORT),
         default=DEFAULT_PORT)
 
     opts, args = parser.parse_args(argv[1:])
@@ -112,7 +113,7 @@ def main(argv=None):
 
     server = SimpleWebServer(opts.port)
     server.start()
-    print("Server started on port %s, hit CTRL-C to quit" % opts.port)
+    print('Server started on port {0}, hit CTRL-C to quit'.format(opts.port))
     try:
         while 1:
             sleep(0.1)

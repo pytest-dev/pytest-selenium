@@ -46,26 +46,26 @@ def test_funcarg(testdir, webserver):
         import pytest
         @pytest.mark.nondestructive
         def test_funcarg(base_url):
-            assert base_url == 'http://localhost:%s'
-    """ % webserver.port)
+            assert base_url == 'http://localhost:{0}'
+    """.format(webserver.port))
     testdir.quick_qa(file_test, passed=1)
 
 
 def test_failing_base_url(testdir, webserver):
     status_code = 500
-    base_url = 'http://localhost:%s/%s/' % (webserver.port, status_code)
+    base_url = 'http://localhost:{0}/{1}/'.format(webserver.port, status_code)
     testdir.makepyfile("""
         import pytest
         @pytest.fixture(scope='session')
         def base_url():
-            return '%s'
+            return '{0}'
         @pytest.mark.nondestructive
         def test_pass(_verify_base_url): pass
-    """ % base_url)
+    """.format(base_url))
     result = testdir.runpytest()
     assert result.ret != 0
     # tracestyle is native by default for hook failures
     result.stdout.fnmatch_lines([
         '*UsageError: Base URL did not return status code '
-        '200 or 401*Response: %s, Headers:*{*}*' % status_code
+        '200 or 401*Response: {0}, Headers:*{{*}}*'.format(status_code)
     ])

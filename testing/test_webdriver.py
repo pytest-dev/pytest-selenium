@@ -22,7 +22,7 @@ def test_event_listening_webdriver(testdir, webserver):
                 selenium.get(base_url)
             assert 'before_navigate_to' in e.exconly()
     """)
-    testdir.quick_qa('--event-listener=testing.'
+    testdir.quick_qa('--event-listener', 'testing.'
                      'test_webdriver.ConcreteEventListener',
                      file_test, passed=1)
 

@@ -13,12 +13,12 @@ pytest_plugins = 'pytester'
 
 @pytest.fixture(scope='session')
 def base_url(webserver):
-    return 'http://localhost:%s' % webserver.port
+    return 'http://localhost:{0}'.format(webserver.port)
 
 
 @pytest.fixture
 def webserver_base_url(webserver):
-    return '--base-url=%s' % base_url(webserver)
+    return '--base-url={0}'.format(base_url(webserver))
 
 
 @pytest.fixture(autouse=True)
@@ -38,10 +38,8 @@ def testdir(request, webserver_base_url):
         """)
 
     def inline_runqa(*args, **kwargs):
-        return testdir.inline_run(
-            webserver_base_url,
-            '--driver=Firefox',
-            *args, **kwargs)
+        return testdir.inline_run(webserver_base_url, '--driver', 'Firefox',
+                                  *args, **kwargs)
 
     testdir.inline_runqa = inline_runqa
 

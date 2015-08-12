@@ -30,7 +30,7 @@ def failure_with_output(testdir, *args, **kwargs):
 @pytest.fixture
 def failure(testdir, testfile, webserver_base_url):
     return partial(failure_with_output, testdir, testfile, webserver_base_url,
-                   '--driver=BrowserStack')
+                   '--driver', 'BrowserStack')
 
 
 def test_missing_username(failure):
