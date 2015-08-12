@@ -9,7 +9,7 @@ setup(name='pytest-selenium',
       url='https://github.com/davehunt/pytest-selenium',
       packages=['pytest_selenium', 'pytest_selenium.cloud'],
       install_requires=[
-          'pytest>=2.2.4',
+          'pytest>=2.6.4',
           'pytest-variables',
           'selenium>=2.26.0',
           'requests'],
