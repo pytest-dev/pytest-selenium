@@ -74,22 +74,6 @@ def saucelabs_driver(item, capabilities):
     return saucelabs.start_driver(item, capabilities)
 
 
-def _create_chrome_options(options):
-    chrome_options = webdriver.ChromeOptions()
-    if options.chrome_options is None:
-        return chrome_options
-    options_from_json = json.loads(options.chrome_options)
-    if 'arguments' in options_from_json:
-        for args_ in options_from_json['arguments']:
-            chrome_options.add_argument(args_)
-    if 'binary_location' in options_from_json:
-        chrome_options.binary_location = options_from_json['binary_location']
-    if options.extension_paths is not None:
-        for extension in options.extension_paths:
-            chrome_options.add_extension(extension)
-    return chrome_options
-
-
 def _create_firefox_profile(options):
     profile = webdriver.FirefoxProfile(options.profile_path)
     if options.firefox_preferences is not None:
