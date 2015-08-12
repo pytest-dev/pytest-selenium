@@ -40,7 +40,7 @@ def test_profile(testdir):
             assert header_color == 'rgba(255, 0, 0, 1)'
             assert anchor_color == 'rgba(255, 105, 180, 1)'
     """)
-    testdir.quick_qa('--firefox-profile=%s' % profile, file_test, passed=1)
+    testdir.quick_qa('--firefox-profile', profile, file_test, passed=1)
 
 
 def test_profile_with_preferences(testdir):
@@ -68,8 +68,8 @@ def test_profile_with_preferences(testdir):
             assert header_color == 'rgba(255, 0, 0, 1)'
             assert anchor_color == 'rgba(255, 0, 0, 1)'
     """)
-    testdir.quick_qa('--firefox-pref=browser.anchor_color:#FF0000',
-                     '--firefox-profile=%s' % profile, file_test, passed=1)
+    testdir.quick_qa('--firefox-preference', 'browser.anchor_color', '#FF0000',
+                     '--firefox-profile', profile, file_test, passed=1)
 
 
 def test_extension(testdir):
@@ -92,4 +92,4 @@ def test_extension(testdir):
                         'extensions-tbody').text)
             assert 'Test Extension (empty)' in extensions
     """)
-    testdir.quick_qa('--browser-extension=%s' % extension, file_test, passed=1)
+    testdir.quick_qa('--firefox-extension', extension, file_test, passed=1)

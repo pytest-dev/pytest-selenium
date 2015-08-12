@@ -200,22 +200,22 @@ def pytest_addoption(parser):
     group._addoption('--firefox-path',
                      metavar='path',
                      help='path to the firefox binary.')
-    group._addoption('--firefox-pref',
+    group._addoption('--firefox-preference',
                      action='append',
+                     default=[],
                      dest='firefox_preferences',
-                     metavar='str',
-                     help='firefox preference name and value to set in format '
-                          '"name:value".')
+                     metavar=('name', 'value'),
+                     nargs=2,
+                     help='additional firefox preferences.')
     group._addoption('--firefox-profile',
-                     action='store',
-                     dest='profile_path',
-                     metavar='str',
-                     help='path to the firefox profile to use.')
-    group._addoption('--browser-extension',
+                     metavar='path',
+                     help='path to the firefox profile.')
+    group._addoption('--firefox-extension',
                      action='append',
-                     dest='extension_paths',
-                     metavar='str',
-                     help='path to browser extension to install.')
+                     default=[],
+                     dest='firefox_extensions',
+                     metavar='path',
+                     help='path to a firefox extension.')
     group._addoption('--event-listener',
                      action='store',
                      dest='event_listener',

@@ -2,8 +2,6 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import json
-
 import pytest
 from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
@@ -75,19 +73,17 @@ def saucelabs_driver(item, capabilities):
 
 
 def _create_firefox_profile(options):
-    profile = webdriver.FirefoxProfile(options.profile_path)
-    if options.firefox_preferences is not None:
-        for p in options.firefox_preferences:
-            name, value = p.split(':')
-            # handle integer preferences
-            if value.isdigit():
-                value = int(value)
-            # handle boolean preferences
-            elif value.lower() in ['true', 'false']:
-                value = value.lower() == 'true'
-            profile.set_preference(name, value)
+    profile = webdriver.FirefoxProfile(options.firefox_profile)
+    for preference in options.firefox_preferences:
+        name, value = preference
+        # handle integer preferences
+        if value.isdigit():
+            value = int(value)
+        # handle boolean preferences
+        elif value.lower() in ['true', 'false']:
+            value = value.lower() == 'true'
+        profile.set_preference(name, value)
     profile.update_preferences()
-    if options.extension_paths is not None:
-        for extension in options.extension_paths:
-            profile.add_extension(extension)
+    for extension in options.firefox_extensions:
+        profile.add_extension(extension)
     return profile
