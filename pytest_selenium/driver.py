@@ -37,10 +37,9 @@ def chrome_driver(item, capabilities):
 
 def firefox_driver(item, capabilities):
     options = item.config.option
-    if options.driver_path:
-        binary = FirefoxBinary(options.driver_path)
-    else:
-        binary = None
+    binary = None
+    if options.firefox_path:
+        binary = FirefoxBinary(options.firefox_path)
     profile = _create_firefox_profile(options)
     return webdriver.Firefox(
         firefox_binary=binary,
@@ -53,9 +52,7 @@ def ie_driver(item, capabilities):
 
 
 def phantomjs_driver(item, capabilities):
-    return webdriver.PhantomJS(
-        executable_path=item.config.option.driver_path or 'phantomjs',
-        desired_capabilities=capabilities)
+    return webdriver.PhantomJS(desired_capabilities=capabilities)
 
 
 def remote_driver(item, capabilities):

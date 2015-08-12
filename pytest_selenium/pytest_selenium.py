@@ -44,8 +44,7 @@ def environment(request, base_url, capabilities):
         config._html.environment.append({
             'Base URL': base_url,
             'Capabilities': capabilities,
-            'Driver': config.option.driver,
-            'Driver Path': config.option.driver_path})
+            'Driver': config.option.driver})
         if not hasattr(cloud, config.option.driver.lower()):
             config._html.environment.append({
                 'Server': 'http://{0.host}:{0.port}'.format(config.option)})
@@ -191,11 +190,6 @@ def pytest_addoption(parser):
                      dest='driver',
                      help='webdriver implementation.',
                      metavar='str')
-    group._addoption('--driver-path',
-                     action='store',
-                     dest='driver_path',
-                     metavar='path',
-                     help='path to the driver.')
     group._addoption('--capability',
                      action='append',
                      default=[],
@@ -203,6 +197,9 @@ def pytest_addoption(parser):
                      metavar=('key', 'value'),
                      nargs=2,
                      help='additional capabilities.')
+    group._addoption('--firefox-path',
+                     metavar='path',
+                     help='path to the firefox binary.')
     group._addoption('--firefox-pref',
                      action='append',
                      dest='firefox_preferences',
