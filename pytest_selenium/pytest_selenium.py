@@ -20,22 +20,6 @@ SUPPORTED_DRIVERS = [
     'SauceLabs']
 
 
-def pytest_sessionstart(session):
-    # configure session proxies
-    option = session.config.option
-    if hasattr(session.config, 'browsermob_session_proxy'):
-        option.proxy_host = option.bmp_host
-        option.proxy_port = session.config.browsermob_session_proxy.port
-
-    zap = getattr(session.config, 'zap', None)
-    if zap is not None:
-        if option.proxy_host and option.proxy_port:
-            zap.core.set_option_proxy_chain_name(option.proxy_host)
-            zap.core.set_option_proxy_chain_port(option.proxy_port)
-        option.proxy_host = option.zap_host
-        option.proxy_port = option.zap_port
-
-
 @pytest.fixture(autouse=True)
 def environment(request, base_url, capabilities):
     """Provide environment details to pytest-html report"""
@@ -90,14 +74,6 @@ def driver(request, capabilities):
 @pytest.fixture
 def selenium(_sensitive_skipping, driver):
     return driver
-
-
-def pytest_runtest_setup(item):
-    # configure test proxies
-    option = item.config.option
-    if hasattr(item.config, 'browsermob_test_proxy'):
-        option.proxy_host = item.config.option.bmp_host
-        option.proxy_port = item.config.browsermob_test_proxy.port
 
 
 def pytest_runtest_makereport(__multicall__, item, call):
