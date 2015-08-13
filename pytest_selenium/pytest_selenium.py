@@ -69,16 +69,12 @@ def capabilities(request, variables):
 
 
 @pytest.fixture
-def driver(request, capabilities):
+def selenium(request, _sensitive_skipping, capabilities):
+    """Returns a WebDriver instance based on options and capabilities"""
     from .driver import start_driver
     driver = start_driver(request.node, capabilities)
     request.node._driver = driver
     request.addfinalizer(lambda: driver.quit())
-    return driver
-
-
-@pytest.fixture
-def selenium(_sensitive_skipping, driver):
     return driver
 
 
