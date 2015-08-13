@@ -25,6 +25,7 @@ def environment(request, base_url, capabilities):
     """Provide environment details to pytest-html report"""
     config = request.config
     if hasattr(config, '_html'):
+        # add environment details to the pytest-html plugin if possible
         config._html.environment.append({
             'Base URL': base_url,
             'Capabilities': capabilities,
@@ -36,6 +37,7 @@ def environment(request, base_url, capabilities):
 
 @pytest.fixture(scope='session')
 def base_url(request):
+    """Return base URL from command line options"""
     config = request.config
     url = config.option.base_url or config.getini('selenium_base_url')
     if not url:
@@ -59,6 +61,7 @@ def _verify_base_url(request, base_url):
 
 @pytest.fixture
 def capabilities(request, variables):
+    """Returns combined capabilities from pytest-variables and command line"""
     capabilities = variables.get('capabilities', {})
     for capability in request.config.option.capabilities:
         capabilities[capability[0]] = capability[1]
@@ -88,19 +91,24 @@ def pytest_runtest_makereport(__multicall__, item, call):
         driver = getattr(item, '_driver', None)
         if driver is not None:
             xfail = hasattr(report, 'wasxfail')
+            # only gather debug if test failed or xfailed
             debug = (report.skipped and xfail) or (report.failed and not xfail)
             if debug:
                 url = driver.current_url
                 if url is not None:
-                    extra_summary.append('Failing URL: %s' % url)
+                    # add failing url to the console output
+                    extra_summary.append('Failing URL: {0}'.format(url))
                     if pytest_html is not None:
+                        # add failing url to the html report
                         extra.append(pytest_html.extras.url(url))
                 screenshot = driver.get_screenshot_as_base64()
                 if screenshot is not None and pytest_html is not None:
+                    # add screenshot to the html report
                     extra.append(pytest_html.extras.image(
                         screenshot, 'Screenshot'))
                 html = driver.page_source.encode('utf-8')
                 if html is not None and pytest_html is not None:
+                    # add page source to the html report
                     extra.append(pytest_html.extras.text(html, 'HTML'))
             driver_name = item.config.option.driver
             if hasattr(cloud, driver_name.lower()) and driver.session_id:

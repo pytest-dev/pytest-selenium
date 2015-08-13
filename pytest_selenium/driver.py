@@ -10,12 +10,15 @@ from selenium import webdriver
 
 
 def start_driver(item, capabilities):
+    """Initialise a driver based on the provided options and capabilities"""
     options = item.config.option
     if options.driver is None:
         raise pytest.UsageError('--driver must be specified')
+    # retrieve driver from appropriate method based on the value of --driver
     driver = globals().get(
-        '%s_driver' % options.driver.lower())(item, capabilities)
+        '{0}_driver'.format(options.driver.lower()))(item, capabilities)
     if options.event_listener is not None:
+        # import the specified event listener and wrap the driver instance
         mod_name, class_name = options.event_listener.rsplit('.', 1)
         mod = __import__(mod_name, fromlist=[class_name])
         event_listener = getattr(mod, class_name)
@@ -31,13 +34,16 @@ def browserstack_driver(item, capabilities):
 
 
 def chrome_driver(item, capabilities):
+    """Return a WebDriver using a Chrome instance"""
     return webdriver.Chrome(desired_capabilities=capabilities)
 
 
 def firefox_driver(item, capabilities):
+    """Return a WebDriver using a Firefox instance"""
     options = item.config.option
     binary = None
     if options.firefox_path:
+        # get firefox binary from options until there's capabilities support
         binary = FirefoxBinary(options.firefox_path)
     profile = _create_firefox_profile(options)
     return webdriver.Firefox(
@@ -47,21 +53,25 @@ def firefox_driver(item, capabilities):
 
 
 def ie_driver(item, capabilities):
+    """Return a WebDriver using an Internet Explorer instance"""
     return webdriver.Ie(capabilities=capabilities)
 
 
 def phantomjs_driver(item, capabilities):
+    """Return a WebDriver using a PhantomJS instance"""
     return webdriver.PhantomJS(desired_capabilities=capabilities)
 
 
 def remote_driver(item, capabilities):
+    """Return a WebDriver using a Selenium server or Selenium Grid instance"""
     options = item.config.option
     if 'browserName' not in capabilities:
+        # remote instances must at least specify a browserName capability
         raise pytest.UsageError('The \'browserName\' capability must be '
                                 'specified when using the remote driver.')
-    capabilities.setdefault('version', '')
-    capabilities.setdefault('platform', 'ANY')
-    executor = 'http://%s:%s/wd/hub' % (options.host, options.port)
+    capabilities.setdefault('version', '')  # default to any version
+    capabilities.setdefault('platform', 'ANY')  # default to any platform
+    executor = 'http://{0.host}:{0.port}/wd/hub'.format(options)
     return webdriver.Remote(
         command_executor=executor,
         desired_capabilities=capabilities,
@@ -75,14 +85,15 @@ def saucelabs_driver(item, capabilities):
 
 
 def _create_firefox_profile(options):
+    """Return a FirefoxProfile based on the specified options"""
     profile = webdriver.FirefoxProfile(options.firefox_profile)
     for preference in options.firefox_preferences:
         name, value = preference
-        # handle integer preferences
         if value.isdigit():
+            # handle integer preferences
             value = int(value)
-        # handle boolean preferences
         elif value.lower() in ['true', 'false']:
+            # handle boolean preferences
             value = value.lower() == 'true'
         profile.set_preference(name, value)
     profile.update_preferences()

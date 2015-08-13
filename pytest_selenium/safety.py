@@ -44,6 +44,7 @@ def pytest_configure(config):
 
 @pytest.fixture
 def _sensitive_skipping(request, base_url):
+    """Skip destructive tests if the environment is considered sensitive"""
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
     response = requests.get(base_url)
@@ -60,4 +61,4 @@ def _sensitive_skipping(request, base_url):
             'This test is destructive and the target URL is '
             'considered a sensitive environment. If this test is '
             'not destructive, add the \'nondestructive\' marker to '
-            'it. Sensitive URL: %s' % first_match.string)
+            'it. Sensitive URL: {0}'.format(first_match.string))
