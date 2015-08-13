@@ -6,55 +6,49 @@ import pytest
 import requests
 from selenium import webdriver
 
-
-name = 'BrowserStack'
-
-
-def _credentials(config):
-    username = config.getini('browserstack_username')
-    access_key = config.getini('browserstack_access_key')
-    if not username:
-        raise pytest.UsageError('BrowserStack username must be set')
-    if not access_key:
-        raise pytest.UsageError('BrowserStack access key must be set')
-    return username, access_key
+from .base import CloudProvider
 
 
-def _split_class_and_test_names(nodeid):
-    # TODO remove duplication of shared code
-    names = nodeid.split("::")
-    names[0] = names[0].replace("/", '.')
-    names = [x.replace(".py", "") for x in names if x != "()"]
-    classnames = names[:-1]
-    classname = ".".join(classnames)
-    name = names[-1]
-    return (classname, name)
+class Provider(CloudProvider):
 
+    _session_url = 'https://www.browserstack.com/automate/sessions/{id}.json'
 
-def start_driver(item, capabilities):
-    test_id = '.'.join(_split_class_and_test_names(item.nodeid))
-    capabilities['name'] = test_id
-    executor = 'http://%s:%s@hub.browserstack.com:80/wd/hub' % \
-        _credentials(item.config)
-    return webdriver.Remote(command_executor=executor,
-                            desired_capabilities=capabilities)
+    @property
+    def name(self):
+        return 'BrowserStack'
 
+    def _username(self, config):
+        username = config.getini('browserstack_username')
+        if not username:
+            raise pytest.UsageError('BrowserStack username must be set')
+        return username
 
-def url(config, session):
-    response = requests.get(
-        'https://www.browserstack.com/automate/sessions/%s.json' % session,
-        auth=_credentials(config))
-    return response.json()['automation_session']['browser_url']
+    def _access_key(self, config):
+        access_key = config.getini('browserstack_access_key')
+        if not access_key:
+            raise pytest.UsageError('BrowserStack access key must be set')
+        return access_key
 
+    def start_driver(self, item, capabilities):
+        test_id = '.'.join(self.split_class_and_test_names(item.nodeid))
+        capabilities['name'] = test_id
+        executor = 'http://{0}:{1}@hub.browserstack.com:80/wd/hub'.format(
+            self._username(item.config), self._access_key(item.config))
+        return webdriver.Remote(command_executor=executor,
+                                desired_capabilities=capabilities)
 
-def additional_html(session):
-    return []
+    def url(self, config, session):
+        response = requests.get(self._session_url.format(id=session),
+                                auth=(self._username(config),
+                                      self._access_key(config)))
+        return response.json()['automation_session']['browser_url']
 
+    def additional_html(self, session):
+        return []
 
-def update_status(config, session, passed):
-    status = {'status': 'completed' if passed else 'error'}
-    requests.put(
-        'https://www.browserstack.com/automate/sessions/%s.json' % session,
-        headers={'Content-Type': 'application/json'},
-        params=status,
-        auth=_credentials(config))
+    def update_status(self, config, session, passed):
+        status = {'status': 'completed' if passed else 'error'}
+        requests.put(self._session_url.format(id=session),
+                     headers={'Content-Type': 'application/json'},
+                     params=status,
+                     auth=(self._username(config), self._access_key(config)))

@@ -101,18 +101,21 @@ def pytest_runtest_makereport(__multicall__, item, call):
                     extra.append(pytest_html.extras.text(html, 'HTML'))
             driver_name = item.config.option.driver
             if hasattr(cloud, driver_name.lower()) and driver.session_id:
-                provider = getattr(cloud, driver_name.lower())
-                extra_summary.append('%s Job: %s' % (
-                    provider.name, provider.url(
-                        item.config, driver.session_id)))
+                provider = getattr(cloud, driver_name.lower()).Provider()
+                # add cloud job identifier to the console output
+                job_url = provider.url(item.config, driver.session_id)
+                extra_summary.append('{0} Job: {1}'.format(
+                    provider.name, job_url))
                 if pytest_html is not None:
+                    # always add cloud job url to the html report
                     extra.append(pytest_html.extras.url(
-                        provider.url(item.config, driver.session_id),
-                        '%s Job' % provider.name))
+                        job_url, '{0} Job'.format(provider.name)))
                     if debug:
+                        # conditionally add cloud extras to html report
                         extra.append(pytest_html.extras.html(
                             provider.additional_html(driver.session_id)))
                 passed = report.passed or (report.failed and xfail)
+                # update job status with cloud provider
                 provider.update_status(item.config, driver.session_id, passed)
         report.sections.append(('pytest-selenium', '\n'.join(extra_summary)))
         report.extra = extra

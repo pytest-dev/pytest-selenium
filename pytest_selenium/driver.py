@@ -25,8 +25,9 @@ def start_driver(item, capabilities):
 
 
 def browserstack_driver(item, capabilities):
-    from .cloud import browserstack
-    return browserstack.start_driver(item, capabilities)
+    """Return a WebDriver using a BrowserStack instance"""
+    from .cloud.browserstack import Provider
+    return Provider().start_driver(item, capabilities)
 
 
 def chrome_driver(item, capabilities):
@@ -68,8 +69,9 @@ def remote_driver(item, capabilities):
 
 
 def saucelabs_driver(item, capabilities):
-    from .cloud import saucelabs
-    return saucelabs.start_driver(item, capabilities)
+    """Return a WebDriver using a Sauce Labs instance"""
+    from .cloud.saucelabs import Provider
+    return Provider().start_driver(item, capabilities)
 
 
 def _create_firefox_profile(options):
