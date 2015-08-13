@@ -153,27 +153,21 @@ def pytest_addoption(parser):
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--base-url',
-                     action='store',
-                     dest='base_url',
                      metavar='url',
                      help='base url for the application under test.')
     group._addoption('--host',
-                     action='store',
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),
                      metavar='str',
                      help='host that selenium server is listening on. '
                           '(default: %default)')
     group._addoption('--port',
-                     action='store',
                      type='int',
                      default=os.environ.get('SELENIUM_PORT', 4444),
                      metavar='num',
                      help='port that selenium server is listening on. '
                           '(default: %default)')
     group._addoption('--driver',
-                     action='store',
                      choices=SUPPORTED_DRIVERS,
-                     dest='driver',
                      help='webdriver implementation.',
                      metavar='str')
     group._addoption('--capability',
@@ -203,8 +197,6 @@ def pytest_addoption(parser):
                      metavar='path',
                      help='path to a firefox extension.')
     group._addoption('--event-listener',
-                     action='store',
-                     dest='event_listener',
                      metavar='str',
                      help='selenium eventlistener class, e.g. '
                           'package.module.EventListenerClassName.')

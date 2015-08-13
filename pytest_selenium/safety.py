@@ -13,7 +13,6 @@ import requests
 def pytest_addoption(parser):
     group = parser.getgroup('safety', 'safety')
     group._addoption('--sensitive-url',
-                     dest='sensitive_url',
                      default=os.environ.get('SELENIUM_SENSITIVE_URL', '.*'),
                      help='regular expression for identifying sensitive urls.'
                           ' (default: %default)')
