@@ -45,13 +45,16 @@ def base_url(request):
 
 @pytest.fixture(scope='session', autouse=True)
 def _verify_base_url(request, base_url):
+    """Verify that the base URL is responding with an acceptable status code"""
     if base_url:
         response = requests.get(base_url, timeout=REQUESTS_TIMEOUT)
-        if response.status_code not in (200, 401):
+        ok_codes = (200, 401)
+        if response.status_code not in ok_codes:
             raise pytest.UsageError(
-                'Base URL did not return status code 200 or 401. '
-                '(URL: %s, Response: %s, Headers: %s)' % (
-                    base_url, response.status_code, response.headers))
+                'Base URL did not respond with one of the following status '
+                'codes: {0}.\nURL: {1},\nResponse status code: {2.status_code}'
+                '\nResponse headers: {2.headers}'.format(
+                    ', '.join(map(str, ok_codes)), base_url, response))
 
 
 @pytest.fixture
