@@ -270,6 +270,40 @@ See the
 for additional configuration that can be set using ``--capability`` command line
 arguments.
 
+TestingBot
+----------
+
+To run your automated tests using `TestingBot <http://testingbot.com/>`_, you
+must provide a valid key and secret. This can be done either by using a
+``setup.cfg`` file or by setting the ``TESTINGBOT_KEY`` and
+``TESTINGBOT_SECRET`` environment variables.
+
+Configuration
+~~~~~~~~~~~~~
+
+Below is an example ``setup.cfg`` showing the configuration options:
+
+.. code-block:: ini
+
+  [pytest]
+  testingbot_key = key
+  testingbot_secret = secret
+
+Running tests
+~~~~~~~~~~~~~
+
+To run your automated tests, simply specify ``TestingBot`` as your driver:
+
+.. code-block:: bash
+
+  $ py.test --driver TestingBot --capability browserName firefox --capability browserName 39 --capability platform WIN8
+
+See the `list of available browsers <http://testingbot.com/support/getting-started/browsers.html>`_
+to help you with your configuration. Additional capabilities can be set using
+the ``--capability`` command line arguments. See the
+`test options <http://testingbot.com/support/other/test-options>`_
+for full details of what can be configured.
+
 Capabilities
 ------------
 

@@ -17,7 +17,8 @@ SUPPORTED_DRIVERS = [
     'IE',
     'PhantomJS',
     'Remote',
-    'SauceLabs']
+    'SauceLabs',
+    'TestingBot']
 
 
 @pytest.fixture(autouse=True)
@@ -150,6 +151,14 @@ def pytest_addoption(parser):
     parser.addini('sauce_labs_job_visibility',
                   help='default visibility for jobs',
                   default='public restricted')
+
+    # testingbot configuration
+    parser.addini('testingbot_key',
+                  help='testingbot key',
+                  default=os.getenv('TESTINGBOT_KEY'))
+    parser.addini('testingbot_secret',
+                  help='testingbot secret',
+                  default=os.getenv('TESTINGBOT_SECRET'))
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--base-url',
