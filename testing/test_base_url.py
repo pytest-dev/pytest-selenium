@@ -66,7 +66,8 @@ def test_failing_base_url(testdir, webserver):
     assert result.ret != 0
     # tracestyle is native by default for hook failures
     result.stdout.fnmatch_lines([
-        '*UsageError: Base URL did not respond with one of the following status codes: *.',
+        '*UsageError: Base URL did not respond with one of the following '
+        'status codes: *.',
         '*URL: {0}*'.format(base_url),
         '*Response status code: {0}*'.format(status_code),
         '*Response headers: {*}*'])

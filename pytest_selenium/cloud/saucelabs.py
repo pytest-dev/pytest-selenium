@@ -33,7 +33,8 @@ class Provider(CloudProvider):
 
     def start_driver(self, item, capabilities):
         keywords = item.keywords
-        marks = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
+        marks = [m for m in keywords.keys() if isinstance(
+            keywords[m], MarkInfo)]
         tags = capabilities.get('tags', []) + marks
         try:
             job_visibility = item.keywords['sauce_labs_job_visibility'].args[0]
@@ -79,7 +80,8 @@ class Provider(CloudProvider):
                 "replayLabel":null}},\
             "plugins":{{\
                 "streamer":{{\
-                    "url":"https://cdn1.saucelabs.com/sauce_skin_deprecated/lib/flowplayer/flowplayer.pseudostreaming-3.2.13.swf",\
+                    "url":"https://cdn1.saucelabs.com/sauce_skin_deprecated\
+                    /lib/flowplayer/flowplayer.pseudostreaming-3.2.13.swf",\
                     "queryString":"%%3Fstart%%3D%%24%%7Bstart%%7D"}},\
                 "controls":{{\
                     "mute":false,\
@@ -103,8 +105,8 @@ class Provider(CloudProvider):
             width='100%',
             height='100%',
             type='application/x-shockwave-flash',
-            data='https://cdn1.saucelabs.com/sauce_skin_deprecated/lib/flowplayer/'
-                 'flowplayer-3.2.17.swf',
+            data='https://cdn1.saucelabs.com/sauce_skin_deprecated/lib/'
+                 'flowplayer/flowplayer-3.2.17.swf',
             name='player_api',
             id='player_api'),
             id='player{0}'.format(session),
