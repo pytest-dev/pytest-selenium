@@ -87,6 +87,12 @@ def saucelabs_driver(item, capabilities):
     return Provider().start_driver(item, capabilities)
 
 
+def testingbot_driver(item, capabilities):
+    """Return a WebDriver using a TestingBot instance"""
+    from .cloud.testingbot import Provider
+    return Provider().start_driver(item, capabilities)
+
+
 def _create_firefox_profile(options):
     """Return a FirefoxProfile based on the specified options"""
     profile = webdriver.FirefoxProfile(options.firefox_profile)
