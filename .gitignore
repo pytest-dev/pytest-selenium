@@ -1,5 +1,6 @@
 *.egg-info/
 *.pyc
 .DS_Store
+.tox
 build
 dist
