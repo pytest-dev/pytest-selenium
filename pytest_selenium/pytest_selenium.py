@@ -21,18 +21,21 @@ SUPPORTED_DRIVERS = [
 
 
 @pytest.fixture(autouse=True)
-def environment(request, base_url, capabilities):
-    """Provide environment details to pytest-html report"""
+def _environment(request, base_url, capabilities):
+    """Provide additional environment details to pytest-html report"""
     config = request.config
     if hasattr(config, '_html'):
         # add environment details to the pytest-html plugin if possible
-        config._html.environment.append({
-            'Base URL': base_url,
-            'Capabilities': capabilities,
-            'Driver': config.option.driver})
+        environment = config._html.environment
+        environment.extend([
+            ('Base URL', base_url),
+            ('Driver', config.option.driver)])
+        # add capabilities to environment
+        environment.extend([('Capability', '{0}: {1}'.format(
+            k, v)) for k, v in capabilities.items()])
         if config.option.driver == 'Remote':
-            config._html.environment.append({
-                'Server': 'http://{0.host}:{0.port}'.format(config.option)})
+            environment.append(
+                ('Server', 'http://{0.host}:{0.port}'.format(config.option)))
 
 
 @pytest.fixture(scope='session')

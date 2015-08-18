@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import copy
+
 import pytest
 from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
@@ -16,7 +18,8 @@ def start_driver(item, capabilities):
         raise pytest.UsageError('--driver must be specified')
     # retrieve driver from appropriate method based on the value of --driver
     driver = globals().get(
-        '{0}_driver'.format(options.driver.lower()))(item, capabilities)
+        '{0}_driver'.format(options.driver.lower()))(
+            item, copy.deepcopy(capabilities))
     if options.event_listener is not None:
         # import the specified event listener and wrap the driver instance
         mod_name, class_name = options.event_listener.rsplit('.', 1)
