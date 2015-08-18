@@ -14,6 +14,9 @@ plugin is still in development. Please check back for updates.
 .. image:: https://img.shields.io/travis/davehunt/pytest-selenium.svg
    :target: https://travis-ci.org/davehunt/pytest-selenium/
    :alt: Travis
+.. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
+   :target: http://pytest-selenium.readthedocs.org/en/latest/
+   :alt: Read the Docs
 .. image:: https://img.shields.io/github/issues-raw/davehunt/pytest-selenium.svg
    :target: https://github.com/davehunt/pytest-selenium/issues
    :alt: Issues
