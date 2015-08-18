@@ -17,8 +17,10 @@ another change to the pull branch.
 Running Tests
 -------------
 
-You will need `pytest <http://pytest.org/>`_ installed to run the tests:
+You will need `Tox <http://tox.testrun.org/>`_ installed to run the tests
+against the supported Python versions.
 
 .. code-block:: bash
 
-  $ py.test testing
+  $ pip install tox
+  $ tox
