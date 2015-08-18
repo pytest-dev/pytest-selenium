@@ -1,6 +1,6 @@
 Release Notes
 =============
 
-**0.1**
+**1.0b1**
 
-* Initial release
+* Initial beta
