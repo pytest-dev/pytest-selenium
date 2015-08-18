@@ -2,8 +2,7 @@ pytest-selenium
 ===============
 
 pytest-selenium is a plugin for `py.test <http://pytest.org>`_ that provides
-support for running `Selenium <http://seleniumhq.org/>`_ based tests. This
-plugin is still in development. Please check back for updates.
+support for running `Selenium <http://seleniumhq.org/>`_ based tests.
 
 .. image:: https://img.shields.io/pypi/l/pytest-selenium.svg
    :target: https://github.com/davehunt/pytest-selenium/blob/master/LICENSE
