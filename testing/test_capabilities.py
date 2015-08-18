@@ -29,7 +29,7 @@ def test_file(testfile, testdir):
 def test_fixture(testfile, testdir):
     testdir.makeconftest("""
         import pytest
-        @pytest.fixture
+        @pytest.fixture(scope='session')
         def capabilities():
             return {'foo': 'bar'}
     """)

@@ -337,7 +337,7 @@ fixture:
 .. code-block:: python
 
   import pytest
-  @pytest.fixture
+  @pytest.fixture(scope='session')
   def capabilities(capabilities):
       capabilities['tags'] = ['tag1', 'tag2', 'tag3']
       return capabilities

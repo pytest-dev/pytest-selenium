@@ -21,7 +21,7 @@ SUPPORTED_DRIVERS = [
     'TestingBot']
 
 
-@pytest.fixture(autouse=True)
+@pytest.fixture(scope='session', autouse=True)
 def _environment(request, base_url, capabilities):
     """Provide additional environment details to pytest-html report"""
     config = request.config
@@ -63,7 +63,7 @@ def _verify_base_url(request, base_url):
                     ', '.join(map(str, ok_codes)), base_url, response))
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def capabilities(request, variables):
     """Returns combined capabilities from pytest-variables and command line"""
     capabilities = variables.get('capabilities', {})
