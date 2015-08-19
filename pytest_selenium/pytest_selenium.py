@@ -182,6 +182,9 @@ def pytest_addoption(parser):
                      choices=SUPPORTED_DRIVERS,
                      help='webdriver implementation.',
                      metavar='str')
+    group._addoption('--driver-path',
+                     metavar='path',
+                     help='path to the driver executable.')
     group._addoption('--capability',
                      action='append',
                      default=[],
