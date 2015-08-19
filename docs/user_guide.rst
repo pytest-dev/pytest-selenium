@@ -169,33 +169,46 @@ There are therefore additional command line options for each of these. Check
 Chrome
 ------
 
-To use Chrome as the driver, you need to have ChromeDriver installed and
-available in your PATH. You can download it
-`here <https://sites.google.com/a/chromium.org/chromedriver/downloads>`_.
-
-To run your automated tests, specify ``Chrome`` as your driver:
+To use Chrome, you will need to
+`download ChromeDriver <https://sites.google.com/a/chromium.org/chromedriver/downloads>`_.
+and specify ``Chrome`` for the ``--driver`` command line option. If the driver
+executable is not available on your path, you can use the ``--driver-path``
+option to indicate where it can be found:
 
 .. code-block:: bash
 
-  $ py.test --driver Chrome
+  $ py.test --driver Chrome --driver-path /path/to/chromedriver
 
-For more information relating to ChromeDriver, you may read its documentation
-`here <https://sites.google.com/a/chromium.org/chromedriver/>`_.
+See the `ChromeDriver documentation <https://sites.google.com/a/chromium.org/chromedriver/>`_
+for more information.
+
+Internet Explorer
+-----------------
+
+To use Internet Explorer, you will need to download and configure the
+`Internet Explorer Driver <https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver>`_
+and specify ``IE`` for the ``--driver`` command line option. If the driver
+executable is not available on your path, you can use the ``--driver-path``
+option to indicate where it can be found:
+
+.. code-block:: batch
+
+  > py.test --driver IE --driver-path \path\to\IEDriverServer.exe
 
 PhantomJS
 ---------
 
-To use PhantomJS as the driver, you need to have it installed and available in
-your PATH. You can download it `here <http://phantomjs.org/download.html>`_.
-
-To run your automated tests, specify ``PhantomJS`` as your driver:
+To use PhantomJS, you will need `download it <http://phantomjs.org/download.html>`_.
+and specify ``PhantomJS`` for the ``--driver`` command line option. If
+the driver executable is not available on your path, you can use the
+``--driver-path`` option to indicate where it can be found:
 
 .. code-block:: bash
 
-  $ py.test --driver PhantomJS
+  $ py.test --driver PhantomJS --driver-path /path/to/phantomjs
 
-For more information relating to PhantomJS, you may read its documentation
-`here <http://phantomjs.org/quick-start.html>`_.
+See the `PhantomJS documentation <http://phantomjs.org/quick-start.html>`_ for
+more information.
 
 Selenium Server/Grid
 --------------------
