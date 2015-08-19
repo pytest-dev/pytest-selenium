@@ -41,26 +41,24 @@ def _environment(request, base_url, capabilities):
 
 @pytest.fixture(scope='session')
 def base_url(request):
-    """Return base URL from command line options"""
+    """Return a verified base URL"""
     config = request.config
-    url = config.option.base_url or config.getini('selenium_base_url')
-    if not url:
-        raise pytest.UsageError('--base-url must be specified.')
-    return url
-
-
-@pytest.fixture(scope='session', autouse=True)
-def _verify_base_url(request, base_url):
-    """Verify that the base URL is responding with an acceptable status code"""
+    base_url = config.option.base_url or config.getini('selenium_base_url')
     if base_url:
-        response = requests.get(base_url, timeout=REQUESTS_TIMEOUT)
-        ok_codes = (200, 401)
-        if response.status_code not in ok_codes:
-            raise pytest.UsageError(
-                'Base URL did not respond with one of the following status '
-                'codes: {0}.\nURL: {1},\nResponse status code: {2.status_code}'
-                '\nResponse headers: {2.headers}'.format(
-                    ', '.join(map(str, ok_codes)), base_url, response))
+        verify_url(base_url)
+        return base_url
+    raise pytest.UsageError('--base-url must be specified.')
+
+
+def verify_url(url):
+    response = requests.get(url, timeout=REQUESTS_TIMEOUT)
+    ok_codes = (200, 401)
+    if response.status_code not in ok_codes:
+        raise pytest.UsageError(
+            'Base URL did not respond with one of the following status '
+            'codes: {0}.\nURL: {1},\nResponse status code: {2.status_code}'
+            '\nResponse headers: {2.headers}'.format(
+                ', '.join(map(str, ok_codes)), url, response))
 
 
 @pytest.fixture(scope='session')

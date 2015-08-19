@@ -56,13 +56,10 @@ def test_failing_base_url(testdir, webserver):
     base_url = 'http://localhost:{0}/{1}/'.format(webserver.port, status_code)
     testdir.makepyfile("""
         import pytest
-        @pytest.fixture(scope='session')
-        def base_url():
-            return '{0}'
         @pytest.mark.nondestructive
-        def test_pass(_verify_base_url): pass
+        def test_pass(): pass
     """.format(base_url))
-    result = testdir.runpytest()
+    result = testdir.runpytest('--base-url', base_url)
     assert result.ret != 0
     # tracestyle is native by default for hook failures
     result.stdout.fnmatch_lines([
