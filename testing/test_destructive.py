@@ -37,11 +37,11 @@ def test_run_destructive_and_non_destructive_when_forced(testdir):
 
 
 def test_skip_destructive_when_forced_and_sensitive(testdir):
-    file_test = testdir.makepyfile('def test_pass(_sensitive_skipping): pass')
+    file_test = testdir.makepyfile('def test_pass(skip_sensitive): pass')
     testdir.quick_qa('--destructive', file_test, skipped=1)
 
 
 def test_run_destructive_when_forced_and_not_sensitive(testdir):
-    file_test = testdir.makepyfile('def test_pass(_sensitive_skipping): pass')
-    testdir.quick_qa('--destructive', '--sensitive-url', 'foo', file_test,
+    file_test = testdir.makepyfile('def test_pass(skip_sensitive): pass')
+    testdir.quick_qa('--destructive', '--sensitive-url', None, file_test,
                      passed=1)

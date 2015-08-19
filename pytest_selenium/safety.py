@@ -41,23 +41,28 @@ def pytest_configure(config):
             config.option.markexpr = 'nondestructive'
 
 
-@pytest.fixture
-def _sensitive_skipping(request, base_url):
-    """Skip destructive tests if the environment is considered sensitive"""
+@pytest.fixture(scope='session')
+def sensitive_url(request, base_url):
+    """Return the first sensitive URL from response history of the base URL"""
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
     response = requests.get(base_url)
     urls = [history.url for history in response.history] + [response.url]
     search = partial(re.search, request.config.option.sensitive_url)
     matches = map(search, urls)
-    sensitive = any(matches)
-
-    item = request.node
-    destructive = 'nondestructive' not in item.keywords
-    if sensitive and destructive:
+    if any(matches):
+        # return the first match
         first_match = next(x for x in matches if x)
+        return first_match.string
+
+
+@pytest.fixture(scope='function')
+def skip_sensitive(request, sensitive_url):
+    """Skip destructive tests if the environment is considered sensitive"""
+    destructive = 'nondestructive' not in request.node.keywords
+    if sensitive_url and destructive:
         pytest.skip(
             'This test is destructive and the target URL is '
             'considered a sensitive environment. If this test is '
             'not destructive, add the \'nondestructive\' marker to '
-            'it. Sensitive URL: {0}'.format(first_match.string))
+            'it. Sensitive URL: {0}'.format(sensitive_url))
