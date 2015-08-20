@@ -356,3 +356,26 @@ the implicit timeout or window size, you can override the ``selenium`` fixture:
       selenium.implicitly_wait(10)
       selenium.maximize_window()
       return selenium
+
+HTML Report
+***********
+
+A custom HTML report is generated when the ``--html`` command line option is
+given. By default this will include additional debug information for failures
+such as the URL, HTML, logs, and a screenshot at the point the test finished.
+
+Capturing Debug
+---------------
+
+To change when debug is captured you can either add a ``selenium_capture_debug``
+item to the ``[pytest]`` section of a ``setup.cfg`` file, or set the
+``SELENIUM_CAPTURE_DEBUG`` environment variable. Valid options are: ``never``,
+``failure`` (the default), and ``always``. Note that always capturing debug will
+dratamtically increase the size of the HTML report.
+
+Excluding Logs
+--------------
+
+Log files can contain sensitive information. To exclude them from the report
+set the ``selenium_exclude_debug`` option or ``SELENIUM_EXCLUDE_DEBUG``
+environment variable to ``logs``.
