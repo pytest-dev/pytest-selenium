@@ -34,3 +34,20 @@ def test_fixture(testfile, testdir):
             return {'foo': 'bar'}
     """)
     testdir.quick_qa(testfile, passed=1)
+
+
+def test_mark(testdir):
+    # set a capability that we can influence and check on the selenium object
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        @pytest.mark.capabilities(acceptSslCerts=False)
+        def test_capabilities(selenium):
+            print selenium.capabilities
+            assert selenium.capabilities['acceptSslCerts'] == False
+
+        @pytest.mark.nondestructive
+        def test_default(selenium):
+            assert selenium.capabilities['acceptSslCerts'] == True
+    """)
+    testdir.quick_qa(file_test, tests=2, passed=2)

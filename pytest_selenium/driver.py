@@ -16,10 +16,14 @@ def start_driver(item, capabilities):
     options = item.config.option
     if options.driver is None:
         raise pytest.UsageError('--driver must be specified')
+    _capabilities = copy.deepcopy(capabilities)  # make a copy
+    capabilities_marker = item.get_marker('capabilities')
+    if capabilities_marker is not None:
+        # add capabilities from the marker
+        _capabilities.update(capabilities_marker.kwargs)
     # retrieve driver from appropriate method based on the value of --driver
-    driver = globals().get(
-        '{0}_driver'.format(options.driver.lower()))(
-            item, copy.deepcopy(capabilities))
+    driver = globals().get('{0}_driver'.format(
+        options.driver.lower()))(item, _capabilities)
     if options.event_listener is not None:
         # import the specified event listener and wrap the driver instance
         mod_name, class_name = options.event_listener.rsplit('.', 1)

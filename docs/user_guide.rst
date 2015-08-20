@@ -187,13 +187,6 @@ Below is an example ``setup.cfg`` showing the configuration options:
   [pytest]
   sauce_labs_username = username
   sauce_labs_api_key = secret
-  sauce_labs_job_visibility = public
-
-The `sauce_labs_job_visibility` entry is used to determine who you share your
-Sauce Labs jobs with. Check the
-`documentation <https://saucelabs.com/docs/additional-config#sharing>`_ for the
-accepted values. If not set, this defaults to
-`public restricted <https://saucelabs.com/docs/additional-config#restricted>`_.
 
 Running tests
 ~~~~~~~~~~~~~
@@ -209,32 +202,6 @@ to help you with your configuration. Additional capabilities can be set using
 the ``--capability`` command line arguments. See the
 `test configuration documentation <https://docs.saucelabs.com/reference/test-configuration/>`_
 for full details of what can be configured.
-
-Job visibility
-~~~~~~~~~~~~~~
-
-You can specify the job sharing level for individual tests by setting a mark on
-the test method. This takes priority over the ``sauce_labs_job_visibility``
-entry in the configuration file:
-
-.. code-block:: python
-
-  import pytest
-  @pytest.mark.sauce_labs_job_visibility('public')
-  def test_public(selenium):
-      assert True
-
-You can also explicitly mark the test as private:
-
-.. code-block:: python
-
-  import pytest
-  @pytest.mark.sauce_labs_job_visibility('private')
-  def test_private(selenium):
-      assert True
-
-For the full list of accepted values, check the
-`Sauce Labs documentation <https://saucelabs.com/docs/additional-config#sharing>`_.
 
 BrowserStack
 ------------
@@ -304,12 +271,24 @@ the ``--capability`` command line arguments. See the
 `test options <http://testingbot.com/support/other/test-options>`_
 for full details of what can be configured.
 
-Capabilities
-------------
+Specifying Capabilities
+***********************
 
 Configuration options are specified using a capabilities dictionary. This is
 required when using a Selenium server to specify the target environment, but
 can also be used to configure local drivers.
+
+Command Line Capabilities
+-------------------------
+
+Simple capabilities can be set or overridden on the command line:
+
+.. code-block:: bash
+
+  $ py.test --driver Remote --capability browserName Firefox
+
+Capabilities Files
+------------------
 
 To specify capabilities, you can provide a JSON file on the command line using
 the `pytest-variables <https://github.com/davehunt/pytest-variables>`_ plugin.
@@ -325,14 +304,10 @@ The following is an example of a variables file including capabilities:
       "platform": "MAC" }
   }
 
-Simple capabilities can be set or overridden on the command line:
+Capabilities Fixture
+--------------------
 
-.. code-block:: bash
-
-  $ py.test --driver Remote --capability browserName Firefox
-
-You can also add or change capabilities by overwriting the ``capabilities``
-fixture:
+You can add or change capabilities by overwriting the ``capabilities`` fixture:
 
 .. code-block:: python
 
@@ -341,6 +316,18 @@ fixture:
   def capabilities(capabilities):
       capabilities['tags'] = ['tag1', 'tag2', 'tag3']
       return capabilities
+
+Capabilities Marker
+-------------------
+
+You can add or change capabilities using the ``capabilities`` marker:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.mark.capabilities(foo='bar')
+  def test_capabilities(selenium):
+      selenium.get('http://www.example.com')
 
 Common Selenium Setup
 *********************

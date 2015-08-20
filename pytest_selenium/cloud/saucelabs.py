@@ -35,17 +35,9 @@ class Provider(CloudProvider):
         keywords = item.keywords
         marks = [m for m in keywords.keys() if isinstance(
             keywords[m], MarkInfo)]
-        tags = capabilities.get('tags', []) + marks
-        try:
-            job_visibility = item.keywords['sauce_labs_job_visibility'].args[0]
-        except (IndexError, KeyError):
-            # mark is not present or has no value
-            job_visibility = item.config.getini('sauce_labs_job_visibility')
-
         test_id = '.'.join(self.split_class_and_test_names(item.nodeid))
-        capabilities.update({
-            'name': test_id,
-            'public': job_visibility})
+        capabilities['name'] = test_id
+        tags = capabilities.get('tags', []) + marks
         if tags:
             capabilities['tags'] = tags
         executor = 'http://{0}:{1}@ondemand.saucelabs.com:80/wd/hub'.format(

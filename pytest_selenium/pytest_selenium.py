@@ -82,6 +82,15 @@ def selenium(request, _sensitive_skipping, capabilities):
     return driver
 
 
+def pytest_configure(config):
+    if hasattr(config, 'slaveinput'):
+        return  # xdist slave
+    config.addinivalue_line(
+        'markers', 'capabilities(kwargs): add or change existing '
+        'capabilities. specify capabilities as keyword arguments, for example '
+        'capabilities(foo=''bar'')')
+
+
 def pytest_runtest_makereport(__multicall__, item, call):
     pytest_html = item.config.pluginmanager.getplugin('html')
     extra_summary = []
@@ -151,9 +160,6 @@ def pytest_addoption(parser):
     parser.addini('sauce_labs_api_key',
                   help='sauce labs api key',
                   default=os.getenv('SAUCELABS_API_KEY'))
-    parser.addini('sauce_labs_job_visibility',
-                  help='default visibility for jobs',
-                  default='public restricted')
 
     # testingbot configuration
     parser.addini('testingbot_key',
