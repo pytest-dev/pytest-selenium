@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from datetime import datetime
 import os
 
 import pytest
@@ -98,17 +99,19 @@ def pytest_runtest_makereport(__multicall__, item, call):
     extra = getattr(report, 'extra', [])
     if report.when == 'call':
         driver = getattr(item, '_driver', None)
+        xfail = hasattr(report, 'wasxfail')
+        failure = (report.skipped and xfail) or (report.failed and not xfail)
+        capture = item.config.getini('selenium_capture_debug').lower()
+        debug = capture == 'always' or (capture == 'failure' and failure)
+        exclude_debug = item.config.getini('selenium_exclude_debug')
         if driver is not None:
-            xfail = hasattr(report, 'wasxfail')
-            # only gather debug if test failed or xfailed
-            debug = (report.skipped and xfail) or (report.failed and not xfail)
             if debug:
                 url = driver.current_url
                 if url is not None:
-                    # add failing url to the console output
-                    extra_summary.append('Failing URL: {0}'.format(url))
+                    # add url to the console output
+                    extra_summary.append('URL: {0}'.format(url))
                     if pytest_html is not None:
-                        # add failing url to the html report
+                        # add url to the html report
                         extra.append(pytest_html.extras.url(url))
                 screenshot = driver.get_screenshot_as_base64()
                 if screenshot is not None and pytest_html is not None:
@@ -119,6 +122,12 @@ def pytest_runtest_makereport(__multicall__, item, call):
                 if html is not None and pytest_html is not None:
                     # add page source to the html report
                     extra.append(pytest_html.extras.text(html, 'HTML'))
+                if 'logs' not in exclude_debug:
+                    for log_type in driver.log_types:
+                        log = driver.get_log(log_type)
+                        if log and pytest_html is not None:
+                            extra.append(pytest_html.extras.text(
+                                format_log(log), '%s Log' % log_type.title()))
             driver_name = item.config.option.driver
             if hasattr(cloud, driver_name.lower()) and driver.session_id:
                 provider = getattr(cloud, driver_name.lower()).Provider()
@@ -142,8 +151,26 @@ def pytest_runtest_makereport(__multicall__, item, call):
     return report
 
 
+def format_log(log):
+    timestamp_format = '%Y-%m-%d %H:%M:%S.%f'
+    entries = ['{0} {1[level]} - {1[message]}'.format(
+        datetime.utcfromtimestamp(entry['timestamp'] / 1000.0).strftime(
+            timestamp_format), entry).rstrip() for entry in log]
+    return '\n'.join(entries)
+
+
 def pytest_addoption(parser):
-    parser.addini('selenium_base_url', 'base url for selenium')
+    parser.addini('selenium_base_url',
+                  help='base url for selenium')
+
+    _capture_choices = ('never', 'failure', 'always')
+    parser.addini('selenium_capture_debug',
+                  help='when debug is captured {0}'.format(_capture_choices),
+                  default=os.getenv('SELENIUM_CAPTURE_DEBUG', 'failure'))
+    parser.addini('selenium_exclude_debug',
+                  help='debug to exclude from capture',
+                  type='args',
+                  default=os.getenv('SELENIUM_EXCLUDE_DEBUG'))
 
     # browserstack configuration
     parser.addini('browserstack_username',
