@@ -33,8 +33,7 @@ Specifying a Base URL
 *********************
 
 Rather than repeating or abstracting the base URL in your tests, pytest-selenium
-also provides a ``base_url`` fixture that by default will return a value
-specified on the command line.
+also provides a ``base_url`` fixture that returns the specified base URL.
 
 Here's the earlier example with the addition of ``base_url``:
 
@@ -43,14 +42,27 @@ Here's the earlier example with the addition of ``base_url``:
   def test_example(base_url, selenium):
       selenium.get('{0}'.format(base_url))
 
-The associated command line would be:
+Using the Command Line
+----------------------
+
+You can specify the base URL on the command line:
 
 .. code-block:: bash
 
   $ py.test --base-url http://www.example.com --driver Firefox
 
-Dynamic Base URLs
------------------
+Using a Configuration File
+--------------------------
+
+You can specify the base URL using a configuration file:
+
+.. code-block:: ini
+
+  [pytest]
+  base_url = http://www.example.com
+
+Using a Fixture
+---------------
 
 If your test harness takes care of launching an instance of your application
 under test, you may not have a predictable base URL to provide on the command

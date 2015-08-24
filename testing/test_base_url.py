@@ -51,6 +51,21 @@ def test_funcarg(testdir, webserver):
     testdir.quick_qa(file_test, passed=1)
 
 
+def test_config(testdir, webserver):
+    base_url = 'http://localhost:{0}/foo'.format(webserver.port)
+    testdir.makefile('.ini', pytest="""
+        [pytest]
+        base_url={0}
+    """.format(base_url))
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_config(base_url):
+            assert base_url == '{0}'
+    """.format(base_url))
+    testdir.inline_run(file_test)
+
+
 def test_failing_base_url(testdir, webserver):
     status_code = 500
     base_url = 'http://localhost:{0}/{1}/'.format(webserver.port, status_code)

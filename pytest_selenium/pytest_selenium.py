@@ -43,7 +43,7 @@ def _environment(request, base_url, capabilities):
 def base_url(request):
     """Return a verified base URL"""
     config = request.config
-    base_url = config.option.base_url or config.getini('selenium_base_url')
+    base_url = config.option.base_url or config.getini('base_url')
     if base_url:
         verify_url(base_url)
         return base_url
@@ -141,7 +141,7 @@ def pytest_runtest_makereport(__multicall__, item, call):
 
 
 def pytest_addoption(parser):
-    parser.addini('selenium_base_url', 'base url for selenium')
+    parser.addini('base_url', 'base url for selenium')
 
     # browserstack configuration
     parser.addini('browserstack_username',
