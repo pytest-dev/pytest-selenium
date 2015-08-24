@@ -96,6 +96,42 @@ may be able to take advantage of one of the following:
   `pytest-flask <http://pytest-flask.readthedocs.org/>`_, which provides a
   ``live_server`` fixture.
 
+Sensitive Environments
+**********************
+
+To avoid accidental changes being made to sensitive environments such as
+your production instances, all tests are assumed to be destructive. Any
+destructive tests attempted to run against a sensitive environment will be
+skipped. By default, all URLs are considered to be sensitive.
+
+Nondestructive Tests
+--------------------
+
+To explicitly mark a test as nondestructive, you can add the appropriate marker
+as shown here:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.mark.nondestructive
+  def test_nondestructive(selenium):
+      selenium.get('http://www.example.com')
+
+Indicating Sensitive Environments
+---------------------------------
+
+Sensitive environments are indicated by a regular expression applied to the
+base URL or any URLs discovered in the history of redirects when retrieving
+the base URL. By default this matches all URLs, but can be configured on by
+setting the ``SENSITIVE_URL`` environment variable, or by using the command
+line:
+
+.. code-block:: bash
+
+  $ py.test --sensitive-url "example\.com"
+
+To disable skipping for senstive URLs, this can be set to ``None``.
+
 Specifying a Browser
 ********************
 

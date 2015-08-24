@@ -15,25 +15,12 @@ def failure_with_output(testdir, *args, **kwargs):
     return out
 
 
-def test_missing_base_url(testdir):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_pass(selenium): pass
-    """)
-    out = failure_with_output(testdir, file_test)
-    assert 'UsageError: --base-url must be specified.' in out
-
-
 def test_fixture(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.fixture(scope='session')
         def base_url():
             return 'foo'
-        @pytest.fixture(scope='session')
-        def _verify_base_url():
-            pass
         @pytest.mark.nondestructive
         def test_fixture(base_url):
             assert base_url == 'foo'

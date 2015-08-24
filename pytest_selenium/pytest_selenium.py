@@ -28,9 +28,9 @@ def _environment(request, base_url, capabilities):
     if hasattr(config, '_html'):
         # add environment details to the pytest-html plugin if possible
         environment = config._html.environment
-        environment.extend([
-            ('Base URL', base_url),
-            ('Driver', config.option.driver)])
+        environment.append(('Driver', config.option.driver))
+        if base_url is not None:
+            environment.append(('Base URL', base_url))
         # add capabilities to environment
         environment.extend([('Capability', '{0}: {1}'.format(
             k, v)) for k, v in capabilities.items()])
@@ -47,7 +47,6 @@ def base_url(request):
     if base_url:
         verify_url(base_url)
         return base_url
-    raise pytest.UsageError('--base-url must be specified.')
 
 
 def verify_url(url):
@@ -71,7 +70,7 @@ def capabilities(request, variables):
 
 
 @pytest.fixture
-def selenium(request, skip_sensitive, capabilities):
+def selenium(request, capabilities):
     """Returns a WebDriver instance based on options and capabilities"""
     from .driver import start_driver
     driver = start_driver(request.node, capabilities)
