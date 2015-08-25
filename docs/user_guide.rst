@@ -96,13 +96,24 @@ may be able to take advantage of one of the following:
   `pytest-flask <http://pytest-flask.readthedocs.org/>`_, which provides a
   ``live_server`` fixture.
 
+Verifying the Base URL
+----------------------
+
+If you specify a base URL for a site that's unavailable then all tests using
+that base URL will likely fail. To avoid running every test in this instance,
+you can enable base URL verification. This will check the base URL is
+responding before proceeding with the test suite. To enable this, specify the
+``--verify-base-url`` command line option or set the ``VERIFY_BASE_URL``
+environment variable to ``TRUE``.
+
+
 Sensitive Environments
 **********************
 
 To avoid accidental changes being made to sensitive environments such as
 your production instances, all tests are assumed to be destructive. Any
 destructive tests attempted to run against a sensitive environment will be
-skipped. By default, all URLs are considered to be sensitive.
+skipped.
 
 Nondestructive Tests
 --------------------

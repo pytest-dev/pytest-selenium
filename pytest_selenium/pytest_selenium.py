@@ -39,26 +39,26 @@ def _environment(request, capabilities):
 
 @pytest.fixture(scope='session')
 def base_url(request):
-    """Return a verified base URL"""
+    """Return a base URL"""
     config = request.config
     base_url = config.option.base_url or config.getini('base_url')
     if base_url:
-        verify_url(base_url)
         if hasattr(config, '_html'):
             config._html.environment.append(('Base URL', base_url))
-            raise Exception('test')
         return base_url
 
 
-def verify_url(url):
-    response = requests.get(url, timeout=REQUESTS_TIMEOUT)
-    ok_codes = (200, 401)
-    if response.status_code not in ok_codes:
-        raise pytest.UsageError(
-            'Base URL did not respond with one of the following status '
-            'codes: {0}.\nURL: {1},\nResponse status code: {2.status_code}'
-            '\nResponse headers: {2.headers}'.format(
-                ', '.join(map(str, ok_codes)), url, response))
+@pytest.fixture(scope='session', autouse=True)
+def _verify_url(request, base_url):
+    """Verifies the base URL"""
+    verify = request.config.option.verify_base_url
+    if base_url and verify:
+        response = requests.get(base_url, timeout=REQUESTS_TIMEOUT)
+        if not response.status_code == requests.codes.ok:
+            raise pytest.UsageError(
+                'Base URL failed verification!'
+                '\nURL: {0}, Response status code: {1.status_code}'
+                '\nResponse headers: {1.headers}'.format(base_url, response))
 
 
 @pytest.fixture(scope='session')
@@ -171,6 +171,11 @@ def pytest_addoption(parser):
     group._addoption('--base-url',
                      metavar='url',
                      help='base url for the application under test.')
+    group._addoption('--verify-base-url',
+                     action='store_true',
+                     default=not os.getenv(
+                         'VERIFY_BASE_URL', 'false').lower() == 'false',
+                     help='verify the base url.')
     group._addoption('--host',
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),
                      metavar='str',
