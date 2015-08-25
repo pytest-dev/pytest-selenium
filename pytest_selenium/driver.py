@@ -5,10 +5,11 @@
 import copy
 
 import pytest
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
-from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
-from selenium import webdriver
 
 
 def start_driver(item, capabilities):
@@ -42,31 +43,43 @@ def browserstack_driver(item, capabilities):
 
 def chrome_driver(item, capabilities):
     """Return a WebDriver using a Chrome instance"""
-    return webdriver.Chrome(desired_capabilities=capabilities)
+    options = item.config.option
+    kwargs = {'desired_capabilities': capabilities}
+    if options.driver_path is not None:
+        kwargs['executable_path'] = options.driver_path
+    return webdriver.Chrome(**kwargs)
 
 
 def firefox_driver(item, capabilities):
     """Return a WebDriver using a Firefox instance"""
     options = item.config.option
-    binary = None
-    if options.firefox_path:
+    kwargs = {'capabilities': capabilities or None}
+    if options.driver_path is not None:
+        kwargs['executable_path'] = options.driver_path
+    if options.firefox_path is not None:
         # get firefox binary from options until there's capabilities support
-        binary = FirefoxBinary(options.firefox_path)
-    profile = _create_firefox_profile(options)
-    return webdriver.Firefox(
-        firefox_binary=binary,
-        firefox_profile=profile,
-        capabilities=capabilities or None)
+        kwargs['firefox_binary'] = FirefoxBinary(options.firefox_path)
+    kwargs['firefox_profile'] = _create_firefox_profile(options)
+    return webdriver.Firefox(**kwargs)
 
 
 def ie_driver(item, capabilities):
     """Return a WebDriver using an Internet Explorer instance"""
-    return webdriver.Ie(capabilities=capabilities)
+    options = item.config.option
+    kwargs = {'capabilities': capabilities or None}
+    if options.driver_path is not None:
+        kwargs['executable_path'] = options.driver_path
+    return webdriver.Ie(**kwargs)
 
 
 def phantomjs_driver(item, capabilities):
     """Return a WebDriver using a PhantomJS instance"""
-    return webdriver.PhantomJS(desired_capabilities=capabilities)
+    options = item.config.option
+    _capabilities = capabilities or DesiredCapabilities.PHANTOMJS
+    kwargs = {'desired_capabilities': _capabilities}
+    if options.driver_path is not None:
+        kwargs['executable_path'] = options.driver_path
+    return webdriver.PhantomJS(**kwargs)
 
 
 def remote_driver(item, capabilities):
