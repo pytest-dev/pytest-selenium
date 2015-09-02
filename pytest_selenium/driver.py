@@ -6,7 +6,6 @@ import copy
 
 import pytest
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
@@ -44,7 +43,9 @@ def browserstack_driver(item, capabilities):
 def chrome_driver(item, capabilities):
     """Return a WebDriver using a Chrome instance"""
     options = item.config.option
-    kwargs = {'desired_capabilities': capabilities}
+    kwargs = {}
+    if capabilities:
+        kwargs['desired_capabilities'] = capabilities
     if options.driver_path is not None:
         kwargs['executable_path'] = options.driver_path
     return webdriver.Chrome(**kwargs)
@@ -53,7 +54,9 @@ def chrome_driver(item, capabilities):
 def firefox_driver(item, capabilities):
     """Return a WebDriver using a Firefox instance"""
     options = item.config.option
-    kwargs = {'capabilities': capabilities or None}
+    kwargs = {}
+    if capabilities:
+        kwargs['capabilities'] = capabilities
     if options.driver_path is not None:
         kwargs['executable_path'] = options.driver_path
     if options.firefox_path is not None:
@@ -66,7 +69,9 @@ def firefox_driver(item, capabilities):
 def ie_driver(item, capabilities):
     """Return a WebDriver using an Internet Explorer instance"""
     options = item.config.option
-    kwargs = {'capabilities': capabilities or None}
+    kwargs = {}
+    if capabilities:
+        kwargs['capabilities'] = capabilities
     if options.driver_path is not None:
         kwargs['executable_path'] = options.driver_path
     return webdriver.Ie(**kwargs)
@@ -75,8 +80,9 @@ def ie_driver(item, capabilities):
 def phantomjs_driver(item, capabilities):
     """Return a WebDriver using a PhantomJS instance"""
     options = item.config.option
-    _capabilities = capabilities or DesiredCapabilities.PHANTOMJS
-    kwargs = {'desired_capabilities': _capabilities}
+    kwargs = {}
+    if capabilities:
+        kwargs['desired_capabilities'] = capabilities
     if options.driver_path is not None:
         kwargs['executable_path'] = options.driver_path
     return webdriver.PhantomJS(**kwargs)
