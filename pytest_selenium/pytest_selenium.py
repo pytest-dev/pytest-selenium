@@ -26,16 +26,14 @@ SUPPORTED_DRIVERS = [
 def _environment(request, capabilities):
     """Provide additional environment details to pytest-html report"""
     config = request.config
-    if hasattr(config, '_html'):
-        # add environment details to the pytest-html plugin if possible
-        environment = config._html.environment
-        environment.append(('Driver', config.option.driver))
-        # add capabilities to environment
-        environment.extend([('Capability', '{0}: {1}'.format(
-            k, v)) for k, v in capabilities.items()])
-        if config.option.driver == 'Remote':
-            environment.append(
-                ('Server', 'http://{0.host}:{0.port}'.format(config.option)))
+    # add environment details to the pytest-html plugin
+    config._environment.append(('Driver', config.option.driver))
+    # add capabilities to environment
+    config._environment.extend([('Capability', '{0}: {1}'.format(
+        k, v)) for k, v in capabilities.items()])
+    if config.option.driver == 'Remote':
+        config._environment.append(
+            ('Server', 'http://{0.host}:{0.port}'.format(config.option)))
 
 
 @pytest.fixture(scope='session')
@@ -44,8 +42,7 @@ def base_url(request):
     config = request.config
     base_url = config.option.base_url or config.getini('base_url')
     if base_url:
-        if hasattr(config, '_html'):
-            config._html.environment.append(('Base URL', base_url))
+        config._environment.append(('Base URL', base_url))
         return base_url
 
 
