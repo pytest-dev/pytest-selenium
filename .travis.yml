@@ -12,7 +12,8 @@ env:
     - DISPLAY=':99.0'
   matrix:
     - PYTEST=2.6.4
-    - PYTEST=2.7.2
+    - PYTEST=2.7.3
+    - PYTEST=2.8.1
 matrix:
   fast_finish: true
   allow_failures:
