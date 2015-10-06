@@ -101,22 +101,25 @@ def pytest_runtest_makereport(__multicall__, item, call):
         exclude_debug = item.config.getini('selenium_exclude_debug')
         if driver is not None:
             if debug:
-                url = driver.current_url
-                if url is not None:
-                    # add url to the console output
-                    extra_summary.append('URL: {0}'.format(url))
-                    if pytest_html is not None:
-                        # add url to the html report
-                        extra.append(pytest_html.extras.url(url))
-                screenshot = driver.get_screenshot_as_base64()
-                if screenshot is not None and pytest_html is not None:
-                    # add screenshot to the html report
-                    extra.append(pytest_html.extras.image(
-                        screenshot, 'Screenshot'))
-                html = driver.page_source.encode('utf-8')
-                if html is not None and pytest_html is not None:
-                    # add page source to the html report
-                    extra.append(pytest_html.extras.text(html, 'HTML'))
+                if 'url' not in exclude_debug:
+                    url = driver.current_url
+                    if url is not None:
+                        # add url to the console output
+                        extra_summary.append('URL: {0}'.format(url))
+                        if pytest_html is not None:
+                            # add url to the html report
+                            extra.append(pytest_html.extras.url(url))
+                if 'screenshot' not in exclude_debug:
+                    screenshot = driver.get_screenshot_as_base64()
+                    if screenshot is not None and pytest_html is not None:
+                        # add screenshot to the html report
+                        extra.append(pytest_html.extras.image(
+                            screenshot, 'Screenshot'))
+                if 'html' not in exclude_debug:
+                    html = driver.page_source.encode('utf-8')
+                    if html is not None and pytest_html is not None:
+                        # add page source to the html report
+                        extra.append(pytest_html.extras.text(html, 'HTML'))
                 if 'logs' not in exclude_debug:
                     for log_type in driver.log_types:
                         log = driver.get_log(log_type)

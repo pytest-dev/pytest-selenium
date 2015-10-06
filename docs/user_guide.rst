@@ -432,9 +432,14 @@ item to the ``[pytest]`` section of a ``setup.cfg`` file, or set the
 ``failure`` (the default), and ``always``. Note that always capturing debug will
 dratamtically increase the size of the HTML report.
 
-Excluding Logs
---------------
+Excluding Debug
+---------------
 
-Log files can contain sensitive information. To exclude them from the report
-set the ``selenium_exclude_debug`` option or ``SELENIUM_EXCLUDE_DEBUG``
-environment variable to ``logs``.
+You may need to exclude certain types of debug from the report. For example, log
+files can contain sensitive information that you may not want to publish. To
+exclude a type of debug from the report, set the ``selenium_exclude_debug``
+option or ``SELENIUM_EXCLUDE_DEBUG`` to a list of the debug types to exclude.
+The debug types are: ``html``, ``logs``, ``screenshot`` and ``url``.
+
+For example, to exclude HTML, logs, and screenshots from the report, you could
+set ``SELENIUM_EXCLUDE_DEBUG`` to ``html:logs:screenshot``.
