@@ -148,10 +148,10 @@ def pytest_runtest_makereport(__multicall__, item, call):
 
 def format_log(log):
     timestamp_format = '%Y-%m-%d %H:%M:%S.%f'
-    entries = ['{0} {1[level]} - {1[message]}'.format(
+    entries = [u'{0} {1[level]} - {1[message]}'.format(
         datetime.utcfromtimestamp(entry['timestamp'] / 1000.0).strftime(
             timestamp_format), entry).rstrip() for entry in log]
-    return '\n'.join(entries)
+    return '\n'.join(entries).encode('utf-8')
 
 
 def pytest_addoption(parser):
