@@ -158,7 +158,7 @@ def format_log(log):
 
 
 def pytest_addoption(parser):
-    parser.addini('base_url', help='base url')
+    parser.addini('base_url', help='base url for the application under test.')
 
     _capture_choices = ('never', 'failure', 'always')
     parser.addini('selenium_capture_debug',

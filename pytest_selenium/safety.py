@@ -11,11 +11,12 @@ import requests
 
 
 def pytest_addoption(parser):
+    parser.addini('sensitive_url',
+                  help='regular expression for identifying sensitive urls.')
+
     group = parser.getgroup('safety', 'safety')
     group._addoption('--sensitive-url',
-                     default=os.environ.get('SENSITIVE_URL', '.*'),
-                     help='regular expression for identifying sensitive urls.'
-                          ' (default: %default)')
+                     help='regular expression for identifying sensitive urls.')
 
 
 def pytest_configure(config):
@@ -35,6 +36,15 @@ def sensitive_url(request, base_url):
         return False
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
+    sensitive = '.*'
+    config = request.config
+    if config.option.sensitive_url:
+        sensitive = config.option.sensitive_url
+    elif config.getini('sensitive_url'):
+        sensitive = config.getini('sensitive_url')
+    elif os.getenv('SENSITIVE_URL'):
+        sensitive = os.getenv('SENSITIVE_URL')
+
     urls = [base_url]
     try:
         response = requests.get(base_url)
@@ -42,7 +52,7 @@ def sensitive_url(request, base_url):
         urls.extend([history.url for history in response.history])
     except requests.exceptions.RequestException:
         pass  # ignore exceptions if this URL is unreachable
-    search = partial(re.search, request.config.option.sensitive_url)
+    search = partial(re.search, sensitive)
     matches = map(search, urls)
     if any(matches):
         # return the first match

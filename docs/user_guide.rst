@@ -133,15 +133,22 @@ Indicating Sensitive Environments
 
 Sensitive environments are indicated by a regular expression applied to the
 base URL or any URLs discovered in the history of redirects when retrieving
-the base URL. By default this matches all URLs, but can be configured on by
-setting the ``SENSITIVE_URL`` environment variable, or by using the command
-line:
+the base URL. By default this matches all URLs, but can be configured by
+setting the ``SENSITIVE_URL`` environment variable, using a configuration file,
+or by using the command line.
+
+An example using a configuration file:
+
+.. code-block:: ini
+
+  [pytest]
+  sensitive_url = example\.com
+
+An example using the command line:
 
 .. code-block:: bash
 
   $ py.test --sensitive-url "example\.com"
-
-To disable skipping for senstive URLs, this can be set to ``None``.
 
 Specifying a Browser
 ********************

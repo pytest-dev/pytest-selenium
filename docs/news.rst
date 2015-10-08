@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.0b3**
+
+* Allow the sensitive URL regex to be specified in a configuration file.
+
 **1.0b2 (2015-10-06)**
 
 * Added support for non ASCII characters in log files. (#33)
