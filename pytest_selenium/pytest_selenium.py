@@ -41,6 +41,7 @@ def base_url(request):
     """Return a base URL"""
     config = request.config
     base_url = config.option.base_url or config.getini('base_url')
+    base_url = base_url.rstrip('/')
     if base_url:
         config._environment.append(('Base URL', base_url))
         return base_url

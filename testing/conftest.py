@@ -18,7 +18,7 @@ def base_url(webserver):
 
 @pytest.fixture
 def webserver_base_url(webserver):
-    return '--base-url={0}'.format(base_url(webserver))
+    return '--base-url={0}/'.format(base_url(webserver))
 
 
 @pytest.fixture(autouse=True)

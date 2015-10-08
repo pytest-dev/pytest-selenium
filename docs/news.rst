@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.0b3**
+
+* Strip trailing slashes from base URL.
+
 **1.0b2 (2015-10-06)**
 
 * Added support for non ASCII characters in log files. (#33)
