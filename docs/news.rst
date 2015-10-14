@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-**1.0b3**
+**1.0b3 (2015-10-14)**
 
 * Allow the sensitive URL regex to be specified in a configuration file.
 
