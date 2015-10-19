@@ -122,12 +122,13 @@ def pytest_runtest_makereport(__multicall__, item, call):
                         # add page source to the html report
                         extra.append(pytest_html.extras.text(html, 'HTML'))
                 if 'logs' not in exclude_debug:
+                    log_types = []
                     try:
                         log_type = driver.log_types
                     except WebDriverException as e:
                         if 'Command not found' in str(e):
                             # some drivers may not implement log types
-                            log_types = []
+                            pass
                         else:
                             raise
                     for log_type in log_types:
