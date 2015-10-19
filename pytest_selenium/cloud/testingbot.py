@@ -48,7 +48,7 @@ class Provider(CloudProvider):
         return 'http://testingbot.com/members/tests/{0}'.format(session)
 
     def additional_html(self, session):
-        return [self._video_html(session)]
+        return self._video_html(session)
 
     def update_status(self, config, session, passed):
         requests.put('https://api.testingbot.com/v1/tests/{0}'.format(session),
@@ -76,7 +76,7 @@ class Provider(CloudProvider):
                 "url":"{0}",\
                 "provider":"rtmp"}}]}}'.format(session)
 
-        return html.div(html.object(
+        return str(html.div(html.object(
             html.param(value='true', name='allowfullscreen'),
             html.param(value='always', name='allowscriptaccess'),
             html.param(value='high', name='quality'),
@@ -93,4 +93,4 @@ class Provider(CloudProvider):
             id='mediaplayer_api'),
             id='mediaplayer{0}'.format(session),
             style='border:1px solid #e6e6e6; float:right; height:240px;'
-                  'margin-left:5px; overflow:hidden; width:320px')
+                  'margin-left:5px; overflow:hidden; width:320px'))

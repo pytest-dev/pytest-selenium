@@ -49,7 +49,7 @@ class Provider(CloudProvider):
         return 'http://saucelabs.com/jobs/{0}'.format(session)
 
     def additional_html(self, session):
-        return [self._video_html(session)]
+        return self._video_html(session)
 
     def update_status(self, config, session, passed):
         username = self._username(config)
@@ -86,7 +86,7 @@ class Provider(CloudProvider):
                 "autoPlay":false,\
                 "autoBuffering":true}}]}}'.format(session)
 
-        return html.div(html.object(
+        return str(html.div(html.object(
             html.param(value='true', name='allowfullscreen'),
             html.param(value='always', name='allowscriptaccess'),
             html.param(value='high', name='quality'),
@@ -103,4 +103,4 @@ class Provider(CloudProvider):
             id='player_api'),
             id='player{0}'.format(session),
             style='border:1px solid #e6e6e6; float:right; height:240px;'
-                  'margin-left:5px; overflow:hidden; width:320px')
+                  'margin-left:5px; overflow:hidden; width:320px'))

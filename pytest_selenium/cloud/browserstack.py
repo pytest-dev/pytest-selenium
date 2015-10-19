@@ -44,7 +44,7 @@ class Provider(CloudProvider):
         return response.json()['automation_session']['browser_url']
 
     def additional_html(self, session):
-        return []
+        return ''
 
     def update_status(self, config, session, passed):
         status = {'status': 'completed' if passed else 'error'}

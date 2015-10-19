@@ -10,7 +10,7 @@ setup(name='pytest-selenium',
       packages=['pytest_selenium', 'pytest_selenium.cloud'],
       install_requires=[
           'pytest>=2.6.4',
-          'pytest-html>=1.6',
+          'pytest-html>=1.7',
           'pytest-variables',
           'selenium>=2.26.0',
           'requests'],
