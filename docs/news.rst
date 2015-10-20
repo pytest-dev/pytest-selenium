@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.0b5 ()**
+
+* Assign an initial value to log_types. (#38)
+
 **1.0b4 (2015-10-19)**
 
 * Use strings for HTML to support serialization when running multiple processes.
