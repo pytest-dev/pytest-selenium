@@ -13,7 +13,7 @@ env:
   matrix:
     - PYTEST=2.6.4
     - PYTEST=2.7.3
-    - PYTEST=2.8.1
+    - PYTEST=2.8.2
 matrix:
   fast_finish: true
   allow_failures:
