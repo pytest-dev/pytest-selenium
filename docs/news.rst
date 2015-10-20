@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-**1.0b5 ()**
+**1.0b5 (2015-10-20)**
 
 * Assign an initial value to log_types. (#38)
 
