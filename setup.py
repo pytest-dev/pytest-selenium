@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pytest-selenium',
-      version='1.0b5',
+      version='1.0',
       description='pytest plugin for Selenium',
       long_description=open('README.rst').read(),
       author='Dave Hunt',
@@ -21,7 +21,7 @@ setup(name='pytest-selenium',
       keywords='py.test pytest selenium saucelabs browserstack webqa qa '
                'mozilla',
       classifiers=[
-          'Development Status :: 4 - Beta',
+          'Development Status :: 5 - Production/Stable',
           'Intended Audience :: Developers',
           'License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)',
           'Operating System :: POSIX',
