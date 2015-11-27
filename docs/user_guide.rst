@@ -29,6 +29,17 @@ invoked. For example, to run it using Firefox installed in a default location:
 For full details of the Selenium API you can refer to the
 `documentation <http://seleniumhq.github.io/selenium/docs/api/py/api.html>`_.
 
+.. _configuration-files:
+
+Configuration Files
+*******************
+
+There are a number of options and values that can be set in an INI-style
+configuration file. For details of the expected name, format, and location of
+these configuration files, check the
+`pytest documentation <http://pytest.org/latest/customize.html#command-line-options-and-configuration-file-settings>`_.
+
+
 Specifying a Base URL
 *********************
 
@@ -54,7 +65,8 @@ You can specify the base URL on the command line:
 Using a Configuration File
 --------------------------
 
-You can specify the base URL using a configuration file:
+You can specify the base URL using a
+:ref:`configuration file <configuration-files>`:
 
 .. code-block:: ini
 
@@ -134,10 +146,10 @@ Indicating Sensitive Environments
 Sensitive environments are indicated by a regular expression applied to the
 base URL or any URLs discovered in the history of redirects when retrieving
 the base URL. By default this matches all URLs, but can be configured by
-setting the ``SENSITIVE_URL`` environment variable, using a configuration file,
-or by using the command line.
+setting the ``SENSITIVE_URL`` environment variable, using a
+:ref:`configuration file <configuration-files>`, or by using the command line.
 
-An example using a configuration file:
+An example using a :ref:`configuration file <configuration-files>`:
 
 .. code-block:: ini
 
@@ -253,13 +265,13 @@ Sauce Labs
 
 To run your automated tests using `Sauce Labs <https://saucelabs.com/>`_, you
 must provide a valid username and API key. This can be done either by using
-a ``setup.cfg`` file or by setting the ``SAUCELABS_USERNAME`` and
-``SAUCELABS_API_KEY`` environment variables.
+a :ref:`configuration file <configuration-files>`, or by setting the
+``SAUCELABS_USERNAME`` and ``SAUCELABS_API_KEY`` environment variables.
 
 Configuration
 ~~~~~~~~~~~~~
 
-Below is an example ``setup.cfg`` showing the configuration options:
+Below is an example :ref:`configuration file <configuration-files>`:
 
 .. code-block:: ini
 
@@ -287,14 +299,14 @@ BrowserStack
 
 To run your automated tests using
 `BrowserStack <https://www.browserstack.com/>`_, you must provide a valid
-username and access key. This can be done either by using a ``setup.cfg`` file
-or by setting the ``BROWSERSTACK_USERNAME`` and ``BROWSERSTACK_ACCESS_KEY``
-environment variables.
+username and access key. This can be done either by using a
+:ref:`configuration file <configuration-files>`, or by setting the
+``BROWSERSTACK_USERNAME`` and ``BROWSERSTACK_ACCESS_KEY`` environment variables.
 
 Configuration
 ~~~~~~~~~~~~~
 
-Below is an example ``setup.cfg`` showing the configuration options:
+Below is an example :ref:`configuration file <configuration-files>`:
 
 .. code-block:: ini
 
@@ -321,13 +333,13 @@ TestingBot
 
 To run your automated tests using `TestingBot <http://testingbot.com/>`_, you
 must provide a valid key and secret. This can be done either by using a
-``setup.cfg`` file or by setting the ``TESTINGBOT_KEY`` and
-``TESTINGBOT_SECRET`` environment variables.
+:ref:`configuration file <configuration-files>`, or by setting the
+``TESTINGBOT_KEY`` and ``TESTINGBOT_SECRET`` environment variables.
 
 Configuration
 ~~~~~~~~~~~~~
 
-Below is an example ``setup.cfg`` showing the configuration options:
+Below is an example :ref:`configuration file <configuration-files>`:
 
 .. code-block:: ini
 
@@ -433,20 +445,22 @@ such as the URL, HTML, logs, and a screenshot at the point the test finished.
 Capturing Debug
 ---------------
 
-To change when debug is captured you can either add a ``selenium_capture_debug``
-item to the ``[pytest]`` section of a ``setup.cfg`` file, or set the
+To change when debug is captured you can either set ``selenium_capture_debug``
+in a :ref:`configuration file <configuration-files>`, or set the
 ``SELENIUM_CAPTURE_DEBUG`` environment variable. Valid options are: ``never``,
 ``failure`` (the default), and ``always``. Note that always capturing debug will
-dratamtically increase the size of the HTML report.
+dramatically increase the size of the HTML report.
 
 Excluding Debug
 ---------------
 
 You may need to exclude certain types of debug from the report. For example, log
 files can contain sensitive information that you may not want to publish. To
-exclude a type of debug from the report, set the ``selenium_exclude_debug``
-option or ``SELENIUM_EXCLUDE_DEBUG`` to a list of the debug types to exclude.
-The debug types are: ``html``, ``logs``, ``screenshot`` and ``url``.
+exclude a type of debug from the report, you can either set
+``selenium_exclude_debug`` in a :ref:`configuration file <configuration-files>`,
+or set the ``SELENIUM_EXCLUDE_DEBUG`` environment variable to a list of the
+debug types to exclude. The debug types are: ``html``, ``logs``, ``screenshot``
+and ``url``.
 
 For example, to exclude HTML, logs, and screenshots from the report, you could
 set ``SELENIUM_EXCLUDE_DEBUG`` to ``html:logs:screenshot``.
