@@ -34,3 +34,21 @@ def failure(testdir, testfile, webserver_base_url):
 def test_missing_driver(failure):
     out = failure()
     assert 'UsageError: --driver must be specified' in out
+
+
+def test_driver_quit(testdir):
+    testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_driver_quit(selenium):
+            selenium.quit()
+    """)
+    result = testdir.runpytestqa()
+    result.stdout.fnmatch_lines_random([
+        'WARNING: Failed to gather URL: *',
+        'WARNING: Failed to gather screenshot: *',
+        'WARNING: Failed to gather HTML: *',
+        'WARNING: Failed to gather log types: *'])
+    outcomes = result.parseoutcomes()
+    assert outcomes.get('passed') == 1
+    assert outcomes.get('error') == 1

@@ -37,6 +37,12 @@ def testdir(request, webserver_base_url):
             return selenium.find_element_by_tag_name('h1').text
         """)
 
+    def runpytestqa(*args, **kwargs):
+        return testdir.runpytest(webserver_base_url, '--driver', 'Firefox',
+                                 *args, **kwargs)
+
+    testdir.runpytestqa = runpytestqa
+
     def inline_runqa(*args, **kwargs):
         return testdir.inline_run(webserver_base_url, '--driver', 'Firefox',
                                   *args, **kwargs)
