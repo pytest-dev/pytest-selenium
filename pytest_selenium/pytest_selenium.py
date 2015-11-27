@@ -88,10 +88,12 @@ def pytest_configure(config):
         'capabilities(foo=''bar'')')
 
 
-def pytest_runtest_makereport(__multicall__, item, call):
+@pytest.mark.hookwrapper
+def pytest_runtest_makereport(item, call):
+    outcome = yield
     pytest_html = item.config.pluginmanager.getplugin('html')
     extra_summary = []
-    report = __multicall__.execute()
+    report = outcome.get_result()
     extra = getattr(report, 'extra', [])
     if report.when == 'call':
         driver = getattr(item, '_driver', None)
@@ -156,7 +158,6 @@ def pytest_runtest_makereport(__multicall__, item, call):
                 provider.update_status(item.config, driver.session_id, passed)
         report.sections.append(('pytest-selenium', '\n'.join(extra_summary)))
         report.extra = extra
-    return report
 
 
 def format_log(log):
