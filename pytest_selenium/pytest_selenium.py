@@ -40,8 +40,8 @@ def _environment(request, capabilities):
 def base_url(request):
     """Return a base URL"""
     config = request.config
-    base_url = config.option.base_url or config.getini('base_url')
-    if base_url:
+    base_url = config.getoption('base_url')
+    if base_url is not None:
         config._environment.append(('Base URL', base_url))
         return base_url
 
@@ -81,6 +81,9 @@ def selenium(request, capabilities):
 def pytest_configure(config):
     if hasattr(config, 'slaveinput'):
         return  # xdist slave
+    base_url = config.getoption('base_url') or config.getini('base_url')
+    if base_url is not None:
+        config.option.base_url = base_url
     config.addinivalue_line(
         'markers', 'capabilities(kwargs): add or change existing '
         'capabilities. specify capabilities as keyword arguments, for example '

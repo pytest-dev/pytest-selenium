@@ -118,6 +118,23 @@ responding before proceeding with the test suite. To enable this, specify the
 ``--verify-base-url`` command line option or set the ``VERIFY_BASE_URL``
 environment variable to ``TRUE``.
 
+Skipping Base URLs
+------------------
+
+You can `skip tests <http://pytest.org/latest/skipping.html>`_ based on the
+value of the base URL so long as it is provided either by the command line or
+in a configuration file:
+
+.. code-block:: python
+
+  import pytest
+
+  @pytest.mark.skipif('dev' in pytest.config.getoption('base_url'), reason='Search not available on dev')
+  def test_search(base_url, selenium):
+      selenium.get('{0}/search'.format(base_url))
+
+Unfortunately if the URL is provided by a fixture, there is no way to know this
+value at test collection.
 
 Sensitive Environments
 **********************

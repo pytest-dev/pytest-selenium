@@ -39,7 +39,29 @@ def test_config(testdir, webserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_config(base_url):
+        def test_config(request, base_url):
+            assert request.config.getvalue('base_url') == '{0}'
+            assert request.config.getini('base_url') == '{0}'
             assert base_url == '{0}'
     """.format(base_url))
-    testdir.inline_run(file_test)
+    reprec = testdir.inline_run(file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(passed) == 1
+
+
+def test_skip_config(testdir, webserver):
+    base_url = 'http://localhost:{0}/foo'.format(webserver.port)
+    testdir.makefile('.ini', pytest="""
+        [pytest]
+        base_url={0}
+    """.format(base_url))
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        @pytest.mark.skipif(pytest.config.getoption('base_url') == '{0}',
+                            reason='skip')
+        def test_skip_config(): pass
+    """.format(base_url))
+    reprec = testdir.inline_run(file_test)
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(skipped) == 1
