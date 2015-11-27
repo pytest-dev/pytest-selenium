@@ -7,7 +7,6 @@ import os
 
 import pytest
 import requests
-from selenium.common.exceptions import WebDriverException
 
 from . import cloud
 
@@ -90,73 +89,105 @@ def pytest_configure(config):
 
 def pytest_runtest_makereport(__multicall__, item, call):
     pytest_html = item.config.pluginmanager.getplugin('html')
-    extra_summary = []
     report = __multicall__.execute()
+    summary = []
     extra = getattr(report, 'extra', [])
-    if report.when == 'call':
-        driver = getattr(item, '_driver', None)
-        xfail = hasattr(report, 'wasxfail')
-        failure = (report.skipped and xfail) or (report.failed and not xfail)
-        capture = item.config.getini('selenium_capture_debug').lower()
-        debug = capture == 'always' or (capture == 'failure' and failure)
-        exclude_debug = item.config.getini('selenium_exclude_debug')
-        if driver is not None:
-            if debug:
-                if 'url' not in exclude_debug:
-                    url = driver.current_url
-                    if url is not None:
-                        # add url to the console output
-                        extra_summary.append('URL: {0}'.format(url))
-                        if pytest_html is not None:
-                            # add url to the html report
-                            extra.append(pytest_html.extras.url(url))
-                if 'screenshot' not in exclude_debug:
-                    screenshot = driver.get_screenshot_as_base64()
-                    if screenshot is not None and pytest_html is not None:
-                        # add screenshot to the html report
-                        extra.append(pytest_html.extras.image(
-                            screenshot, 'Screenshot'))
-                if 'html' not in exclude_debug:
-                    html = driver.page_source.encode('utf-8')
-                    if html is not None and pytest_html is not None:
-                        # add page source to the html report
-                        extra.append(pytest_html.extras.text(html, 'HTML'))
-                if 'logs' not in exclude_debug:
-                    log_types = []
-                    try:
-                        log_type = driver.log_types
-                    except WebDriverException as e:
-                        if 'Command not found' in str(e):
-                            # some drivers may not implement log types
-                            pass
-                        else:
-                            raise
-                    for log_type in log_types:
-                        log = driver.get_log(log_type)
-                        if log and pytest_html is not None:
-                            extra.append(pytest_html.extras.text(
-                                format_log(log), '%s Log' % log_type.title()))
-            driver_name = item.config.option.driver
-            if hasattr(cloud, driver_name.lower()) and driver.session_id:
-                provider = getattr(cloud, driver_name.lower()).Provider()
-                # add cloud job identifier to the console output
-                job_url = provider.url(item.config, driver.session_id)
-                extra_summary.append('{0} Job: {1}'.format(
-                    provider.name, job_url))
-                if pytest_html is not None:
-                    # always add cloud job url to the html report
-                    extra.append(pytest_html.extras.url(
-                        job_url, '{0} Job'.format(provider.name)))
-                    if debug:
-                        # conditionally add cloud extras to html report
-                        extra.append(pytest_html.extras.html(
-                            provider.additional_html(driver.session_id)))
-                passed = report.passed or (report.failed and xfail)
-                # update job status with cloud provider
-                provider.update_status(item.config, driver.session_id, passed)
-        report.sections.append(('pytest-selenium', '\n'.join(extra_summary)))
-        report.extra = extra
+    driver = getattr(item, '_driver', None)
+    xfail = hasattr(report, 'wasxfail')
+    failure = (report.skipped and xfail) or (report.failed and not xfail)
+    when = item.config.getini('selenium_capture_debug').lower()
+    capture_debug = when == 'always' or (when == 'failure' and failure)
+    if driver is not None:
+        if capture_debug:
+            exclude = item.config.getini('selenium_exclude_debug')
+            if 'url' not in exclude:
+                _gather_url(item, report, driver, summary, extra)
+            if 'screenshot' not in exclude:
+                _gather_screenshot(item, report, driver, summary, extra)
+            if 'html' not in exclude:
+                _gather_html(item, report, driver, summary, extra)
+            if 'logs' not in exclude:
+                _gather_logs(item, report, driver, summary, extra)
+        driver_name = item.config.option.driver
+        if hasattr(cloud, driver_name.lower()) and driver.session_id:
+            provider = getattr(cloud, driver_name.lower()).Provider()
+            # add cloud job identifier to the console output
+            job_url = provider.url(item.config, driver.session_id)
+            summary.append('{0} Job: {1}'.format(
+                provider.name, job_url))
+            if pytest_html is not None:
+                # always add cloud job url to the html report
+                extra.append(pytest_html.extras.url(
+                    job_url, '{0} Job'.format(provider.name)))
+                if capture_debug:
+                    # conditionally add cloud extras to html report
+                    extra.append(pytest_html.extras.html(
+                        provider.additional_html(driver.session_id)))
+            xfail = hasattr(report, 'wasxfail')
+            passed = report.passed or (report.failed and xfail)
+            # update job status with cloud provider
+            provider.update_status(item.config, driver.session_id, passed)
+    if summary:
+        report.sections.append(('pytest-selenium', '\n'.join(summary)))
+    report.extra = extra
     return report
+
+
+def _gather_url(item, report, driver, summary, extra):
+    try:
+        url = driver.current_url
+    except Exception as e:
+        summary.append('WARNING: Failed to gather URL: {0}'.format(e))
+        return
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if pytest_html is not None:
+        # add url to the html report
+        extra.append(pytest_html.extras.url(url))
+    summary.append('URL: {0}'.format(url))
+
+
+def _gather_screenshot(item, report, driver, summary, extra):
+    try:
+        screenshot = driver.get_screenshot_as_base64()
+    except Exception as e:
+        summary.append('WARNING: Failed to gather screenshot: {0}'.format(e))
+        return
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if pytest_html is not None:
+        # add screenshot to the html report
+        extra.append(pytest_html.extras.image(screenshot, 'Screenshot'))
+
+
+def _gather_html(item, report, driver, summary, extra):
+    try:
+        html = driver.page_source.encode('utf-8')
+    except Exception as e:
+        summary.append('WARNING: Failed to gather HTML: {0}'.format(e))
+        return
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if pytest_html is not None:
+        # add page source to the html report
+        extra.append(pytest_html.extras.text(html, 'HTML'))
+
+
+def _gather_logs(item, report, driver, summary, extra):
+    try:
+        types = driver.log_types
+    except Exception as e:
+        # note that some drivers may not implement log types
+        summary.append('WARNING: Failed to gather log types: {0}'.format(e))
+        return
+    for name in types:
+        try:
+            log = driver.get_log(name)
+        except Exception as e:
+            summary.append('WARNING: Failed to gather {0} log: {1}'.format(
+                name, e))
+            return
+        pytest_html = item.config.pluginmanager.getplugin('html')
+        if pytest_html is not None:
+            extra.append(pytest_html.extras.text(
+                format_log(log), '%s Log' % name.title()))
 
 
 def format_log(log):
