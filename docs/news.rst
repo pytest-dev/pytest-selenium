@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+**1.1 (2015-12-??)**
+
+* Consistently stash the base URL in the configuration options.
+* Drop support for pytest 2.6.
+* Avoid deprecation warnings in pytest 2.8.
+* Report warnings when gathering debug fails. (#40)
+
 **1.0 (2015-10-26)**
 
 * Official release
