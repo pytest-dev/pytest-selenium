@@ -259,7 +259,7 @@ the default when running tests against a remote driver.
 
 To run your automated tests, simply specify ``Remote`` as your driver. Browser
 selection is determined using capabilities. Check the
-`documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`_
+`desired capabilities documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`_
 for details of accepted values. There are also a number of
 `browser specific capabilities <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#browser-specific-capabilities>`_
 that can be set. Be sure to also check the documentation for your chosen
