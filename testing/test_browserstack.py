@@ -44,6 +44,7 @@ def test_missing_access_key(failure, monkeypatch):
     assert 'UsageError: BrowserStack access key must be set' in out
 
 
+@pytest.skip('Frequent timeouts occurring with BrowserStack')
 def test_invalid_credentials(failure, monkeypatch):
     monkeypatch.setenv('BROWSERSTACK_USERNAME', 'foo')
     monkeypatch.setenv('BROWSERSTACK_ACCESS_KEY', 'bar')
