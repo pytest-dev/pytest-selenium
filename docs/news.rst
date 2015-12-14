@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-**1.1 (2015-12-??)**
+**1.1 (2015-12-14)**
 
 * Consistently stash the base URL in the configuration options.
 * Drop support for pytest 2.6.
