@@ -1,29 +1,39 @@
 language: python
 sudo: false
-python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
-  - pypy
-  - pypy3
 env:
   global:
-    - DISPLAY=':99.0'
+    - DISPLAY=:99.0
   matrix:
-    - PYTEST=2.7.3
-    - PYTEST=2.8.3
+    - TOXENV=py26-pytest27
+    - TOXENV=py26-pytest28
+    - TOXENV=py27-pytest27
+    - TOXENV=py27-pytest28
+    - TOXENV=py32-pytest27
+    - TOXENV=py32-pytest28
+    - TOXENV=py33-pytest27
+    - TOXENV=py33-pytest28
+    - TOXENV=py34-pytest27
+    - TOXENV=py34-pytest28
+    - TOXENV=pypy-pytest27
+    - TOXENV=pypy-pytest28
+    - TOXENV=pypy3-pytest27
+    - TOXENV=pypy3-pytest28
+    - TOXENV=docs
+    - TOXENV=flake8
 matrix:
   fast_finish: true
   allow_failures:
-    - python: 3.3
-    - python: 3.4
-    - python: pypy3
+    - env: TOXENV=py32-pytest27
+    - env: TOXENV=py32-pytest28
+    - env: TOXENV=py33-pytest27
+    - env: TOXENV=py33-pytest28
+    - env: TOXENV=py34-pytest27
+    - env: TOXENV=py34-pytest28
+    - env: TOXENV=pypy3-pytest27
+    - env: TOXENV=pypy3-pytest28
 install:
-  - pip install flake8
-  - pip install -q pytest==$PYTEST
-  - pip install -q -e .
+  - pip install tox
 before_script:
   - sh -e /etc/init.d/xvfb start
-  - flake8 .
-script: py.test testing -m 'not chrome'
+script:
+  - tox
