@@ -371,7 +371,7 @@ To run your automated tests, simply specify ``TestingBot`` as your driver:
 
 .. code-block:: bash
 
-  $ py.test --driver TestingBot --capability browserName firefox --capability browserName 39 --capability platform WIN8
+  $ py.test --driver TestingBot --capability browserName firefox --capability version 39 --capability platform WIN8
 
 See the `list of available browsers <http://testingbot.com/support/getting-started/browsers.html>`_
 to help you with your configuration. Additional capabilities can be set using
