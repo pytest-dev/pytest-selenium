@@ -10,7 +10,6 @@ import requests
 
 from . import cloud
 
-REQUESTS_TIMEOUT = 10
 SUPPORTED_DRIVERS = [
     'BrowserStack',
     'Chrome',
@@ -51,7 +50,7 @@ def _verify_url(request, base_url):
     """Verifies the base URL"""
     verify = request.config.option.verify_base_url
     if base_url and verify:
-        response = requests.get(base_url, timeout=REQUESTS_TIMEOUT)
+        response = requests.get(base_url, timeout=10)
         if not response.status_code == requests.codes.ok:
             raise pytest.UsageError(
                 'Base URL failed verification!'
@@ -93,7 +92,6 @@ def pytest_configure(config):
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item, call):
     outcome = yield
-    pytest_html = item.config.pluginmanager.getplugin('html')
     report = outcome.get_result()
     summary = []
     extra = getattr(report, 'extra', [])
@@ -116,22 +114,10 @@ def pytest_runtest_makereport(item, call):
         driver_name = item.config.option.driver
         if hasattr(cloud, driver_name.lower()) and driver.session_id:
             provider = getattr(cloud, driver_name.lower()).Provider()
-            # add cloud job identifier to the console output
-            job_url = provider.url(item.config, driver.session_id)
-            summary.append('{0} Job: {1}'.format(
-                provider.name, job_url))
-            if pytest_html is not None:
-                # always add cloud job url to the html report
-                extra.append(pytest_html.extras.url(
-                    job_url, '{0} Job'.format(provider.name)))
-                if capture_debug:
-                    # conditionally add cloud extras to html report
-                    extra.append(pytest_html.extras.html(
-                        provider.additional_html(driver.session_id)))
-            xfail = hasattr(report, 'wasxfail')
-            passed = report.passed or (report.failed and xfail)
-            # update job status with cloud provider
-            provider.update_status(item.config, driver.session_id, passed)
+            _gather_cloud_url(provider, item, report, driver, summary, extra)
+            if capture_debug:
+                _gather_cloud_extras(provider, item, report, driver, extra)
+            _update_cloud_status(provider, item, report, driver, summary)
     if summary:
         report.sections.append(('pytest-selenium', '\n'.join(summary)))
     report.extra = extra
@@ -192,6 +178,44 @@ def _gather_logs(item, report, driver, summary, extra):
         if pytest_html is not None:
             extra.append(pytest_html.extras.text(
                 format_log(log), '%s Log' % name.title()))
+
+
+def _gather_cloud_url(provider, item, report, driver, summary, extra):
+    try:
+        url = provider.url(item.config, driver.session_id)
+    except Exception as e:
+        summary.append('WARNING: Failed to gather {0} job URL: {1}'.format(
+            provider.name, e))
+        return
+    summary.append('{0} Job: {1}'.format(
+        provider.name, url))
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if pytest_html is not None:
+        # always add cloud job url to the html report
+        extra.append(pytest_html.extras.url(
+            url, '{0} Job'.format(provider.name)))
+
+
+def _gather_cloud_extras(provider, item, report, driver, summary, extra):
+    try:
+        extras = provider.additional_html(driver.session_id)
+    except Exception as e:
+        summary.append('WARNING: Failed to gather {0} extras: {1}'.format(
+            provider.name, e))
+        return
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if pytest_html is not None:
+        extra.append(pytest_html.extras.html(extras))
+
+
+def _update_cloud_status(provider, item, report, driver, summary):
+    xfail = hasattr(report, 'wasxfail')
+    passed = report.passed or (report.failed and xfail)
+    try:
+        provider.update_status(item.config, driver.session_id, passed)
+    except Exception as e:
+        summary.append('WARNING: Failed to update {0} status: {0}'.format(
+            provider.name, e))
 
 
 def format_log(log):

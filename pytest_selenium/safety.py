@@ -47,7 +47,7 @@ def sensitive_url(request, base_url):
 
     urls = [base_url]
     try:
-        response = requests.get(base_url)
+        response = requests.get(base_url, timeout=10)
         urls.append(response.url)
         urls.extend([history.url for history in response.history])
     except requests.exceptions.RequestException:

@@ -53,7 +53,8 @@ class Provider(CloudProvider):
     def update_status(self, config, session, passed):
         requests.put('https://api.testingbot.com/v1/tests/{0}'.format(session),
                      data={'test[success]': '1' if passed else '0'},
-                     auth=(self._key(config), self._secret(config)))
+                     auth=(self._key(config), self._secret(config)),
+                     timeout=10)
 
     def _video_html(self, session):
         flash_vars = 'config={{\

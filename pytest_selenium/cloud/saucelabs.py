@@ -57,7 +57,8 @@ class Provider(CloudProvider):
         status = {'passed': passed}
         requests.put('http://saucelabs.com/rest/v1/{0}/jobs/{1}'.format(
             username, session),
-            data=json.dumps(status), auth=(username, api_key))
+            data=json.dumps(status), auth=(username, api_key),
+            timeout=10)
 
     def _video_html(self, session):
         flash_vars = 'config={{\

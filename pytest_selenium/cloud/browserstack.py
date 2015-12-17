@@ -40,7 +40,8 @@ class Provider(CloudProvider):
     def url(self, config, session):
         response = requests.get(self._session_url.format(id=session),
                                 auth=(self._username(config),
-                                      self._access_key(config)))
+                                      self._access_key(config)),
+                                timeout=10)
         return response.json()['automation_session']['browser_url']
 
     def additional_html(self, session):
@@ -51,4 +52,5 @@ class Provider(CloudProvider):
         requests.put(self._session_url.format(id=session),
                      headers={'Content-Type': 'application/json'},
                      params=status,
-                     auth=(self._username(config), self._access_key(config)))
+                     auth=(self._username(config), self._access_key(config)),
+                     timeout=10)
