@@ -116,7 +116,8 @@ def pytest_runtest_makereport(item, call):
             provider = getattr(cloud, driver_name.lower()).Provider()
             _gather_cloud_url(provider, item, report, driver, summary, extra)
             if capture_debug:
-                _gather_cloud_extras(provider, item, report, driver, extra)
+                _gather_cloud_extras(
+                    provider, item, report, driver, summary, extra)
             _update_cloud_status(provider, item, report, driver, summary)
     if summary:
         report.sections.append(('pytest-selenium', '\n'.join(summary)))
@@ -209,6 +210,8 @@ def _gather_cloud_extras(provider, item, report, driver, summary, extra):
 
 
 def _update_cloud_status(provider, item, report, driver, summary):
+    if report.when != 'call':
+        return  # only update status for the test method
     xfail = hasattr(report, 'wasxfail')
     passed = report.passed or (report.failed and xfail)
     try:
