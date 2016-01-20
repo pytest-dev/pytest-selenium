@@ -37,17 +37,12 @@ def test_fixture(testfile, testdir):
 
 
 def test_mark(testdir):
-    # set a capability that we can influence and check on the selenium object
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        @pytest.mark.capabilities(acceptSslCerts=False)
-        def test_capabilities(selenium):
-            print selenium.capabilities
-            assert selenium.capabilities['acceptSslCerts'] == False
-
-        @pytest.mark.nondestructive
-        def test_default(selenium):
-            assert selenium.capabilities['acceptSslCerts'] == True
+        @pytest.mark.capabilities(foo='bar')
+        def test_capabilities(session_capabilities, capabilities):
+            assert 'foo' not in session_capabilities
+            assert capabilities['foo'] == 'bar'
     """)
-    testdir.quick_qa(file_test, tests=2, passed=2)
+    testdir.quick_qa(file_test, passed=1)

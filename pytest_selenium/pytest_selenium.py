@@ -2,13 +2,14 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import copy
 from datetime import datetime
 import os
 
 import pytest
 import requests
-
-from . import cloud
+from selenium.webdriver.support.event_firing_webdriver import \
+    EventFiringWebDriver
 
 SUPPORTED_DRIVERS = [
     'BrowserStack',
@@ -21,15 +22,23 @@ SUPPORTED_DRIVERS = [
     'TestingBot']
 
 
+def pytest_addhooks(pluginmanager):
+    from . import hooks
+    method = getattr(pluginmanager, 'add_hookspecs', None)
+    if method is None:
+        method = pluginmanager.addhooks
+    method(hooks)
+
+
 @pytest.fixture(scope='session', autouse=True)
-def _environment(request, capabilities):
+def _environment(request, session_capabilities):
     """Provide additional environment details to pytest-html report"""
     config = request.config
     # add environment details to the pytest-html plugin
     config._environment.append(('Driver', config.option.driver))
     # add capabilities to environment
     config._environment.extend([('Capability', '{0}: {1}'.format(
-        k, v)) for k, v in capabilities.items()])
+        k, v)) for k, v in session_capabilities.items()])
     if config.option.driver == 'Remote':
         config._environment.append(
             ('Server', 'http://{0.host}:{0.port}'.format(config.option)))
@@ -59,21 +68,51 @@ def _verify_url(request, base_url):
 
 
 @pytest.fixture(scope='session')
-def capabilities(request, variables):
+def session_capabilities(request, variables):
     """Returns combined capabilities from pytest-variables and command line"""
     capabilities = variables.get('capabilities', {})
-    for capability in request.config.option.capabilities:
+    for capability in request.config.getoption('capabilities'):
         capabilities[capability[0]] = capability[1]
     return capabilities
 
 
 @pytest.fixture
-def selenium(request, capabilities):
+def capabilities(request, session_capabilities):
+    """Returns combined capabilities"""
+    capabilities = copy.deepcopy(session_capabilities)  # make a copy
+    capabilities_marker = request.node.get_marker('capabilities')
+    if capabilities_marker is not None:
+        # add capabilities from the marker
+        capabilities.update(capabilities_marker.kwargs)
+    return capabilities
+
+
+@pytest.fixture
+def driver_path(request):
+    return request.config.getoption('driver_path')
+
+
+@pytest.fixture
+def selenium(request):
     """Returns a WebDriver instance based on options and capabilities"""
-    from .driver import start_driver
-    driver = start_driver(request.node, capabilities)
+    driver_type = request.config.getoption('driver')
+    if driver_type is None:
+        raise pytest.UsageError('--driver must be specified')
+
+    driver_fixture = '{0}_driver'.format(driver_type.lower())
+    driver = request.getfuncargvalue(driver_fixture)
+
+    event_listener = request.config.getoption('event_listener')
+    if event_listener is not None:
+        # Import the specified event listener and wrap the driver instance
+        mod_name, class_name = event_listener.rsplit('.', 1)
+        mod = __import__(mod_name, fromlist=[class_name])
+        event_listener = getattr(mod, class_name)
+        if not isinstance(driver, EventFiringWebDriver):
+            driver = EventFiringWebDriver(driver, event_listener())
+
     request.node._driver = driver
-    request.addfinalizer(lambda: driver.quit())
+    request.addfinalizer(driver.quit)
     return driver
 
 
@@ -111,13 +150,10 @@ def pytest_runtest_makereport(item, call):
                 _gather_html(item, report, driver, summary, extra)
             if 'logs' not in exclude:
                 _gather_logs(item, report, driver, summary, extra)
-        driver_name = item.config.option.driver
-        if hasattr(cloud, driver_name.lower()) and driver.session_id:
-            provider = getattr(cloud, driver_name.lower()).Provider()
-            _gather_cloud_url(provider, item, report, driver, summary, extra)
-            if capture_debug:
-                _gather_cloud_extras(provider, item, report, driver, extra)
-            _update_cloud_status(provider, item, report, driver, summary)
+            item.config.hook.pytest_selenium_capture_debug(
+                item=item, report=report, extra=extra)
+        item.config.hook.pytest_selenium_runtest_makereport(
+            item=item, report=report, summary=summary, extra=extra)
     if summary:
         report.sections.append(('pytest-selenium', '\n'.join(summary)))
     report.extra = extra
@@ -180,50 +216,23 @@ def _gather_logs(item, report, driver, summary, extra):
                 format_log(log), '%s Log' % name.title()))
 
 
-def _gather_cloud_url(provider, item, report, driver, summary, extra):
-    try:
-        url = provider.url(item.config, driver.session_id)
-    except Exception as e:
-        summary.append('WARNING: Failed to gather {0} job URL: {1}'.format(
-            provider.name, e))
-        return
-    summary.append('{0} Job: {1}'.format(
-        provider.name, url))
-    pytest_html = item.config.pluginmanager.getplugin('html')
-    if pytest_html is not None:
-        # always add cloud job url to the html report
-        extra.append(pytest_html.extras.url(
-            url, '{0} Job'.format(provider.name)))
-
-
-def _gather_cloud_extras(provider, item, report, driver, summary, extra):
-    try:
-        extras = provider.additional_html(driver.session_id)
-    except Exception as e:
-        summary.append('WARNING: Failed to gather {0} extras: {1}'.format(
-            provider.name, e))
-        return
-    pytest_html = item.config.pluginmanager.getplugin('html')
-    if pytest_html is not None:
-        extra.append(pytest_html.extras.html(extras))
-
-
-def _update_cloud_status(provider, item, report, driver, summary):
-    xfail = hasattr(report, 'wasxfail')
-    passed = report.passed or (report.failed and xfail)
-    try:
-        provider.update_status(item.config, driver.session_id, passed)
-    except Exception as e:
-        summary.append('WARNING: Failed to update {0} status: {0}'.format(
-            provider.name, e))
-
-
 def format_log(log):
     timestamp_format = '%Y-%m-%d %H:%M:%S.%f'
     entries = [u'{0} {1[level]} - {1[message]}'.format(
         datetime.utcfromtimestamp(entry['timestamp'] / 1000.0).strftime(
             timestamp_format), entry).rstrip() for entry in log]
     return '\n'.join(entries).encode('utf-8')
+
+
+def split_class_and_test_names(nodeid):
+    """Returns the class and method name from the current test"""
+    names = nodeid.split('::')
+    names[0] = names[0].replace('/', '.')
+    names = [x.replace('.py', '') for x in names if x != '()']
+    classnames = names[:-1]
+    classname = '.'.join(classnames)
+    name = names[-1]
+    return (classname, name)
 
 
 def pytest_addoption(parser):
@@ -237,30 +246,6 @@ def pytest_addoption(parser):
                   help='debug to exclude from capture',
                   type='args',
                   default=os.getenv('SELENIUM_EXCLUDE_DEBUG'))
-
-    # browserstack configuration
-    parser.addini('browserstack_username',
-                  help='browserstack username',
-                  default=os.getenv('BROWSERSTACK_USERNAME'))
-    parser.addini('browserstack_access_key',
-                  help='browserstack access key',
-                  default=os.getenv('BROWSERSTACK_ACCESS_KEY'))
-
-    # sauce labs configuration
-    parser.addini('sauce_labs_username',
-                  help='sauce labs username',
-                  default=os.getenv('SAUCELABS_USERNAME'))
-    parser.addini('sauce_labs_api_key',
-                  help='sauce labs api key',
-                  default=os.getenv('SAUCELABS_API_KEY'))
-
-    # testingbot configuration
-    parser.addini('testingbot_key',
-                  help='testingbot key',
-                  default=os.getenv('TESTINGBOT_KEY'))
-    parser.addini('testingbot_secret',
-                  help='testingbot secret',
-                  default=os.getenv('TESTINGBOT_SECRET'))
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--base-url',
@@ -296,25 +281,6 @@ def pytest_addoption(parser):
                      metavar=('key', 'value'),
                      nargs=2,
                      help='additional capabilities.')
-    group._addoption('--firefox-path',
-                     metavar='path',
-                     help='path to the firefox binary.')
-    group._addoption('--firefox-preference',
-                     action='append',
-                     default=[],
-                     dest='firefox_preferences',
-                     metavar=('name', 'value'),
-                     nargs=2,
-                     help='additional firefox preferences.')
-    group._addoption('--firefox-profile',
-                     metavar='path',
-                     help='path to the firefox profile.')
-    group._addoption('--firefox-extension',
-                     action='append',
-                     default=[],
-                     dest='firefox_extensions',
-                     metavar='path',
-                     help='path to a firefox extension.')
     group._addoption('--event-listener',
                      metavar='str',
                      help='selenium eventlistener class, e.g. '
