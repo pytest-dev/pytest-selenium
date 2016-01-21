@@ -23,6 +23,7 @@ def pytest_addoption(parser):
                   default=os.getenv('BROWSERSTACK_ACCESS_KEY'))
 
 
+@pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     if item.config.getoption('driver') != 'BrowserStack':
         return

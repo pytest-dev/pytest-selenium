@@ -27,6 +27,7 @@ def pytest_addoption(parser):
                   default=os.getenv('SAUCELABS_API_KEY'))
 
 
+@pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
     if item.config.getoption('driver') != 'SauceLabs':
         return
@@ -37,6 +38,7 @@ def pytest_selenium_capture_debug(item, report, extra):
         extra.append(pytest_html.extras.html(_video_html(driver.session_id)))
 
 
+@pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     if item.config.getoption('driver') != 'SauceLabs':
         return
