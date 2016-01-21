@@ -412,17 +412,33 @@ The following is an example of a variables file including capabilities:
       "platform": "MAC" }
   }
 
-Capabilities Fixture
---------------------
+Capabilities Fixtures
+---------------------
 
-You can add or change capabilities by overwriting the ``capabilities`` fixture:
+The ``session_capabilities`` fixture includes capabilities that
+apply to the entire test session (including any command line or file based
+capabilities). Any changes to these capabilities will apply to every test.
+These capabilities are also reported at the top of the HTML report.
 
 .. code-block:: python
 
   import pytest
   @pytest.fixture(scope='session')
+  def session_capabilities(session_capabilities):
+      session_capabilities['tags'] = ['tag1', 'tag2', 'tag3']
+      return session_capabilities
+
+The ``capabilities`` fixture contains all of the session capabilities, plus any
+capabilities specified by the capabilities marker. Any changes to these
+capabilities will apply only to the tests covered by scope of the fixture
+override.
+
+.. code-block:: python
+
+  import pytest
+  @pytest.fixture
   def capabilities(capabilities):
-      capabilities['tags'] = ['tag1', 'tag2', 'tag3']
+      capabilities['public'] = 'private'
       return capabilities
 
 Capabilities Marker
