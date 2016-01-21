@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+**1.2 (???)**
+
+* Introduced a new capabilities fixture to combine session and marker
+  capabilities.
+* **BREAKING CHANGE:** Renamed session scoped capabilities fixture to
+  session_capabilities.
+
+  * If you have any ``capabilities`` fixture overrides, they will need to be
+    renamed to ``session_capabilities``.
+
+* Move driver implementations into fixtures and plugins.
+
 **1.1 (2015-12-14)**
 
 * Consistently stash the base URL in the configuration options.
