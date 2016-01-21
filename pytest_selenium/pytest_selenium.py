@@ -264,17 +264,6 @@ def pytest_addoption(parser):
                      default=not os.getenv(
                          'VERIFY_BASE_URL', 'false').lower() == 'false',
                      help='verify the base url.')
-    group._addoption('--host',
-                     default=os.environ.get('SELENIUM_HOST', 'localhost'),
-                     metavar='str',
-                     help='host that selenium server is listening on. '
-                          '(default: %default)')
-    group._addoption('--port',
-                     type='int',
-                     default=os.environ.get('SELENIUM_PORT', 4444),
-                     metavar='num',
-                     help='port that selenium server is listening on. '
-                          '(default: %default)')
     group._addoption('--driver',
                      choices=SUPPORTED_DRIVERS,
                      help='webdriver implementation.',

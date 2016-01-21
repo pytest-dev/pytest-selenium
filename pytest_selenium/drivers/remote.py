@@ -2,8 +2,25 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
+
 import pytest
 from selenium.webdriver import Remote
+
+
+def pytest_addoption(parser):
+    group = parser.getgroup('selenium', 'selenium')
+    group._addoption('--host',
+                     default=os.environ.get('SELENIUM_HOST', 'localhost'),
+                     metavar='str',
+                     help='host that selenium server is listening on. '
+                          '(default: %default)')
+    group._addoption('--port',
+                     type='int',
+                     default=os.environ.get('SELENIUM_PORT', 4444),
+                     metavar='num',
+                     help='port that selenium server is listening on. '
+                          '(default: %default)')
 
 
 @pytest.fixture
