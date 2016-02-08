@@ -13,6 +13,7 @@ from selenium.webdriver import Remote
 
 from pytest_selenium import split_class_and_test_names
 
+DRIVER = 'SauceLabs'
 API_JOB_URL = 'http://saucelabs.com/rest/v1/{username}/jobs/{session}'
 EXECUTOR_URL = 'http://{username}:{key}@ondemand.saucelabs.com:80/wd/hub'
 JOB_URL = 'http://saucelabs.com/jobs/{session}'
@@ -29,39 +30,41 @@ def pytest_addoption(parser):
 
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
-    if item.config.getoption('driver') != 'SauceLabs':
+    if item.config.getoption('driver') != DRIVER:
         return
 
-    driver = getattr(item, '_driver', None)
     pytest_html = item.config.pluginmanager.getplugin('html')
-    if pytest_html is not None:
-        extra.append(pytest_html.extras.html(_video_html(driver.session_id)))
+    extra.append(pytest_html.extras.html(_video_html(item._driver.session_id)))
 
 
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
-    if item.config.getoption('driver') != 'SauceLabs':
+    if item.config.getoption('driver') != DRIVER:
         return
 
-    # Add the job URL to the summary
-    driver = getattr(item, '_driver', None)
-    job_url = JOB_URL.format(session=driver.session_id)
-    summary.append('Sauce Labs Job: {0}'.format(job_url))
-    pytest_html = item.config.pluginmanager.getplugin('html')
-    if pytest_html is not None:
-        # Add the job URL to the HTML report
-        extra.append(pytest_html.extras.url(job_url, 'Sauce Labs Job'))
-
-    # Update the job result
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))
-    username = _username(item.config)
-    auth = (username, _api_key(item.config))
-    api_url = API_JOB_URL.format(username=username, session=driver.session_id)
-    job_info = requests.get(api_url, auth=auth, timeout=10).json()
-    if report.when == 'setup' or job_info.get('passed') is not False:
-        # Only update the result if it's not already marked as failed
-        data = json.dumps({'passed': passed})
-        requests.put(api_url, data=data, auth=auth, timeout=10)
+    session_id = item._driver.session_id
+
+    # Add the job URL to the summary
+    job_url = JOB_URL.format(session=session_id)
+    summary.append('{0} Job: {1}'.format(DRIVER, job_url))
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    # Add the job URL to the HTML report
+    extra.append(pytest_html.extras.url(job_url, '{0} Job'.format(DRIVER)))
+
+    try:
+        # Update the job result
+        username = _username(item.config)
+        auth = (username, _api_key(item.config))
+        api_url = API_JOB_URL.format(username=username, session=session_id)
+        job_info = requests.get(api_url, auth=auth, timeout=10).json()
+        if report.when == 'setup' or job_info.get('passed') is not False:
+            # Only update the result if it's not already marked as failed
+            data = json.dumps({'passed': passed})
+            requests.put(api_url, data=data, auth=auth, timeout=10)
+    except Exception as e:
+        summary.append('WARNING: Failed to update {0} job status: {1}'.format(
+            DRIVER, e))
 
 
 @pytest.fixture
