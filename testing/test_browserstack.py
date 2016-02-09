@@ -6,8 +6,7 @@ from functools import partial
 
 import pytest
 
-pytestmark = pytestmark = [pytest.mark.skip_selenium,
-                           pytest.mark.nondestructive]
+pytestmark = pytest.mark.nondestructive
 
 
 @pytest.fixture
@@ -44,7 +43,7 @@ def test_missing_access_key(failure, monkeypatch):
     assert 'UsageError: BrowserStack access key must be set' in out
 
 
-@pytest.skip('Frequent timeouts occurring with BrowserStack')
+@pytest.mark.skipif(reason='Frequent timeouts occurring with BrowserStack')
 def test_invalid_credentials(failure, monkeypatch):
     monkeypatch.setenv('BROWSERSTACK_USERNAME', 'foo')
     monkeypatch.setenv('BROWSERSTACK_ACCESS_KEY', 'bar')

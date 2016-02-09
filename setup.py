@@ -1,13 +1,13 @@
 from setuptools import setup
 
 setup(name='pytest-selenium',
-      version='1.1',
+      version='1.2rc1',
       description='pytest plugin for Selenium',
       long_description=open('README.rst').read(),
       author='Dave Hunt',
       author_email='dhunt@mozilla.com',
       url='https://github.com/davehunt/pytest-selenium',
-      packages=['pytest_selenium', 'pytest_selenium.cloud'],
+      packages=['pytest_selenium', 'pytest_selenium.drivers'],
       install_requires=[
           'pytest>=2.7.3',
           'pytest-html>=1.7',
@@ -16,7 +16,12 @@ setup(name='pytest-selenium',
           'requests'],
       entry_points={'pytest11': [
           'selenium = pytest_selenium.pytest_selenium',
-          'selenium_safety = pytest_selenium.safety']},
+          'selenium_safety = pytest_selenium.safety',
+          'browserstack_driver = pytest_selenium.drivers.browserstack',
+          'firefox_driver = pytest_selenium.drivers.firefox',
+          'remote_driver = pytest_selenium.drivers.remote',
+          'saucelabs_driver = pytest_selenium.drivers.saucelabs',
+          'testingbot_driver = pytest_selenium.drivers.testingbot']},
       license='Mozilla Public License 2.0 (MPL 2.0)',
       keywords='py.test pytest selenium saucelabs browserstack webqa qa '
                'mozilla',
