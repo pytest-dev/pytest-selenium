@@ -9,7 +9,7 @@ from selenium.webdriver.support.abstract_event_listener import \
 pytestmark = pytest.mark.nondestructive
 
 
-def test_event_listening_webdriver(testdir, webserver):
+def test_event_listening_webdriver(testdir, httpserver):
     file_test = testdir.makepyfile("""
         import pytest
         from selenium.webdriver.support.event_firing_webdriver import \

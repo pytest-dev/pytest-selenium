@@ -6,23 +6,20 @@
 
 import pytest
 
-from .webserver import SimpleWebServer
-
 pytest_plugins = 'pytester'
 
 
-@pytest.fixture(scope='session')
-def base_url(webserver):
-    return 'http://localhost:{0}'.format(webserver.port)
+def base_url(httpserver):
+    return httpserver.url
 
 
 @pytest.fixture
-def webserver_base_url(webserver):
-    return '--base-url={0}'.format(base_url(webserver))
+def httpserver_base_url(httpserver):
+    return '--base-url={0}'.format(base_url(httpserver))
 
 
 @pytest.fixture(autouse=True)
-def testdir(request, webserver_base_url):
+def testdir(request, httpserver_base_url):
     item = request.node
     if 'testdir' not in item.funcargnames:
         return
@@ -38,13 +35,13 @@ def testdir(request, webserver_base_url):
         """)
 
     def runpytestqa(*args, **kwargs):
-        return testdir.runpytest(webserver_base_url, '--driver', 'Firefox',
+        return testdir.runpytest(httpserver_base_url, '--driver', 'Firefox',
                                  *args, **kwargs)
 
     testdir.runpytestqa = runpytestqa
 
     def inline_runqa(*args, **kwargs):
-        return testdir.inline_run(webserver_base_url, '--driver', 'Firefox',
+        return testdir.inline_run(httpserver_base_url, '--driver', 'Firefox',
                                   *args, **kwargs)
 
     testdir.inline_runqa = inline_runqa
@@ -60,11 +57,3 @@ def testdir(request, webserver_base_url):
 
     testdir.quick_qa = quick_qa
     return testdir
-
-
-@pytest.fixture(scope='session', autouse=True)
-def webserver(request):
-    webserver = SimpleWebServer()
-    webserver.start()
-    request.addfinalizer(webserver.stop)
-    return webserver

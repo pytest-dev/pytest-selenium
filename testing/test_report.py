@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
@@ -30,7 +32,8 @@ def run(testdir, *args):
 
 
 @pytest.mark.parametrize('when', ['always', 'failure', 'never'])
-def test_capture_debug_env(testdir, base_url, monkeypatch, when):
+def test_capture_debug_env(testdir, httpserver, monkeypatch, when):
+    httpserver.serve_content(content='<h1>Success!</h1><p>Ё</p>')
     monkeypatch.setenv('SELENIUM_CAPTURE_DEBUG', when)
     testdir.makepyfile("""
         import pytest
@@ -40,13 +43,13 @@ def test_capture_debug_env(testdir, base_url, monkeypatch, when):
     """.format('True' if 'always' else 'False'))
     result, html = run(testdir)
     if when in ['always', 'failure']:
-        assert URL_LINK.format(base_url) in html
+        assert URL_LINK.format(httpserver.url) in html
         assert SCREENSHOT_LINK in html
         assert re.search(SCREENSHOT_REGEX, html) is not None
         assert re.search(LOGS_REGEX, html) is not None
         assert re.search(HTML_REGEX, html) is not None
     else:
-        assert URL_LINK.format(base_url) not in html
+        assert URL_LINK.format(httpserver.url) not in html
         assert SCREENSHOT_LINK not in html
         assert re.search(SCREENSHOT_REGEX, html) is None
         assert re.search(LOGS_REGEX, html) is None
@@ -54,7 +57,8 @@ def test_capture_debug_env(testdir, base_url, monkeypatch, when):
 
 
 @pytest.mark.parametrize('when', ['always', 'failure', 'never'])
-def test_capture_debug_config(testdir, base_url, when):
+def test_capture_debug_config(testdir, httpserver, when):
+    httpserver.serve_content(content='<h1>Success!</h1><p>Ё</p>')
     testdir.makefile('.ini', pytest="""
         [pytest]
         selenium_capture_debug={0}
@@ -67,13 +71,13 @@ def test_capture_debug_config(testdir, base_url, when):
     """.format('True' if 'always' else 'False'))
     result, html = run(testdir)
     if when in ['always', 'failure']:
-        assert URL_LINK.format(base_url) in html
+        assert URL_LINK.format(httpserver.url) in html
         assert SCREENSHOT_LINK in html
         assert re.search(SCREENSHOT_REGEX, html) is not None
         assert re.search(LOGS_REGEX, html) is not None
         assert re.search(HTML_REGEX, html) is not None
     else:
-        assert URL_LINK.format(base_url) not in html
+        assert URL_LINK.format(httpserver.url) not in html
         assert SCREENSHOT_LINK not in html
         assert re.search(SCREENSHOT_REGEX, html) is None
         assert re.search(LOGS_REGEX, html) is None
@@ -81,15 +85,16 @@ def test_capture_debug_config(testdir, base_url, when):
 
 
 @pytest.mark.parametrize('exclude', ['url', 'screenshot', 'html', 'logs'])
-def test_exclude_debug_env(testdir, base_url, monkeypatch, exclude):
+def test_exclude_debug_env(testdir, httpserver, monkeypatch, exclude):
+    httpserver.serve_content(content='<h1>Success!</h1><p>Ё</p>')
     monkeypatch.setenv('SELENIUM_EXCLUDE_DEBUG', exclude)
     result, html = run(testdir)
     assert result.ret
 
     if exclude == 'url':
-        assert URL_LINK.format(base_url) not in html
+        assert URL_LINK.format(httpserver.url) not in html
     else:
-        assert URL_LINK.format(base_url) in html
+        assert URL_LINK.format(httpserver.url) in html
 
     if exclude == 'screenshot':
         assert SCREENSHOT_LINK not in html
@@ -110,7 +115,8 @@ def test_exclude_debug_env(testdir, base_url, monkeypatch, exclude):
 
 
 @pytest.mark.parametrize('exclude', ['url', 'screenshot', 'html', 'logs'])
-def test_exclude_debug_config(testdir, base_url, monkeypatch, exclude):
+def test_exclude_debug_config(testdir, httpserver, monkeypatch, exclude):
+    httpserver.serve_content(content='<h1>Success!</h1><p>Ё</p>')
     testdir.makefile('.ini', pytest="""
         [pytest]
         selenium_exclude_debug={0}
@@ -119,9 +125,9 @@ def test_exclude_debug_config(testdir, base_url, monkeypatch, exclude):
     assert result.ret
 
     if exclude == 'url':
-        assert URL_LINK.format(base_url) not in html
+        assert URL_LINK.format(httpserver.url) not in html
     else:
-        assert URL_LINK.format(base_url) in html
+        assert URL_LINK.format(httpserver.url) in html
 
     if exclude == 'screenshot':
         assert SCREENSHOT_LINK not in html

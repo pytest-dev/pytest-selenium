@@ -20,18 +20,18 @@ def test_fixture(testdir):
     testdir.quick_qa(file_test, passed=1)
 
 
-def test_funcarg(testdir, webserver):
+def test_funcarg(testdir, httpserver):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_funcarg(base_url):
-            assert base_url == 'http://localhost:{0}'
-    """.format(webserver.port))
+            assert base_url == '{0}'
+    """.format(httpserver.url))
     testdir.quick_qa(file_test, passed=1)
 
 
-def test_config(testdir, webserver):
-    base_url = 'http://localhost:{0}/foo'.format(webserver.port)
+def test_config(testdir, httpserver):
+    base_url = '{0}/foo'.format(httpserver.url)
     testdir.makefile('.ini', pytest="""
         [pytest]
         base_url={0}
@@ -49,8 +49,8 @@ def test_config(testdir, webserver):
     assert len(passed) == 1
 
 
-def test_skip_config(testdir, webserver):
-    base_url = 'http://localhost:{0}/foo'.format(webserver.port)
+def test_skip_config(testdir, httpserver):
+    base_url = '{0}/foo'.format(httpserver.url)
     testdir.makefile('.ini', pytest="""
         [pytest]
         base_url={0}

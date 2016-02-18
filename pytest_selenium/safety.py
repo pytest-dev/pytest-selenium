@@ -53,7 +53,7 @@ def sensitive_url(request, base_url):
     except requests.exceptions.RequestException:
         pass  # ignore exceptions if this URL is unreachable
     search = partial(re.search, sensitive)
-    matches = map(search, urls)
+    matches = list(map(search, urls))
     if any(matches):
         # return the first match
         first_match = next(x for x in matches if x)

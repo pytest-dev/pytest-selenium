@@ -43,7 +43,6 @@ def test_mark(testdir):
         @pytest.mark.nondestructive
         @pytest.mark.capabilities(acceptSslCerts=False)
         def test_capabilities(selenium):
-            print selenium.capabilities
             assert selenium.capabilities['acceptSslCerts'] == False
 
         @pytest.mark.nondestructive

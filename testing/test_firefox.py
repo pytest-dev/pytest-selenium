@@ -7,7 +7,8 @@ import pytest
 pytestmark = pytest.mark.nondestructive
 
 
-def test_launch(testdir):
+def test_launch(testdir, httpserver):
+    httpserver.serve_content(content='<h1>Success!</h1>')
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -17,12 +18,13 @@ def test_launch(testdir):
     testdir.quick_qa(file_test, passed=1)
 
 
-def test_profile(testdir):
+def test_profile(testdir, httpserver):
     """Test that specified profile is used when starting Firefox.
 
     The profile changes the colors in the browser, which are then reflected
     when calling value_of_css_property.
     """
+    httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
     profile = testdir.tmpdir.mkdir('profile')
     profile.join('prefs.js').write(
         'user_pref("browser.anchor_color", "#FF69B4");'
@@ -43,7 +45,7 @@ def test_profile(testdir):
     testdir.quick_qa('--firefox-profile', profile, file_test, passed=1)
 
 
-def test_profile_with_preferences(testdir):
+def test_profile_with_preferences(testdir, httpserver):
     """Test that preferences override profile when starting Firefox.
 
     The profile changes the colors in the browser, which are then reflected
@@ -51,6 +53,7 @@ def test_profile_with_preferences(testdir):
     h1 tag is overridden by the profile, while the color of the a tag is
     overridden by the preference.
     """
+    httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
     profile = testdir.tmpdir.mkdir('profile')
     profile.join('prefs.js').write(
         'user_pref("browser.anchor_color", "#FF69B4");'

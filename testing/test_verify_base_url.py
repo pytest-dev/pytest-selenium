@@ -24,35 +24,35 @@ def failure_with_output(testdir, *args, **kwargs):
     return out
 
 
-def test_ignore_bad_url(testdir, testfile, webserver):
-    base_url = 'http://localhost:{0}/500/'.format(webserver.port)
-    testdir.quick_qa('--base-url', base_url, testfile, passed=1)
+def test_ignore_bad_url(testdir, testfile, httpserver):
+    httpserver.serve_content(content='<h1>Error!</h1>', code=500)
+    testdir.quick_qa('--base-url', httpserver.url, testfile, passed=1)
 
 
-def test_enable_verify_via_cli(testdir, testfile, webserver, monkeypatch):
+def test_enable_verify_via_cli(testdir, testfile, httpserver, monkeypatch):
     monkeypatch.setenv('VERIFY_BASE_URL', False)
     status_code = 500
-    base_url = 'http://localhost:{0}/{1}/'.format(webserver.port, status_code)
-    out = failure_with_output(testdir, testfile, '--base-url', base_url,
+    httpserver.serve_content(content='<h1>Error!</h1>', code=status_code)
+    out = failure_with_output(testdir, testfile, '--base-url', httpserver.url,
                               '--verify-base-url')
     assert 'UsageError: Base URL failed verification!' in out
-    assert 'URL: {0}'.format(base_url) in out
+    assert 'URL: {0}'.format(httpserver.url) in out
     assert 'Response status code: {0}'.format(status_code) in out
     assert 'Response headers: ' in out
 
 
-def test_enable_verify_via_env(testdir, testfile, webserver, monkeypatch):
+def test_enable_verify_via_env(testdir, testfile, httpserver, monkeypatch):
     monkeypatch.setenv('VERIFY_BASE_URL', True)
     status_code = 500
-    base_url = 'http://localhost:{0}/{1}/'.format(webserver.port, status_code)
-    out = failure_with_output(testdir, testfile, '--base-url', base_url)
+    httpserver.serve_content(content='<h1>Error!</h1>', code=status_code)
+    out = failure_with_output(testdir, testfile, '--base-url', httpserver.url)
     assert 'UsageError: Base URL failed verification!' in out
-    assert 'URL: {0}'.format(base_url) in out
+    assert 'URL: {0}'.format(httpserver.url) in out
     assert 'Response status code: {0}'.format(status_code) in out
     assert 'Response headers: ' in out
 
 
-def test_disable_verify_via_env(testdir, testfile, webserver, monkeypatch):
+def test_disable_verify_via_env(testdir, testfile, httpserver, monkeypatch):
     monkeypatch.setenv('VERIFY_BASE_URL', False)
-    base_url = 'http://localhost:{0}/500/'.format(webserver.port)
-    testdir.quick_qa('--base-url', base_url, testfile, passed=1)
+    httpserver.serve_content(content='<h1>Error!</h1>', code=500)
+    testdir.quick_qa('--base-url', httpserver.url, testfile, passed=1)
