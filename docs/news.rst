@@ -1,8 +1,9 @@
 Release Notes
 =============
 
-**1.2 (???)**
+**1.2 (2016-02-24)**
 
+* Added support for Python 3.
 * Introduced a new capabilities fixture to combine session and marker
   capabilities.
 * **BREAKING CHANGE:** Renamed session scoped capabilities fixture to
