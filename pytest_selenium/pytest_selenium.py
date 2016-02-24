@@ -252,7 +252,6 @@ def pytest_addoption(parser):
                   default=os.getenv('SELENIUM_CAPTURE_DEBUG', 'failure'))
     parser.addini('selenium_exclude_debug',
                   help='debug to exclude from capture',
-                  type='args',
                   default=os.getenv('SELENIUM_EXCLUDE_DEBUG'))
 
     group = parser.getgroup('selenium', 'selenium')

@@ -38,6 +38,8 @@ def test_fixture(testfile, testdir):
 
 def test_mark(testdir):
     file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
         @pytest.mark.capabilities(foo='bar')
         def test_capabilities(session_capabilities, capabilities):
             assert 'foo' not in session_capabilities
