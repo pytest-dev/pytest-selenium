@@ -472,8 +472,20 @@ HTML Report
 ***********
 
 A custom HTML report is generated when the ``--html`` command line option is
-given. By default this will include additional debug information for failures
-such as the URL, HTML, logs, and a screenshot at the point the test finished.
+given. By default this will include additional debug information for failures.
+
+Debug Types
+-----------
+
+The following debug information is gathered by default when a test fails:
+
+* **URL** - The current URL open in the browser.
+* **HTML** - The HTML source of the page open in the browser.
+* **LOG** - All logs available. Note that this will vary depending on the browser and
+  server in use. See
+  `logging <https://github.com/SeleniumHQ/selenium/wiki/Logging>`_ for more
+  details.
+* **SCREENSHOT** - A screenshot of the page open in the browser.
 
 Capturing Debug
 ---------------
@@ -492,8 +504,7 @@ files can contain sensitive information that you may not want to publish. To
 exclude a type of debug from the report, you can either set
 ``selenium_exclude_debug`` in a :ref:`configuration file <configuration-files>`,
 or set the ``SELENIUM_EXCLUDE_DEBUG`` environment variable to a list of the
-debug types to exclude. The debug types are: ``html``, ``logs``, ``screenshot``
-and ``url``.
+`Debug Types`_ to exclude.
 
 For example, to exclude HTML, logs, and screenshots from the report, you could
 set ``SELENIUM_EXCLUDE_DEBUG`` to ``html:logs:screenshot``.

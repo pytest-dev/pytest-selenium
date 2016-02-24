@@ -144,7 +144,7 @@ def pytest_runtest_makereport(item, call):
     capture_debug = when == 'always' or (when == 'failure' and failure)
     if driver is not None:
         if capture_debug:
-            exclude = item.config.getini('selenium_exclude_debug')
+            exclude = item.config.getini('selenium_exclude_debug').lower()
             if 'url' not in exclude:
                 _gather_url(item, report, driver, summary, extra)
             if 'screenshot' not in exclude:
