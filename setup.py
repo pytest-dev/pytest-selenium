@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pytest-selenium',
-      version='1.2rc1',
+      version='1.2.0',
       description='pytest plugin for Selenium',
       long_description=open('README.rst').read(),
       author='Dave Hunt',
