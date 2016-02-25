@@ -8,7 +8,8 @@ pytestmark = pytest.mark.nondestructive
 
 
 @pytest.mark.phantomjs
-def test_launch(testdir):
+def test_launch(testdir, httpserver):
+    httpserver.serve_content(content='<h1>Success!</h1>')
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive

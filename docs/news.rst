@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.2.1 (2016-02-25)**
+
+* Fixed regression with Chrome, PhantomJS, and Internet Explorer drivers.
+
 **1.2.0 (2016-02-25)**
 
 * Added support for Python 3.
