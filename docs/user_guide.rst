@@ -46,6 +46,12 @@ Specifying a Base URL
 Rather than repeating or abstracting the base URL in your tests, pytest-selenium
 also provides a ``base_url`` fixture that returns the specified base URL.
 
+.. note::  By default all tests are considered to be destructive, and all
+   environments are considered to be sensitive. This means that tests will be
+   skipped unless they are explicitly marked as nondestructive (see
+   `nondestructive tests`_) or sensitive environments have been configured (see
+   `indicating sensitive environments`_).
+
 Here's the earlier example with the addition of ``base_url``:
 
 .. code-block:: python
