@@ -405,7 +405,7 @@ Capabilities Files
 ------------------
 
 To specify capabilities, you can provide a JSON file on the command line using
-the `pytest-variables <https://github.com/davehunt/pytest-variables>`_ plugin.
+the `pytest-variables <https://github.com/pytest-dev/pytest-variables>`_ plugin.
 For example if you had a ``capabilties.json`` containing your capabilities, you
 would need to include ``--variables capabilities.json`` on your command line.
 

@@ -9,7 +9,7 @@ based on the ``.travis.yml`` file.
 
 Usually, a link to your specific travis build appears in pull requests, but if
 not, you can find it on the
-`pull requests page <https://travis-ci.org/davehunt/pytest-selenium/pull_requests>`_
+`pull requests page <https://travis-ci.org/pytest-dev/pytest-selenium/pull_requests>`_
 
 The only way to trigger Travis CI to run again for a pull request, is to submit
 another change to the pull branch.
