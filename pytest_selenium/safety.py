@@ -29,7 +29,7 @@ def pytest_configure(config):
         'accidentally.')
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture
 def sensitive_url(request, base_url):
     """Return the first sensitive URL from response history of the base URL"""
     if not base_url:
@@ -60,7 +60,7 @@ def sensitive_url(request, base_url):
         return first_match.string
 
 
-@pytest.fixture(scope='function', autouse=True)
+@pytest.fixture
 def _skip_sensitive(request, sensitive_url):
     """Skip destructive tests if the environment is considered sensitive"""
     destructive = 'nondestructive' not in request.node.keywords
