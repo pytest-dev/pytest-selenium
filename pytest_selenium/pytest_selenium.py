@@ -57,7 +57,7 @@ def base_url(request):
         return base_url
 
 
-@pytest.fixture(scope='session', autouse=True)
+@pytest.fixture
 def _verify_url(request, base_url):
     """Verifies the base URL"""
     verify = request.config.option.verify_base_url
