@@ -1,25 +1,32 @@
 language: python
+python:
+  - 2.6
+  - 2.7
+  - 3.3
+  - 3.4
+  - 3.5
+  - pypy
+  - pypy3
+  - nightly
 sudo: false
 env:
   global:
     - DISPLAY=:99.0
   matrix:
-    - TOXENV=py26-pytest28
-    - TOXENV=py26-pytest29
-    - TOXENV=py27-pytest28
-    - TOXENV=py27-pytest29
-    - TOXENV=py33-pytest28
-    - TOXENV=py33-pytest29
-    - TOXENV=py34-pytest28
-    - TOXENV=py34-pytest29
-    - TOXENV=pypy-pytest28
-    - TOXENV=pypy-pytest29
-    - TOXENV=pypy3-pytest28
-    - TOXENV=pypy3-pytest29
-    - TOXENV=docs
-    - TOXENV=flake8
+    - TOXENV=pytest28
+    - TOXENV=pytest29
+matrix:
+  include:
+    - python: 2.7
+      env: TOXENV=docs
+    - python: 2.7
+      env: TOXENV=flake8
+    - python: 3.5
+      env: TOXENV=docs
+    - python: 3.5
+      env: TOXENV=flake8
 install:
-  - pip install tox
+  - pip install tox-travis
 before_script:
   - sh -e /etc/init.d/xvfb start
 script:
