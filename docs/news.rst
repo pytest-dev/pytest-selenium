@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.3.0 (unreleased)**
+
+* Moved base URL implementation to the pytest-base-url plugin.
+
 **1.2.1 (2016-02-25)**
 
 * Fixed regression with Chrome, PhantomJS, and Internet Explorer drivers.
