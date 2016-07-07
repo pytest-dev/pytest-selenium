@@ -31,19 +31,23 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture
-def firefox_driver(request, capabilities, driver_path, firefox_profile):
+def firefox_driver(request, capabilities, driver_path, firefox_profile, firefox_path):
     """Return a WebDriver using a Firefox instance"""
     kwargs = {}
     if capabilities:
         kwargs['capabilities'] = capabilities
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
-    firefox_path = request.config.getoption('firefox_path')
     if firefox_path is not None:
         # get firefox binary from options until there's capabilities support
         kwargs['firefox_binary'] = FirefoxBinary(firefox_path)
     kwargs['firefox_profile'] = firefox_profile
     return Firefox(**kwargs)
+
+
+@pytest.fixture
+def firefox_path(request):
+    return request.config.getoption('firefox_path')
 
 
 @pytest.fixture

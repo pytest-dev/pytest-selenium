@@ -4,6 +4,7 @@ Release Notes
 **1.3.0 (unreleased)**
 
 * Moved base URL implementation to the pytest-base-url plugin.
+* Moved retrieval of Firefox path to `firefox_path` fixture
 
 **1.2.1 (2016-02-25)**
 
