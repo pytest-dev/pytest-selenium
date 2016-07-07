@@ -22,11 +22,18 @@ def pytest_addoption(parser):
 def pytest_configure(config):
     if hasattr(config, 'slaveinput'):
         return  # xdist slave
+    config.option.sensitive_url = config.getoption('sensitive_url') or \
+        config.getini('sensitive_url') or \
+        os.getenv('SENSITIVE_URL') or '.*'
     config.addinivalue_line(
         'markers', 'nondestructive: mark the test as nondestructive. '
         'Tests are assumed to be destructive unless this marker is '
         'present. This reduces the risk of running destructive tests '
         'accidentally.')
+
+
+def pytest_report_header(config, startdir):
+    return 'sensitiveurl: {0}'.format(config.getoption('sensitive_url'))
 
 
 @pytest.fixture(scope='session')
@@ -36,15 +43,6 @@ def sensitive_url(request, base_url):
         return False
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
-    sensitive = '.*'
-    config = request.config
-    if config.option.sensitive_url:
-        sensitive = config.option.sensitive_url
-    elif config.getini('sensitive_url'):
-        sensitive = config.getini('sensitive_url')
-    elif os.getenv('SENSITIVE_URL'):
-        sensitive = os.getenv('SENSITIVE_URL')
-
     urls = [base_url]
     try:
         response = requests.get(base_url, timeout=10)
@@ -52,7 +50,7 @@ def sensitive_url(request, base_url):
         urls.extend([history.url for history in response.history])
     except requests.exceptions.RequestException:
         pass  # ignore exceptions if this URL is unreachable
-    search = partial(re.search, sensitive)
+    search = partial(re.search, request.config.getoption('sensitive_url'))
     matches = list(map(search, urls))
     if any(matches):
         # return the first match

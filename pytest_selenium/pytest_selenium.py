@@ -104,6 +104,12 @@ def pytest_configure(config):
         'capabilities(foo=''bar'')')
 
 
+def pytest_report_header(config, startdir):
+    driver = config.getoption('driver')
+    if driver is not None:
+        return 'driver: {0}'.format(driver)
+
+
 @pytest.mark.hookwrapper
 def pytest_runtest_makereport(item, call):
     outcome = yield

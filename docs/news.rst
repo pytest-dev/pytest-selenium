@@ -3,6 +3,7 @@ Release Notes
 
 **1.3.0 (unreleased)**
 
+* Added driver and sensitive URL to report header.
 * Moved base URL implementation to the pytest-base-url plugin.
 
 **1.2.1 (2016-02-25)**
