@@ -42,6 +42,7 @@ def test_driver_quit(testdir):
         @pytest.mark.nondestructive
         def test_driver_quit(selenium):
             selenium.quit()
+            selenium.title
     """)
     result = testdir.runpytestqa()
     result.stdout.fnmatch_lines_random([
@@ -50,5 +51,4 @@ def test_driver_quit(testdir):
         'WARNING: Failed to gather HTML: *',
         'WARNING: Failed to gather log types: *'])
     outcomes = result.parseoutcomes()
-    assert outcomes.get('passed') == 1
-    assert outcomes.get('error') == 1
+    assert outcomes.get('failed') == 1
