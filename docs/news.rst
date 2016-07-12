@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-**1.3.0 (unreleased)**
+**1.3.0 (2016-07-12)**
 
 * Moved retrieval of Firefox path to ``firefox_path`` fixture.
 * Added driver and sensitive URL to report header.
