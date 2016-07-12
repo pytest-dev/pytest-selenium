@@ -31,7 +31,8 @@ def pytest_addoption(parser):
 
 
 @pytest.fixture
-def firefox_driver(request, capabilities, driver_path, firefox_profile, firefox_path):
+def firefox_driver(request, capabilities, driver_path, firefox_profile,
+                   firefox_path):
     """Return a WebDriver using a Firefox instance"""
     kwargs = {}
     if capabilities:
