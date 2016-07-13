@@ -46,7 +46,7 @@ def firefox_driver(request, capabilities, driver_path, firefox_profile,
     return Firefox(**kwargs)
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def firefox_path(request):
     return request.config.getoption('firefox_path')
 
