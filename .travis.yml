@@ -13,8 +13,8 @@ env:
   global:
     - DISPLAY=:99.0
   matrix:
-    - TOXENV=pytest28
     - TOXENV=pytest29
+    - TOXENV=pytest30
 matrix:
   include:
     - python: 2.7
