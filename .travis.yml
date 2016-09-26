@@ -1,34 +1,45 @@
 language: python
 python:
-  - 2.6
-  - 2.7
-  - 3.3
-  - 3.4
-  - 3.5
-  - pypy
-  - pypy3
-  - nightly
+- 2.6
+- 2.7
+- 3.3
+- 3.4
+- 3.5
+- pypy
+- pypy3
+- nightly
 sudo: false
 env:
   global:
-    - DISPLAY=:99.0
-    - PYTEST_ADDOPS="-m 'not (chrome or safari or phantomjs)'"
+  - DISPLAY=:99.0
+  - PYTEST_ADDOPS="-m 'not (chrome or safari or phantomjs)'"
   matrix:
-    - TOXENV=pytest29
-    - TOXENV=pytest30
+  - TOXENV=pytest29
+  - TOXENV=pytest30
 matrix:
   include:
-    - python: 2.7
-      env: TOXENV=docs
-    - python: 2.7
-      env: TOXENV=flake8
-    - python: 3.5
-      env: TOXENV=docs
-    - python: 3.5
-      env: TOXENV=flake8
+  - python: 2.7
+    env: TOXENV=docs
+  - python: 2.7
+    env: TOXENV=flake8
+  - python: 3.5
+    env: TOXENV=docs
+  - python: 3.5
+    env: TOXENV=flake8
 install:
-  - pip install tox-travis
+- pip install tox-travis
 before_script:
-  - sh -e /etc/init.d/xvfb start
+- sh -e /etc/init.d/xvfb start
 script:
-  - tox
+- tox
+deploy:
+  provider: pypi
+  user: davehunt
+  password:
+    secure: JqMVLhBMAinN9MmRHr52D149IFO62cJa0PDEn6d/eEDBX5VjABMSbo7+qbFFXeSdD+Yz8FqNo29SJnVQ99OUan12Wd+XNtw7f94YisMtcJrrcXrj3HM10NRcZS6RHXMbezNyYPcnp+8KDfFvHnwiBmrpOcKgpfWF7KT/7gZnKwbV6yZ8aofMU3CF2JRp1imPrVSeeRh7o0+TdwPXaKQ0XKk9gugrmMzcsjIlsM8nJbTxaRAgG1pUP+0+CQhgcGY/e172F8ZpfWgHJ03LDirxNsFEL1kQlxCwnaibljiAeGJqGn3bpDubt96fmdwwcA3aSlVb8xu4rLzNpDvxYryPpCipY127gykMBYWR4xtpxqqzyGQu0ZackFQGOUQmtNwlJVYjBhLQScevIBQE88nHal5FElrbxm5I7j/d1IY3MSkwqFs0ve+FtdUBJcair2EQZ4ZdXsETJSYejetJTGm9foqTYqhCchpA7u3qRCG/ruTiD64nt5PWnIRYaftXbI6VsQTXOPZRQpt3gt2jOHM8Bxr5m5j37taIfMBI3ltWIJukmC1czAFIOQT50XB2yAl6zFupnI2eF48sJgovIKacizw535C8FcinyIyq6ZftgTUrw61/cZvM9kNTK09SgF55Lddw0aNYqkHGm/ooSvdZOh7bZPSlNPQBNoY6rb3hHzI=
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    repo: pytest-dev/pytest-selenium
+    python: 3.5
+    condition: "$TOXENV = pytest30"
