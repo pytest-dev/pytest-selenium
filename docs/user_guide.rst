@@ -130,7 +130,7 @@ Chrome
 ------
 
 To use Chrome, you will need to
-`download ChromeDriver <https://sites.google.com/a/chromium.org/chromedriver/downloads>`_.
+`download ChromeDriver <https://sites.google.com/a/chromium.org/chromedriver/downloads>`_
 and specify ``Chrome`` for the ``--driver`` command line option. If the driver
 executable is not available on your path, you can use the ``--driver-path``
 option to indicate where it can be found:
@@ -158,7 +158,7 @@ option to indicate where it can be found:
 PhantomJS
 ---------
 
-To use PhantomJS, you will need `download it <http://phantomjs.org/download.html>`_.
+To use PhantomJS, you will need `download it <http://phantomjs.org/download.html>`_
 and specify ``PhantomJS`` for the ``--driver`` command line option. If
 the driver executable is not available on your path, you can use the
 ``--driver-path`` option to indicate where it can be found:
