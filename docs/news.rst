@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.4.0 (2016-09-26)**
+
+* Added support for Safari.
+
 **1.3.1 (2016-07-13)**
 
 * Made ``firefox_path`` a session scoped fixture.
