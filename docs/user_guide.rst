@@ -156,6 +156,18 @@ the driver executable is not available on your path, you can use the
 See the `PhantomJS documentation <http://phantomjs.org/quick-start.html>`_ for
 more information.
 
+Safari
+------
+
+To use Safari, you will need to have at least Safari 10 running on OS X El
+Capitan or later, and ``selenium`` 3.0 or later. Once you have these
+prerequisites, simply specify ``Safari`` for the ``--driver`` command line
+option.
+
+.. code-block:: bash
+
+  $ py.test --driver Safari
+
 Selenium Server/Grid
 --------------------
 
