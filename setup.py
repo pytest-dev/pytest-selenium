@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='pytest-selenium',
-      version='1.3.1',
+      use_scm_version=True,
       description='pytest plugin for Selenium',
       long_description=open('README.rst').read(),
       author='Dave Hunt',
@@ -27,6 +27,7 @@ setup(name='pytest-selenium',
           'safari_driver = pytest_selenium.drivers.safari',
           'saucelabs_driver = pytest_selenium.drivers.saucelabs',
           'testingbot_driver = pytest_selenium.drivers.testingbot']},
+      setup_requires=['setuptools_scm'],
       license='Mozilla Public License 2.0 (MPL 2.0)',
       keywords='py.test pytest selenium saucelabs browserstack webqa qa '
                'mozilla',
