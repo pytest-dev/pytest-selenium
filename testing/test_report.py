@@ -11,10 +11,10 @@ import pytest
 pytestmark = pytest.mark.nondestructive
 
 URL_LINK = '<a class="url" href="{0}/" target="_blank">URL</a>'
-SCREENSHOT_LINK = '<a class="image" href="#" target="_blank">Screenshot</a>'
-SCREENSHOT_REGEX = '<div class="image"><a href="#"><img src="data:image/png;base64,.*"/></a></div>'  # noqa
-LOGS_REGEX = '<a class="text" href="data:text/plain;charset=utf-8;base64,.*" target="_blank">.* Log</a>'  # noqa
-HTML_REGEX = '<a class="text" href="data:text/plain;charset=utf-8;base64,.*" target="_blank">HTML</a>'  # noqa
+SCREENSHOT_LINK_REGEX = '<a class="image" href=".*" target="_blank">Screenshot</a>'  # noqa
+SCREENSHOT_REGEX = '<div class="image"><a href=".*"><img src=".*"/></a></div>'
+LOGS_REGEX = '<a class="text" href=".*" target="_blank">.* Log</a>'
+HTML_REGEX = '<a class="text" href=".*" target="_blank">HTML</a>'
 
 
 def run(testdir, *args):
@@ -44,13 +44,13 @@ def test_capture_debug_env(testdir, httpserver, monkeypatch, when):
     result, html = run(testdir)
     if when in ['always', 'failure']:
         assert URL_LINK.format(httpserver.url) in html
-        assert SCREENSHOT_LINK in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is not None
         assert re.search(SCREENSHOT_REGEX, html) is not None
         assert re.search(LOGS_REGEX, html) is not None
         assert re.search(HTML_REGEX, html) is not None
     else:
         assert URL_LINK.format(httpserver.url) not in html
-        assert SCREENSHOT_LINK not in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is None
         assert re.search(SCREENSHOT_REGEX, html) is None
         assert re.search(LOGS_REGEX, html) is None
         assert re.search(HTML_REGEX, html) is None
@@ -72,13 +72,13 @@ def test_capture_debug_config(testdir, httpserver, when):
     result, html = run(testdir)
     if when in ['always', 'failure']:
         assert URL_LINK.format(httpserver.url) in html
-        assert SCREENSHOT_LINK in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is not None
         assert re.search(SCREENSHOT_REGEX, html) is not None
         assert re.search(LOGS_REGEX, html) is not None
         assert re.search(HTML_REGEX, html) is not None
     else:
         assert URL_LINK.format(httpserver.url) not in html
-        assert SCREENSHOT_LINK not in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is None
         assert re.search(SCREENSHOT_REGEX, html) is None
         assert re.search(LOGS_REGEX, html) is None
         assert re.search(HTML_REGEX, html) is None
@@ -97,10 +97,10 @@ def test_exclude_debug_env(testdir, httpserver, monkeypatch, exclude):
         assert URL_LINK.format(httpserver.url) in html
 
     if exclude == 'screenshot':
-        assert SCREENSHOT_LINK not in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is None
         assert re.search(SCREENSHOT_REGEX, html) is None
     else:
-        assert SCREENSHOT_LINK in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is not None
         assert re.search(SCREENSHOT_REGEX, html) is not None
 
     if exclude == 'logs':
@@ -130,10 +130,10 @@ def test_exclude_debug_config(testdir, httpserver, monkeypatch, exclude):
         assert URL_LINK.format(httpserver.url) in html
 
     if exclude == 'screenshot':
-        assert SCREENSHOT_LINK not in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is None
         assert re.search(SCREENSHOT_REGEX, html) is None
     else:
-        assert SCREENSHOT_LINK in html
+        assert re.search(SCREENSHOT_LINK_REGEX, html) is not None
         assert re.search(SCREENSHOT_REGEX, html) is not None
 
     if exclude == 'logs':
