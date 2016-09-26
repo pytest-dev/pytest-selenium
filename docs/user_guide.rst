@@ -98,11 +98,25 @@ specify a driver and optional capabilties.
 Firefox
 -------
 
-To run your automated tests with Firefox, specify ``Firefox`` as your driver:
+To run your automated tests with Firefox version 47 or earlier, simply specify
+``Firefox`` as your driver:
 
 .. code-block:: bash
 
   $ py.test --driver Firefox
+
+For Firefox version 48 onwards, you will need to
+`download GeckoDriver <https://github.com/mozilla/geckodriver/releases>`_ and
+``selenium`` 3.0 or later. If the driver executable is not available on your
+path, you can use the ``--driver-path`` option to indicate where it can be
+found:
+
+.. code-block:: bash
+
+  $ py.test --driver Firefox --driver-path /path/to/geckodriver
+
+See the `GeckoDriver documentation <https://github.com/mozilla/geckodriver>`_
+for more information.
 
 Configuration
 ~~~~~~~~~~~~~
