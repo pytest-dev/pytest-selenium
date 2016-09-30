@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-**1.4.0 (2016-09-26)**
+**1.4.0 (2016-09-30)**
 
 * Added support for Safari.
 
