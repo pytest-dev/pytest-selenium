@@ -8,8 +8,11 @@ import os
 import sys
 
 import pytest
+from selenium import webdriver
 from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
+
+from . import drivers
 
 PY3 = sys.version_info[0] == 3
 
@@ -68,19 +71,39 @@ def capabilities(request, session_capabilities):
 
 
 @pytest.fixture
+def driver_kwargs(request, capabilities, driver_class, driver_path,
+                  firefox_path, firefox_profile):
+    kwargs = {}
+    driver = request.config.getoption('driver').lower()
+    kwargs.update(getattr(drivers, driver).driver_kwargs(
+        capabilities=capabilities,
+        driver_path=driver_path,
+        firefox_path=firefox_path,
+        firefox_profile=firefox_profile,
+        host=request.config.getoption('host'),
+        port=request.config.getoption('port'),
+        request=request,
+        test='.'.join(split_class_and_test_names(request.node.nodeid))))
+    return kwargs
+
+
+@pytest.fixture
+def driver_class(request):
+    driver = request.config.getoption('driver')
+    if driver is None:
+        raise pytest.UsageError('--driver must be specified')
+    return getattr(webdriver, driver, webdriver.Remote)
+
+
+@pytest.fixture
 def driver_path(request):
     return request.config.getoption('driver_path')
 
 
-@pytest.fixture
-def selenium(request):
+@pytest.yield_fixture
+def driver(request, driver_class, driver_kwargs):
     """Returns a WebDriver instance based on options and capabilities"""
-    driver_type = request.config.getoption('driver')
-    if driver_type is None:
-        raise pytest.UsageError('--driver must be specified')
-
-    driver_fixture = '{0}_driver'.format(driver_type.lower())
-    driver = request.getfuncargvalue(driver_fixture)
+    driver = driver_class(**driver_kwargs)
 
     event_listener = request.config.getoption('event_listener')
     if event_listener is not None:
@@ -92,8 +115,13 @@ def selenium(request):
             driver = EventFiringWebDriver(driver, event_listener())
 
     request.node._driver = driver
-    request.addfinalizer(driver.quit)
-    return driver
+    yield driver
+    driver.quit()
+
+
+@pytest.yield_fixture
+def selenium(driver):
+    yield driver
 
 
 def pytest_configure(config):

@@ -3,7 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-from selenium.webdriver import Firefox, FirefoxProfile
+from selenium.webdriver import FirefoxProfile
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 
 
@@ -30,20 +30,18 @@ def pytest_addoption(parser):
                      help='path to a firefox extension.')
 
 
-@pytest.fixture
-def firefox_driver(request, capabilities, driver_path, firefox_profile,
-                   firefox_path):
-    """Return a WebDriver using a Firefox instance"""
+def driver_kwargs(capabilities, driver_path, firefox_path, firefox_profile,
+                  **kwargs):
     kwargs = {}
     if capabilities:
         kwargs['capabilities'] = capabilities
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
     if firefox_path is not None:
-        # get firefox binary from options until there's capabilities support
+        # get firefox binary from options until capabilities support
         kwargs['firefox_binary'] = FirefoxBinary(firefox_path)
     kwargs['firefox_profile'] = firefox_profile
-    return Firefox(**kwargs)
+    return kwargs
 
 
 @pytest.fixture(scope='session')

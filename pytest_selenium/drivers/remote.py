@@ -5,7 +5,6 @@
 import os
 
 import pytest
-from selenium.webdriver import Remote
 
 
 def pytest_addoption(parser):
@@ -23,19 +22,17 @@ def pytest_addoption(parser):
                           '(default: %default)')
 
 
-@pytest.fixture
-def remote_driver(request, capabilities, firefox_profile):
-    """Return a WebDriver using a Selenium server or Selenium Grid instance"""
+def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
     if 'browserName' not in capabilities:
         # remote instances must at least specify a browserName capability
         raise pytest.UsageError('The \'browserName\' capability must be '
                                 'specified when using the remote driver.')
     capabilities.setdefault('version', '')  # default to any version
     capabilities.setdefault('platform', 'ANY')  # default to any platform
-    executor = 'http://{host}:{port}/wd/hub'.format(
-        host=request.config.getoption('host'),
-        port=request.config.getoption('port'))
-    return Remote(
-        command_executor=executor,
-        desired_capabilities=capabilities,
-        browser_profile=firefox_profile)
+
+    executor = 'http://{host}:{port}/wd/hub'.format(host=host, port=port)
+    kwargs = {
+        'command_executor': executor,
+        'desired_capabilities': capabilities,
+        'browser_profile': firefox_profile}
+    return kwargs

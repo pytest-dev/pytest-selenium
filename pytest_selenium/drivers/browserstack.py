@@ -6,9 +6,6 @@ import os
 
 import pytest
 import requests
-from selenium.webdriver import Remote
-
-from pytest_selenium import split_class_and_test_names
 
 DRIVER = 'BrowserStack'
 API_JOB_URL = 'https://www.browserstack.com/automate/sessions/{session}.json'
@@ -64,16 +61,15 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
         summary.append('WARNING: Failed to update job status: {0}'.format(e))
 
 
-@pytest.fixture
-def browserstack_driver(request, capabilities):
-    """Return a WebDriver using a BrowserStack instance"""
-    test_id = '.'.join(split_class_and_test_names(request.node.nodeid))
-    capabilities['name'] = test_id
+def driver_kwargs(request, test, capabilities, **kwargs):
+    capabilities.setdefault('name', test)
     executor = EXECUTOR_URL.format(
         username=_username(request.config),
         key=_access_key(request.config))
-    return Remote(command_executor=executor,
-                  desired_capabilities=capabilities)
+    kwargs = {
+        'command_executor': executor,
+        'desired_capabilities': capabilities}
+    return kwargs
 
 
 def _access_key(config):

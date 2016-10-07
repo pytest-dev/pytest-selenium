@@ -9,9 +9,6 @@ from _pytest.mark import MarkInfo
 from py.xml import html
 import pytest
 import requests
-from selenium.webdriver import Remote
-
-from pytest_selenium import split_class_and_test_names
 
 DRIVER = 'SauceLabs'
 API_JOB_URL = 'http://saucelabs.com/rest/v1/{username}/jobs/{session}'
@@ -67,12 +64,9 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
             DRIVER, e))
 
 
-@pytest.fixture
-def saucelabs_driver(request, capabilities):
-    """Return a WebDriver using a Sauce Labs instance"""
+def driver_kwargs(request, test, capabilities, **kwargs):
     keywords = request.node.keywords
-    test_id = '.'.join(split_class_and_test_names(request.node.nodeid))
-    capabilities['name'] = test_id
+    capabilities.setdefault('name', test)
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     tags = capabilities.get('tags', []) + markers
     if tags:
@@ -80,8 +74,10 @@ def saucelabs_driver(request, capabilities):
     executor = EXECUTOR_URL.format(
         username=_username(request.config),
         key=_api_key(request.config))
-    return Remote(command_executor=executor,
-                  desired_capabilities=capabilities)
+    kwargs = {
+        'command_executor': executor,
+        'desired_capabilities': capabilities}
+    return kwargs
 
 
 def _api_key(config):

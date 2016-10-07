@@ -8,9 +8,6 @@ import pytest
 from _pytest.mark import MarkInfo
 from py.xml import html
 import requests
-from selenium.webdriver import Remote
-
-from pytest_selenium import split_class_and_test_names
 
 DRIVER = 'TestingBot'
 API_JOB_URL = 'https://api.testingbot.com/v1/tests/{session}'
@@ -65,12 +62,9 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
             DRIVER, e))
 
 
-@pytest.fixture
-def testingbot_driver(request, capabilities):
-    """Return a WebDriver using a TestingBot instance"""
+def driver_kwargs(request, test, capabilities, **kwargs):
     keywords = request.node.keywords
-    test_id = '.'.join(split_class_and_test_names(request.node.nodeid))
-    capabilities['name'] = test_id
+    capabilities.setdefault('name', test)
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     groups = capabilities.get('groups', []) + markers
     if groups:
@@ -78,8 +72,10 @@ def testingbot_driver(request, capabilities):
     executor = EXECUTOR_URL.format(
         key=_key(request.config),
         secret=_secret(request.config))
-    return Remote(command_executor=executor,
-                  desired_capabilities=capabilities)
+    kwargs = {
+        'command_executor': executor,
+        'desired_capabilities': capabilities}
+    return kwargs
 
 
 def _key(config):
