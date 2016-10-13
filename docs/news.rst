@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+**1.5.0 (2016-10-13)**
+
+* Replaced driver fixtures with generic ``driver_class`` fixture.
+* Introduced a ``driver_kwargs`` fixture.
+
 **1.4.0 (2016-09-30)**
 
 * Added support for Safari.
