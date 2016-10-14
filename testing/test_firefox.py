@@ -39,8 +39,8 @@ def test_profile(testdir, httpserver):
             anchor = selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
-            assert header_color == 'rgba(255, 0, 0, 1)'
-            assert anchor_color == 'rgba(255, 105, 180, 1)'
+            assert header_color == 'rgb(255, 0, 0)'
+            assert anchor_color == 'rgb(255, 105, 180)'
     """)
     testdir.quick_qa('--firefox-profile', profile, file_test, passed=1)
 
@@ -68,8 +68,8 @@ def test_profile_with_preferences(testdir, httpserver):
             anchor = selenium.find_element_by_tag_name('a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
-            assert header_color == 'rgba(255, 0, 0, 1)'
-            assert anchor_color == 'rgba(255, 0, 0, 1)'
+            assert header_color == 'rgb(255, 0, 0)'
+            assert anchor_color == 'rgb(255, 0, 0)'
     """)
     testdir.quick_qa('--firefox-preference', 'browser.anchor_color', '#FF0000',
                      '--firefox-profile', profile, file_test, passed=1)
