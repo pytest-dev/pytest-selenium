@@ -35,7 +35,7 @@ before_script:
 - pip install --user mozdownload mozinstall
 - mozdownload --version latest --destination firefox.tar.bz2
 - mozinstall firefox.tar.bz2
-- sudo ln -sf $PWD/firefox/firefox /usr/local/bin/firefox
+- ln -sf $PWD/firefox/firefox /usr/local/bin/firefox
 - firefox --version
 - sh -e /etc/init.d/xvfb start
 script:
