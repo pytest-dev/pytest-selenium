@@ -1,1 +1,1 @@
-from . import internet_explorer as ie
+from . import internet_explorer as ie  # noqa
