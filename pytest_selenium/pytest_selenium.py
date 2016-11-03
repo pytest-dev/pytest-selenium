@@ -20,7 +20,7 @@ SUPPORTED_DRIVERS = [
     'BrowserStack',
     'Chrome',
     'Firefox',
-    'IE',
+    'Ie',
     'PhantomJS',
     'Remote',
     'Safari',
