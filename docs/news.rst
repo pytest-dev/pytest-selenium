@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.5.1 (2016-11-03)**
+
+* Fix issues with Internet Explorer driver.
+
 **1.5.0 (2016-10-13)**
 
 * Replaced driver fixtures with generic ``driver_class`` fixture.
