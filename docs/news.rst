@@ -1,6 +1,10 @@
 Release Notes
 =============
 
+**1.6.0 (2016-11-17)**
+
+* Added support for `CrossBrowserTesting <https://crossbrowsertesting.com/>`_.
+
 **1.5.1 (2016-11-03)**
 
 * Fix issues with Internet Explorer driver.
