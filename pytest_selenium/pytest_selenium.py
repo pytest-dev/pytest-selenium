@@ -18,6 +18,7 @@ PY3 = sys.version_info[0] == 3
 
 SUPPORTED_DRIVERS = [
     'BrowserStack',
+    'CrossBrowserTesting',
     'Chrome',
     'Firefox',
     'Ie',

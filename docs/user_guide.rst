@@ -315,6 +315,42 @@ the ``--capability`` command line arguments. See the
 `test options <http://testingbot.com/support/other/test-options>`_
 for full details of what can be configured.
 
+CrossBrowserTesting
+-------------------
+
+To run your automated tests using
+`CrossBrowserTesting <https://crossbrowsertesting.com/>`_, you must provide a
+valid username and auth key. This can be done either by using
+a :ref:`configuration file <configuration-files>`, or by setting the
+``CROSSBROWSERTESTING_USERNAME`` and ``CROSSBROWSERTESTING_AUTH_KEY``
+environment variables.
+
+Configuration
+~~~~~~~~~~~~~
+
+Below is an example :ref:`configuration file <configuration-files>`:
+
+.. code-block:: ini
+
+  [pytest]
+  crossbrowsertesting_username = username
+  crossbrowsertesting_auth_key = secret
+
+Running tests
+~~~~~~~~~~~~~
+
+To run your automated tests, simply specify ``CrossBrowserTesting`` as your
+driver:
+
+.. code-block:: bash
+
+  $ py.test --driver CrossBrowserTesting --capability os_api_name Win10 --capability browser_api_name FF46
+
+Additional capabilities can be set using the ``--capability`` command line
+arguments. See the
+`automation capabilities <https://help.crossbrowsertesting.com/selenium-testing/general/crossbrowsertesting-automation-capabilities/>`_
+for full details of what can be configured.
+
 Specifying Capabilities
 ***********************
 

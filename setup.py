@@ -19,6 +19,8 @@ setup(name='pytest-selenium',
           'selenium = pytest_selenium.pytest_selenium',
           'selenium_safety = pytest_selenium.safety',
           'browserstack_driver = pytest_selenium.drivers.browserstack',
+          'crossbrowsertesting_driver = '
+          'pytest_selenium.drivers.crossbrowsertesting',
           'chrome_driver = pytest_selenium.drivers.chrome',
           'firefox_driver = pytest_selenium.drivers.firefox',
           'ie_driver = pytest_selenium.drivers.internet_explorer',
