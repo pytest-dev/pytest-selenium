@@ -42,12 +42,3 @@ def test_missing_api_key(failure, monkeypatch):
     monkeypatch.setenv('CROSSBROWSERTESTING_USERNAME', 'foo')
     out = failure()
     assert 'UsageError: CrossBrowserTesting auth key must be set' in out
-
-
-def test_invalid_credentials(failure, monkeypatch):
-    monkeypatch.setenv('CROSSBROWSERTESTING_USERNAME', 'foo')
-    monkeypatch.setenv('CROSSBROWSERTESTING_AUTH_KEY', 'bar')
-    failure('--capability', 'browser_api_name', 'FF46', '--capability',
-            'os_api_name', 'Win10')
-    out = failure()
-    assert 'You are not authorized to view this!' in out
