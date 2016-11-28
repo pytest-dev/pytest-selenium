@@ -5,6 +5,7 @@
 import pytest
 from selenium.webdriver import FirefoxProfile
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+from selenium.webdriver.firefox.options import Options
 
 
 def pytest_addoption(parser):
@@ -30,18 +31,23 @@ def pytest_addoption(parser):
                      help='path to a firefox extension.')
 
 
-def driver_kwargs(capabilities, driver_path, firefox_path, firefox_profile,
-                  **kwargs):
+def driver_kwargs(capabilities, driver_path, firefox_options, **kwargs):
     kwargs = {}
     if capabilities:
         kwargs['capabilities'] = capabilities
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
-    if firefox_path is not None:
-        # get firefox binary from options until capabilities support
-        kwargs['firefox_binary'] = FirefoxBinary(firefox_path)
-    kwargs['firefox_profile'] = firefox_profile
+    kwargs['firefox_options'] = firefox_options
     return kwargs
+
+
+@pytest.fixture
+def firefox_options(request, firefox_path, firefox_profile):
+    options = Options()
+    options.profile = firefox_profile
+    if firefox_path is not None:
+        options.binary = FirefoxBinary(firefox_path)
+    return options
 
 
 @pytest.fixture(scope='session')
