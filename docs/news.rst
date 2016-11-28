@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+**1.7.0 (2016-11-29)**
+
+* Introduced a ``firefox_options`` fixture.
+* Switched to Firefox options for speciying binary and profile.
+
 **1.6.0 (2016-11-17)**
 
 * Added support for `CrossBrowserTesting <https://crossbrowsertesting.com/>`_.
