@@ -49,7 +49,7 @@ def firefox_path(request):
     return request.config.getoption('firefox_path')
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def firefox_profile(request):
     profile = FirefoxProfile(request.config.getoption('firefox_profile'))
     for preference in request.config.getoption('firefox_preferences'):

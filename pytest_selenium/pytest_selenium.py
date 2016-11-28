@@ -71,13 +71,13 @@ def capabilities(request, session_capabilities):
     return capabilities
 
 
-@pytest.fixture
-def driver_kwargs(request, capabilities, driver_class, driver_path,
+@pytest.fixture(scope='session')
+def driver_kwargs(request, session_capabilities, driver_class, driver_path,
                   firefox_path, firefox_profile):
     kwargs = {}
     driver = request.config.getoption('driver').lower()
     kwargs.update(getattr(drivers, driver).driver_kwargs(
-        capabilities=capabilities,
+        capabilities=session_capabilities,
         driver_path=driver_path,
         firefox_path=firefox_path,
         firefox_profile=firefox_profile,
@@ -88,7 +88,7 @@ def driver_kwargs(request, capabilities, driver_class, driver_path,
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_class(request):
     driver = request.config.getoption('driver')
     if driver is None:
@@ -96,12 +96,11 @@ def driver_class(request):
     return getattr(webdriver, driver, webdriver.Remote)
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_path(request):
     return request.config.getoption('driver_path')
 
 
-@pytest.yield_fixture
 def driver(request, driver_class, driver_kwargs):
     """Returns a WebDriver instance based on options and capabilities"""
     driver = driver_class(**driver_kwargs)
@@ -116,13 +115,22 @@ def driver(request, driver_class, driver_kwargs):
             driver = EventFiringWebDriver(driver, event_listener())
 
     request.node._driver = driver
+    return driver
+
+
+@pytest.yield_fixture(scope='session')
+def steady_selenium(request, driver_class, driver_kwargs):
+    driver = driver(request, driver_class, driver_kwargs)
     yield driver
     driver.quit()
 
 
 @pytest.yield_fixture
-def selenium(driver):
+def selenium(request, driver_class, driver_kwargs, capabilities):
+    driver_kwargs['capabilities'] = capabilities
+    driver = driver(request, driver_class, driver_kwargs)
     yield driver
+    driver.quit()
 
 
 def pytest_configure(config):
