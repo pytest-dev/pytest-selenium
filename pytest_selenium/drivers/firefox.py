@@ -41,7 +41,7 @@ def driver_kwargs(capabilities, driver_path, firefox_options, **kwargs):
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def firefox_options(request, firefox_path, firefox_profile):
     options = Options()
     options.profile = firefox_profile
@@ -55,7 +55,7 @@ def firefox_path(request):
     return request.config.getoption('firefox_path')
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def firefox_profile(request):
     profile = FirefoxProfile(request.config.getoption('firefox_profile'))
     for preference in request.config.getoption('firefox_preferences'):
