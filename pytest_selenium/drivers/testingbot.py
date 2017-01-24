@@ -2,31 +2,41 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import os
-
 import pytest
 from _pytest.mark import MarkInfo
 from py.xml import html
 import requests
 
-DRIVER = 'TestingBot'
-API_JOB_URL = 'https://api.testingbot.com/v1/tests/{session}'
-EXECUTOR_URL = 'http://{key}:{secret}@hub.testingbot.com/wd/hub'
-JOB_URL = 'http://testingbot.com/members/tests/{session}'
+from pytest_selenium.drivers.cloud import Provider
 
 
-def pytest_addoption(parser):
-    parser.addini('testingbot_key',
-                  help='testingbot key',
-                  default=os.getenv('TESTINGBOT_KEY'))
-    parser.addini('testingbot_secret',
-                  help='testingbot secret',
-                  default=os.getenv('TESTINGBOT_SECRET'))
+class TestingBot(Provider):
+
+    API = 'https://api.testingbot.com/v1/tests/{session}'
+    JOB = 'http://testingbot.com/members/tests/{session}'
+
+    @property
+    def auth(self):
+        return (self.key, self.secret)
+
+    @property
+    def executor(self):
+        return 'http://{0}:{1}@hub.testingbot.com/wd/hub'.format(
+            self.key, self.secret)
+
+    @property
+    def key(self):
+        return self.get_credential('key', 'TESTINGBOT_KEY')
+
+    @property
+    def secret(self):
+        return self.get_credential('secret', 'TESTINGBOT_SECRET')
 
 
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
-    if item.config.getoption('driver') != DRIVER:
+    provider = TestingBot()
+    if item.config.getoption('driver') != provider.driver:
         return
 
     pytest_html = item.config.pluginmanager.getplugin('html')
@@ -35,61 +45,46 @@ def pytest_selenium_capture_debug(item, report, extra):
 
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
-    if item.config.getoption('driver') != DRIVER:
+    provider = TestingBot()
+    if item.config.getoption('driver') != provider.driver:
         return
 
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))
     session_id = item._driver.session_id
 
     # Add the job URL to the summary
-    job_url = JOB_URL.format(session=session_id)
-    summary.append('{0} Job: {1}'.format(DRIVER, job_url))
+    job_url = provider.JOB.format(session=session_id)
+    summary.append('{0} Job: {1}'.format(provider.name, job_url))
     pytest_html = item.config.pluginmanager.getplugin('html')
     # Add the job URL to the HTML report
-    extra.append(pytest_html.extras.url(job_url, '{0} Job'.format(DRIVER)))
+    extra.append(pytest_html.extras.url(job_url, '{0} Job'.format(
+        provider.name)))
 
     try:
         # Update the job result
-        auth = (_key(item.config), _secret(item.config))
-        api_url = API_JOB_URL.format(session=session_id)
-        job_info = requests.get(api_url, auth=auth, timeout=10).json()
+        api_url = provider.API.format(session=session_id)
+        job_info = requests.get(api_url, auth=provider.auth, timeout=10).json()
         if report.when == 'setup' or job_info.get('success') is not False:
             # Only update the result if it's not already marked as failed
             data = {'test[success]': '1' if passed else '0'}
-            requests.put(api_url, data=data, auth=auth, timeout=10)
+            requests.put(api_url, data=data, auth=provider.auth, timeout=10)
     except Exception as e:
         summary.append('WARNING: Failed to update {0} job status: {1}'.format(
-            DRIVER, e))
+            provider.name, e))
 
 
 def driver_kwargs(request, test, capabilities, **kwargs):
+    provider = TestingBot()
     keywords = request.node.keywords
     capabilities.setdefault('name', test)
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     groups = capabilities.get('groups', []) + markers
     if groups:
         capabilities['groups'] = groups
-    executor = EXECUTOR_URL.format(
-        key=_key(request.config),
-        secret=_secret(request.config))
     kwargs = {
-        'command_executor': executor,
+        'command_executor': provider.executor,
         'desired_capabilities': capabilities}
     return kwargs
-
-
-def _key(config):
-    key = config.getini('testingbot_key')
-    if not key:
-        raise pytest.UsageError('TestingBot key must be set')
-    return key
-
-
-def _secret(config):
-    secret = config.getini('testingbot_secret')
-    if not secret:
-        raise pytest.UsageError('TestingBot secret must be set')
-    return secret
 
 
 def _video_html(session):

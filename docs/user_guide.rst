@@ -218,19 +218,20 @@ Sauce Labs
 
 To run your automated tests using `Sauce Labs <https://saucelabs.com/>`_, you
 must provide a valid username and API key. This can be done either by using
-a :ref:`configuration file <configuration-files>`, or by setting the
-``SAUCELABS_USERNAME`` and ``SAUCELABS_API_KEY`` environment variables.
+a ``.saucelabs`` configuration file in the working directory or your home
+directory, or by setting the ``SAUCELABS_USERNAME`` and ``SAUCELABS_API_KEY``
+environment variables.
 
 Configuration
 ~~~~~~~~~~~~~
 
-Below is an example :ref:`configuration file <configuration-files>`:
+Below is an example ``.saucelabs`` configuration file:
 
 .. code-block:: ini
 
-  [pytest]
-  sauce_labs_username = username
-  sauce_labs_api_key = secret
+  [credentials]
+  username = username
+  key = secret
 
 Running tests
 ~~~~~~~~~~~~~
@@ -252,20 +253,21 @@ BrowserStack
 
 To run your automated tests using
 `BrowserStack <https://www.browserstack.com/>`_, you must provide a valid
-username and access key. This can be done either by using a
-:ref:`configuration file <configuration-files>`, or by setting the
-``BROWSERSTACK_USERNAME`` and ``BROWSERSTACK_ACCESS_KEY`` environment variables.
+username and access key. This can be done either by using
+a ``.browserstack`` configuration file in the working directory or your home
+directory, or by setting the ``BROWSERSTACK_USERNAME`` and
+``BROWSERSTACK_ACCESS_KEY`` environment variables.
 
 Configuration
 ~~~~~~~~~~~~~
 
-Below is an example :ref:`configuration file <configuration-files>`:
+Below is an example ``.browserstack`` configuration file:
 
 .. code-block:: ini
 
-  [pytest]
-  browserstack_username = username
-  browserstack_access_key = secret
+  [credentials]
+  username = username
+  key = secret
 
 Running tests
 ~~~~~~~~~~~~~
@@ -285,20 +287,21 @@ TestingBot
 ----------
 
 To run your automated tests using `TestingBot <http://testingbot.com/>`_, you
-must provide a valid key and secret. This can be done either by using a
-:ref:`configuration file <configuration-files>`, or by setting the
-``TESTINGBOT_KEY`` and ``TESTINGBOT_SECRET`` environment variables.
+must provide a valid key and secret. This can be done either by using
+a ``.testingbot`` configuration file in the working directory or your home
+directory, or by setting the ``TESTINGBOT_KEY`` and ``TESTINGBOT_SECRET``
+environment variables.
 
 Configuration
 ~~~~~~~~~~~~~
 
-Below is an example :ref:`configuration file <configuration-files>`:
+Below is an example ``.testingbot`` configuration file:
 
 .. code-block:: ini
 
-  [pytest]
-  testingbot_key = key
-  testingbot_secret = secret
+  [credentials]
+  key = key
+  secret = secret
 
 Running tests
 ~~~~~~~~~~~~~
@@ -321,20 +324,20 @@ CrossBrowserTesting
 To run your automated tests using
 `CrossBrowserTesting <https://crossbrowsertesting.com/>`_, you must provide a
 valid username and auth key. This can be done either by using
-a :ref:`configuration file <configuration-files>`, or by setting the
-``CROSSBROWSERTESTING_USERNAME`` and ``CROSSBROWSERTESTING_AUTH_KEY``
-environment variables.
+a ``.crossbrowsertesting`` configuration file in the working directory or your
+home directory, or by setting the ``CROSSBROWSERTESTING_USERNAME`` and
+``CROSSBROWSERTESTING_AUTH_KEY`` environment variables.
 
 Configuration
 ~~~~~~~~~~~~~
 
-Below is an example :ref:`configuration file <configuration-files>`:
+Below is an example ``.crossbrowsertesting`` configuration file:
 
 .. code-block:: ini
 
-  [pytest]
-  crossbrowsertesting_username = username
-  crossbrowsertesting_auth_key = secret
+  [credentials]
+  username = username
+  key = secret
 
 Running tests
 ~~~~~~~~~~~~~

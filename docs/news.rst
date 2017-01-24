@@ -1,6 +1,32 @@
 Release Notes
 =============
 
+**1.8.0 (unreleased)**
+
+* **BREAKING CHANGE:** Moved cloud testing provider credentials into separate
+  files for improved security.
+
+  * If you are using the environment variables for specifying cloud testing
+    provider credentials, then you will not be affected.
+  * If you are storing credentials from any of the cloud testing providers in
+    one of the default configuration files then they will no longer be used.
+    These files are often checked into source code repositories, so it was
+    previously very easy to accidentally expose your credentials.
+  * Each cloud provider now has their own configuration file, such as
+    ``.browserstack``, ``.crossbrowsertesting``, ``.saucelabs``,
+    ``.testingbot`` and these can be located in the working directory or in the
+    user's home directory. This provides a convenient way to set up these files
+    globally, and override them for individual projects.
+  * To migrate, check ``pytest.ini``, ``tox.ini``, and ``setup.cfg`` for any
+    keys starting with ``browserstack_``, ``crossbrowsertesting_``,
+    ``saucelabs_``, or ``testingbot_``. If you find any, create a new
+    configuration file for the appropriate cloud testing provider with your
+    credentials, and remove the entries from the original file.
+  * The configuration keys can differ between cloud testing providers, so
+    please check the :doc:`user_guide` for details.
+  * See `#60 <https://github.com/pytest-dev/pytest-selenium/issues/60>`_ for
+    for original issue and related patch.
+
 **1.7.0 (2016-11-29)**
 
 * Introduced a ``firefox_options`` fixture.

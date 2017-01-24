@@ -2,46 +2,56 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import os
-
 import pytest
 import requests
 
-DRIVER = 'BrowserStack'
-API_JOB_URL = 'https://www.browserstack.com/automate/sessions/{session}.json'
-EXECUTOR_URL = 'http://{username}:{key}@hub.browserstack.com:80/wd/hub'
+from pytest_selenium.drivers.cloud import Provider
 
 
-def pytest_addoption(parser):
-    parser.addini('browserstack_username',
-                  help='browserstack username',
-                  default=os.getenv('BROWSERSTACK_USERNAME'))
-    parser.addini('browserstack_access_key',
-                  help='browserstack access key',
-                  default=os.getenv('BROWSERSTACK_ACCESS_KEY'))
+class BrowserStack(Provider):
+
+    API = 'https://www.browserstack.com/automate/sessions/{session}.json'
+
+    @property
+    def auth(self):
+        return (self.username, self.key)
+
+    @property
+    def executor(self):
+        return 'http://{0}:{1}@hub.browserstack.com:80/wd/hub'.format(
+            self.username, self.key)
+
+    @property
+    def username(self):
+        return self.get_credential('username', 'BROWSERSTACK_USERNAME')
+
+    @property
+    def key(self):
+        return self.get_credential('key', 'BROWSERSTACK_ACCESS_KEY')
 
 
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
-    if item.config.getoption('driver') != DRIVER:
+    provider = BrowserStack()
+    if item.config.getoption('driver') != provider.driver:
         return
 
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))
     session_id = item._driver.session_id
-    auth = (_username(item.config), _access_key(item.config))
-    api_url = API_JOB_URL.format(session=session_id)
+    api_url = provider.API.format(session=session_id)
 
     try:
-        job_info = requests.get(api_url, auth=auth, timeout=10).json()
+        job_info = requests.get(api_url, auth=provider.auth, timeout=10).json()
         job_url = job_info['automation_session']['browser_url']
         # Add the job URL to the summary
-        summary.append('{0} Job: {1}'.format(DRIVER, job_url))
+        summary.append('{0} Job: {1}'.format(provider.name, job_url))
         pytest_html = item.config.pluginmanager.getplugin('html')
         # Add the job URL to the HTML report
-        extra.append(pytest_html.extras.url(job_url, '{0} Job'.format(DRIVER)))
+        extra.append(pytest_html.extras.url(job_url, '{0} Job'.format(
+            provider.name)))
     except Exception as e:
         summary.append('WARNING: Failed to determine {0} job URL: {1}'.format(
-            DRIVER, e))
+            provider.name, e))
 
     try:
         # Update the job result
@@ -55,32 +65,16 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
                 api_url,
                 headers={'Content-Type': 'application/json'},
                 params={'status': status},
-                auth=auth,
+                auth=provider.auth,
                 timeout=10)
     except Exception as e:
         summary.append('WARNING: Failed to update job status: {0}'.format(e))
 
 
 def driver_kwargs(request, test, capabilities, **kwargs):
+    provider = BrowserStack()
     capabilities.setdefault('name', test)
-    executor = EXECUTOR_URL.format(
-        username=_username(request.config),
-        key=_access_key(request.config))
     kwargs = {
-        'command_executor': executor,
+        'command_executor': provider.executor,
         'desired_capabilities': capabilities}
     return kwargs
-
-
-def _access_key(config):
-    access_key = config.getini('browserstack_access_key')
-    if not access_key:
-        raise pytest.UsageError('BrowserStack access key must be set')
-    return access_key
-
-
-def _username(config):
-    username = config.getini('browserstack_username')
-    if not username:
-        raise pytest.UsageError('BrowserStack username must be set')
-    return username

@@ -3,31 +3,46 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import json
-import os
 
 from _pytest.mark import MarkInfo
 from py.xml import html
 import pytest
 import requests
 
-DRIVER = 'SauceLabs'
-API_JOB_URL = 'http://saucelabs.com/rest/v1/{username}/jobs/{session}'
-EXECUTOR_URL = 'http://{username}:{key}@ondemand.saucelabs.com:80/wd/hub'
-JOB_URL = 'http://saucelabs.com/jobs/{session}'
+from pytest_selenium.drivers.cloud import Provider
 
 
-def pytest_addoption(parser):
-    parser.addini('sauce_labs_username',
-                  help='sauce labs username',
-                  default=os.getenv('SAUCELABS_USERNAME'))
-    parser.addini('sauce_labs_api_key',
-                  help='sauce labs api key',
-                  default=os.getenv('SAUCELABS_API_KEY'))
+class SauceLabs(Provider):
+
+    API = 'http://saucelabs.com/rest/v1/{username}/jobs/{session}'
+    JOB = 'http://saucelabs.com/jobs/{session}'
+
+    @property
+    def auth(self):
+        return (self.username, self.key)
+
+    @property
+    def executor(self):
+        return 'http://{0}:{1}@ondemand.saucelabs.com:80/wd/hub'.format(
+            self.username, self.key)
+
+    @property
+    def name(self):
+        return 'Sauce Labs'
+
+    @property
+    def username(self):
+        return self.get_credential('username', 'SAUCELABS_USERNAME')
+
+    @property
+    def key(self):
+        return self.get_credential('key', 'SAUCELABS_API_KEY')
 
 
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
-    if item.config.getoption('driver') != DRIVER:
+    provider = SauceLabs()
+    if item.config.getoption('driver') != provider.driver:
         return
 
     pytest_html = item.config.pluginmanager.getplugin('html')
@@ -36,62 +51,49 @@ def pytest_selenium_capture_debug(item, report, extra):
 
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
-    if item.config.getoption('driver') != DRIVER:
+    provider = SauceLabs()
+    if item.config.getoption('driver') != provider.driver:
         return
 
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))
     session_id = item._driver.session_id
 
     # Add the job URL to the summary
-    job_url = JOB_URL.format(session=session_id)
-    summary.append('{0} Job: {1}'.format(DRIVER, job_url))
+    provider = SauceLabs()
+    job_url = provider.JOB.format(session=session_id)
+    summary.append('{0} Job: {1}'.format(provider.name, job_url))
     pytest_html = item.config.pluginmanager.getplugin('html')
     # Add the job URL to the HTML report
-    extra.append(pytest_html.extras.url(job_url, '{0} Job'.format(DRIVER)))
+    extra.append(pytest_html.extras.url(job_url, '{0} Job'.format(
+        provider.name)))
 
     try:
         # Update the job result
-        username = _username(item.config)
-        auth = (username, _api_key(item.config))
-        api_url = API_JOB_URL.format(username=username, session=session_id)
-        job_info = requests.get(api_url, auth=auth, timeout=10).json()
+        api_url = provider.API.format(
+            session=session_id,
+            username=provider.username)
+        job_info = requests.get(api_url, auth=provider.auth, timeout=10).json()
         if report.when == 'setup' or job_info.get('passed') is not False:
             # Only update the result if it's not already marked as failed
             data = json.dumps({'passed': passed})
-            requests.put(api_url, data=data, auth=auth, timeout=10)
+            requests.put(api_url, data=data, auth=provider.auth, timeout=10)
     except Exception as e:
         summary.append('WARNING: Failed to update {0} job status: {1}'.format(
-            DRIVER, e))
+            provider.name, e))
 
 
 def driver_kwargs(request, test, capabilities, **kwargs):
+    provider = SauceLabs()
     keywords = request.node.keywords
     capabilities.setdefault('name', test)
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     tags = capabilities.get('tags', []) + markers
     if tags:
         capabilities['tags'] = tags
-    executor = EXECUTOR_URL.format(
-        username=_username(request.config),
-        key=_api_key(request.config))
     kwargs = {
-        'command_executor': executor,
+        'command_executor': provider.executor,
         'desired_capabilities': capabilities}
     return kwargs
-
-
-def _api_key(config):
-    api_key = config.getini('sauce_labs_api_key')
-    if not api_key:
-        raise pytest.UsageError('Sauce Labs API key must be set')
-    return api_key
-
-
-def _username(config):
-    username = config.getini('sauce_labs_username')
-    if not username:
-        raise pytest.UsageError('Sauce Labs username must be set')
-    return username
 
 
 def _video_html(session):

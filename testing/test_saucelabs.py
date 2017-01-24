@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from functools import partial
+import os
 
 import pytest
 
@@ -33,18 +34,35 @@ def failure(testdir, testfile, httpserver_base_url):
                    '--driver', 'SauceLabs')
 
 
-def test_missing_username(failure):
-    out = failure()
-    assert 'UsageError: Sauce Labs username must be set' in out
+def test_missing_username(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
+    assert 'Sauce Labs username must be set' in failure()
 
 
-def test_missing_api_key(failure, monkeypatch):
+def test_missing_api_key_env(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    out = failure()
-    assert 'UsageError: Sauce Labs API key must be set' in out
+    assert 'Sauce Labs key must be set' in failure()
 
 
-def test_invalid_credentials(failure, monkeypatch):
+def test_missing_api_key_file(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
+    tmpdir.join('.saucelabs').write('[credentials]\nusername=foo')
+    assert 'Sauce Labs key must be set' in failure()
+
+
+def test_invalid_credentials_env(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
     monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
-    failure('--capability', 'browserName', 'Firefox')
+    out = failure('--capability', 'browserName', 'Firefox')
+    messages = ['Sauce Labs Authentication Error', 'basic auth failed']
+    assert any(message in out for message in messages)
+
+
+def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
+    tmpdir.join('.saucelabs').write('[credentials]\nusername=foo\nkey=bar')
+    out = failure('--capability', 'browserName', 'Firefox')
+    messages = ['Sauce Labs Authentication Error', 'basic auth failed']
+    assert any(message in out for message in messages)

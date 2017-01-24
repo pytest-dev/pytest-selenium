@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from functools import partial
+import os
 
 import pytest
 
@@ -33,18 +34,35 @@ def failure(testdir, testfile, httpserver_base_url):
                    '--driver', 'TestingBot')
 
 
-def test_missing_key(failure):
-    out = failure()
-    assert 'UsageError: TestingBot key must be set' in out
+def test_missing_key(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
+    assert 'TestingBot key must be set' in failure()
 
 
-def test_missing_secret(failure, monkeypatch):
+def test_missing_secret_env(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv('TESTINGBOT_KEY', 'foo')
-    out = failure()
-    assert 'UsageError: TestingBot secret must be set' in out
+    assert 'TestingBot secret must be set' in failure()
 
 
-def test_invalid_credentials(failure, monkeypatch):
+def test_missing_secret_file(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
+    tmpdir.join('.testingbot').write('[credentials]\nkey=foo')
+    assert 'TestingBot secret must be set' in failure()
+
+
+def test_invalid_credentials_env(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv('TESTINGBOT_KEY', 'foo')
     monkeypatch.setenv('TESTINGBOT_SECRET', 'bar')
-    failure('--capability', 'browserName', 'firefox')
+    out = failure('--capability', 'browserName', 'firefox')
+    messages = ['incorrect TestingBot credentials', 'basic auth failed']
+    assert any(message in out for message in messages)
+
+
+def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
+    tmpdir.join('.testingbot').write('[credentials]\nkey=foo\nsecret=bar')
+    out = failure('--capability', 'browserName', 'firefox')
+    messages = ['incorrect TestingBot credentials', 'basic auth failed']
+    assert any(message in out for message in messages)
