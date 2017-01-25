@@ -14,7 +14,7 @@ support for running `Selenium <http://seleniumhq.org/>`_ based tests.
    :target: https://travis-ci.org/pytest-dev/pytest-selenium/
    :alt: Travis
 .. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
-   :target: http://pytest-selenium.readthedocs.org/en/latest/
+   :target: http://pytest-selenium.readthedocs.io/en/latest/
    :alt: Read the Docs
 .. image:: https://img.shields.io/github/issues-raw/pytest-dev/pytest-selenium.svg
    :target: https://github.com/pytest-dev/pytest-selenium/issues
@@ -26,6 +26,6 @@ support for running `Selenium <http://seleniumhq.org/>`_ based tests.
 Resources
 ---------
 
-- `Documentation <http://pytest-selenium.readthedocs.org/>`_
+- `Documentation <http://pytest-selenium.readthedocs.io/en/latest/>`_
 - `Issue Tracker <http://github.com/pytest-dev/pytest-selenium/issues>`_
 - `Code <http://github.com/pytest-dev/pytest-selenium/>`_
