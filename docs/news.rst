@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-**1.8.0 (unreleased)**
+**1.8.0 (2017-01-25)**
 
 * **BREAKING CHANGE:** Moved cloud testing provider credentials into separate
   files for improved security.
