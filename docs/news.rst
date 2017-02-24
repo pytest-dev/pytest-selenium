@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+**1.9.0 (2017-02-27)**
+
+* Add driver and session capabilities to metadata provided by
+  `pytest-metadata <https://pypi.python.org/pypi/pytest-metadata/>`_
+
 **1.8.0 (2017-01-25)**
 
 * **BREAKING CHANGE:** Moved cloud testing provider credentials into separate

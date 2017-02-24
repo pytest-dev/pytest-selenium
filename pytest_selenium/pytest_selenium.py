@@ -37,26 +37,14 @@ def pytest_addhooks(pluginmanager):
     method(hooks)
 
 
-@pytest.fixture(scope='session', autouse=True)
-def _environment(request, session_capabilities):
-    """Provide additional environment details to pytest-html report"""
-    config = request.config
-    # add environment details to the pytest-html plugin
-    config._environment.append(('Driver', config.option.driver))
-    # add capabilities to environment
-    config._environment.extend([('Capability', '{0}: {1}'.format(
-        k, v)) for k, v in session_capabilities.items()])
-    if config.option.driver == 'Remote':
-        config._environment.append(
-            ('Server', 'http://{0.host}:{0.port}'.format(config.option)))
-
-
 @pytest.fixture(scope='session')
 def session_capabilities(request, variables):
     """Returns combined capabilities from pytest-variables and command line"""
+    config = request.config
     capabilities = variables.get('capabilities', {})
-    for capability in request.config.getoption('capabilities'):
-        capabilities[capability[0]] = capability[1]
+    capabilities.update({k: v for k, v in config.getoption('capabilities')})
+    if hasattr(config, '_metadata'):
+        config._metadata['Capabilities'] = capabilities
     return capabilities
 
 
@@ -132,6 +120,13 @@ def pytest_configure(config):
         'markers', 'capabilities(kwargs): add or change existing '
         'capabilities. specify capabilities as keyword arguments, for example '
         'capabilities(foo=''bar'')')
+    if hasattr(config, '_metadata'):
+        config._metadata['Driver'] = config.getoption('driver')
+        config._metadata['Capabilities'] = {
+            k: v for k, v in config.getoption('capabilities')}
+        if config.option.driver == 'Remote':
+            config._metadata['Server'] = 'http://{0}:{1}'.format(
+                config.getoption('host', 'port'))
 
 
 def pytest_report_header(config, startdir):
