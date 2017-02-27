@@ -123,7 +123,8 @@ def pytest_configure(config):
             k: v for k, v in config.getoption('capabilities')}
         if config.option.driver == 'Remote':
             config._metadata['Server'] = 'http://{0}:{1}'.format(
-                config.getoption('host', 'port'))
+                config.getoption('host'),
+                config.getoption('port'))
 
 
 def pytest_report_header(config, startdir):
