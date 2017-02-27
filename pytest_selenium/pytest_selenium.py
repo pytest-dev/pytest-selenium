@@ -5,7 +5,6 @@
 import copy
 from datetime import datetime
 import os
-import sys
 
 import pytest
 from selenium import webdriver
@@ -13,8 +12,6 @@ from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
 
 from . import drivers
-
-PY3 = sys.version_info[0] == 3
 
 SUPPORTED_DRIVERS = [
     'BrowserStack',
@@ -194,8 +191,6 @@ def _gather_screenshot(item, report, driver, summary, extra):
 def _gather_html(item, report, driver, summary, extra):
     try:
         html = driver.page_source
-        if not PY3:
-            html = html.encode('utf-8')
     except Exception as e:
         summary.append('WARNING: Failed to gather HTML: {0}'.format(e))
         return
@@ -231,8 +226,6 @@ def format_log(log):
         datetime.utcfromtimestamp(entry['timestamp'] / 1000.0).strftime(
             timestamp_format), entry).rstrip() for entry in log]
     log = '\n'.join(entries)
-    if not PY3:
-        log = log.encode('utf-8')
     return log
 
 
