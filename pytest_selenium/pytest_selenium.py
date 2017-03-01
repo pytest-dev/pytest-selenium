@@ -35,14 +35,9 @@ def pytest_addhooks(pluginmanager):
 
 
 @pytest.fixture(scope='session')
-def session_capabilities(request, variables):
+def session_capabilities(pytestconfig):
     """Returns combined capabilities from pytest-variables and command line"""
-    config = request.config
-    capabilities = variables.get('capabilities', {})
-    capabilities.update({k: v for k, v in config.getoption('capabilities')})
-    if hasattr(config, '_metadata'):
-        config._metadata['Capabilities'] = capabilities
-    return capabilities
+    return pytestconfig._capabilities
 
 
 @pytest.fixture
@@ -110,17 +105,18 @@ def selenium(driver):
     yield driver
 
 
+@pytest.hookimpl(trylast=True)
 def pytest_configure(config):
-    if hasattr(config, 'slaveinput'):
-        return  # xdist slave
+    config._capabilities = config._variables.get('capabilities', {})
+    config._capabilities.update({
+        k: v for k, v in config.getoption('capabilities')})
     config.addinivalue_line(
         'markers', 'capabilities(kwargs): add or change existing '
         'capabilities. specify capabilities as keyword arguments, for example '
         'capabilities(foo=''bar'')')
     if hasattr(config, '_metadata'):
         config._metadata['Driver'] = config.getoption('driver')
-        config._metadata['Capabilities'] = {
-            k: v for k, v in config.getoption('capabilities')}
+        config._metadata['Capabilities'] = config._capabilities
         if config.option.driver == 'Remote':
             config._metadata['Server'] = 'http://{0}:{1}'.format(
                 config.getoption('host'),

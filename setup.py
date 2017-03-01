@@ -12,7 +12,7 @@ setup(name='pytest-selenium',
           'pytest>=2.7.3',
           'pytest-base-url',
           'pytest-html>=1.14.0',
-          'pytest-variables',
+          'pytest-variables>=1.5.0',
           'selenium>=3.0.0',
           'requests'],
       entry_points={'pytest11': [

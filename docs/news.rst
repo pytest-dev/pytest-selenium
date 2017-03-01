@@ -1,6 +1,12 @@
 Release Notes
 =============
 
+**1.9.1 (2017-03-01)**
+
+* Add capabilities to metadata during :code:`pytest_configure` hook instead of
+  the :code:`session_capabilities` fixture to make them available to other
+  plugins earlier.
+
 **1.9.0 (2017-02-27)**
 
 * Add driver and session capabilities to metadata provided by
