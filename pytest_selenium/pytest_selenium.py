@@ -17,6 +17,7 @@ SUPPORTED_DRIVERS = [
     'BrowserStack',
     'CrossBrowserTesting',
     'Chrome',
+    'Edge',
     'Firefox',
     'Ie',
     'PhantomJS',

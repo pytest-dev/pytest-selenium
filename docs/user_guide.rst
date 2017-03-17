@@ -142,6 +142,23 @@ option to indicate where it can be found:
 See the `ChromeDriver documentation <https://sites.google.com/a/chromium.org/chromedriver/>`_
 for more information.
 
+
+Edge
+----
+
+To use Edge, you will need to
+`download Edge WebDriver <https://docs.microsoft.com/en-us/microsoft-edge/dev-guide/tools/webdriver>`_
+and specify ``Edge`` for the ``--driver`` command line option. If the driver
+executable is not available on your path, you can use the ``--driver-path``
+option to indicate where it can be found:
+
+.. code-block:: bash
+
+  $ py.test --driver Edge --driver-path /path/to/edgedriver
+
+Selenium v2.47 or greater is required.
+
+
 Internet Explorer
 -----------------
 
