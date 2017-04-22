@@ -51,10 +51,14 @@ def test_missing_api_key_file(failure, monkeypatch, tmpdir):
     assert 'Sauce Labs key must be set' in failure()
 
 
-def test_invalid_credentials_env(failure, monkeypatch, tmpdir):
+@pytest.mark.parametrize(('username', 'key'), [('SAUCELABS_USERNAME',
+                                                'SAUCELABS_API_KEY'),
+                                               ('SAUCELABS_USR',
+                                                'SAUCELABS_PSW')])
+def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
-    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+    monkeypatch.setenv(username, 'foo')
+    monkeypatch.setenv(key, 'bar')
     out = failure('--capability', 'browserName', 'Firefox')
     messages = ['Sauce Labs Authentication Error', 'basic auth failed']
     assert any(message in out for message in messages)
