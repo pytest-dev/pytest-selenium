@@ -222,6 +222,17 @@ a ``.saucelabs`` configuration file in the working directory or your home
 directory, or by setting the ``SAUCELABS_USERNAME`` and ``SAUCELABS_API_KEY``
 environment variables.
 
+Alternatively, when using `Jenkins CI <https://jenkins.io/>`_ declarative piplines,
+credentials can be set as environment variables as follows:
+
+.. code-block:: ini
+
+  environment {
+    SAUCELABS = credentials('SAUCELABS')
+  }
+
+For more information see Jenkins `docs <https://jenkins.io/doc/pipeline/tour/environment/>`_.
+
 Configuration
 ~~~~~~~~~~~~~
 
@@ -258,6 +269,17 @@ a ``.browserstack`` configuration file in the working directory or your home
 directory, or by setting the ``BROWSERSTACK_USERNAME`` and
 ``BROWSERSTACK_ACCESS_KEY`` environment variables.
 
+Alternatively, when using `Jenkins CI <https://jenkins.io/>`_ declarative piplines,
+credentials can be set as environment variables as follows:
+
+.. code-block:: ini
+
+  environment {
+    BROWSERSTACK = credentials('BROWSERSTACK')
+  }
+
+For more information see Jenkins `docs <https://jenkins.io/doc/pipeline/tour/environment/>`_.
+
 Configuration
 ~~~~~~~~~~~~~
 
@@ -291,6 +313,19 @@ must provide a valid key and secret. This can be done either by using
 a ``.testingbot`` configuration file in the working directory or your home
 directory, or by setting the ``TESTINGBOT_KEY`` and ``TESTINGBOT_SECRET``
 environment variables.
+
+Alternatively, when using `Jenkins CI <https://jenkins.io/>`_ declarative piplines,
+credentials can be set as environment variables as follows:
+
+.. code-block:: ini
+
+  environment {
+    TESTINGBOT = credentials('TESTINGBOT')
+  }
+
+Note that for TestingBot, ``username`` corresponds to ``secret`` and ``password`` to ``key``.
+
+For more information see Jenkins `docs <https://jenkins.io/doc/pipeline/tour/environment/>`_.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -327,6 +362,17 @@ valid username and auth key. This can be done either by using
 a ``.crossbrowsertesting`` configuration file in the working directory or your
 home directory, or by setting the ``CROSSBROWSERTESTING_USERNAME`` and
 ``CROSSBROWSERTESTING_AUTH_KEY`` environment variables.
+
+Alternatively, when using `Jenkins CI <https://jenkins.io/>`_ declarative piplines,
+credentials can be set as environment variables as follows:
+
+.. code-block:: ini
+
+  environment {
+    CROSSBROWSERTESTING = credentials('CROSSBROWSERTESTING')
+  }
+
+For more information see Jenkins `docs <https://jenkins.io/doc/pipeline/tour/environment/>`_.
 
 Configuration
 ~~~~~~~~~~~~~
