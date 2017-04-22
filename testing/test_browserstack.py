@@ -50,10 +50,14 @@ def test_missing_access_key_file(failure, monkeypatch, tmpdir):
     assert 'BrowserStack key must be set' in failure()
 
 
-def test_invalid_credentials_env(failure, monkeypatch, tmpdir):
+@pytest.mark.parametrize(('username', 'key'), [('BROWSERSTACK_USERNAME',
+                                                'BROWSERSTACK_ACCESS_KEY'),
+                                               ('BROWSERSTACK_USR',
+                                                'BROWSERSTACK_PSW')])
+def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
-    monkeypatch.setenv('BROWSERSTACK_USERNAME', 'foo')
-    monkeypatch.setenv('BROWSERSTACK_ACCESS_KEY', 'bar')
+    monkeypatch.setenv(username, 'foo')
+    monkeypatch.setenv(key, 'bar')
     out = failure()
     messages = ['Invalid username or password', 'basic auth failed']
     assert any(message in out for message in messages)

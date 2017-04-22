@@ -26,11 +26,13 @@ class TestingBot(Provider):
 
     @property
     def key(self):
-        return self.get_credential('key', 'TESTINGBOT_KEY')
+        return self.get_credential('key', ['TESTINGBOT_KEY',
+                                           'TESTINGBOT_USR'])
 
     @property
     def secret(self):
-        return self.get_credential('secret', 'TESTINGBOT_SECRET')
+        return self.get_credential('secret', ['TESTINGBOT_SECRET',
+                                              'TESTINGBOT_PSW'])
 
 
 @pytest.mark.optionalhook
