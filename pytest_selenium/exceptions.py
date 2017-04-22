@@ -11,4 +11,5 @@ class MissingCloudCredentialError(pytest.UsageError):
         super(MissingCloudCredentialError, self).__init__(
             '{0} {1} must be set. Try setting the {2} environment '
             'variable, or see the documentation for how to use a '
-            'configuration file.'.format(driver, key, env))
+            'configuration file. For Jenkins credentials, please '
+            'refer to the documentation'.format(driver, key, env))

@@ -38,5 +38,13 @@ class Provider(object):
                 KeyError):
             value = os.getenv(env)
         if not value:
+            value = self.get_jenkins_credential(key)
+        if not value:
             raise MissingCloudCredentialError(self.name, key, env)
         return value
+
+    def get_jenkins_credential(self, key):
+        if 'username' == key:
+            return os.getenv(self.name.replace(' ', '').upper() + '_USR')
+        elif 'key' == key:
+            return os.getenv(self.name.replace(' ', '').upper() + '_PSW')

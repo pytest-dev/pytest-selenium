@@ -6,6 +6,7 @@ import pytest
 from _pytest.mark import MarkInfo
 from py.xml import html
 import requests
+import os
 
 from pytest_selenium.drivers.cloud import Provider
 
@@ -31,6 +32,12 @@ class TestingBot(Provider):
     @property
     def secret(self):
         return self.get_credential('secret', 'TESTINGBOT_SECRET')
+
+    def get_jenkins_credential(self, key):
+        if 'secret' == key:
+            return os.getenv(self.name.upper() + '_USR')
+        elif 'key' == key:
+            return os.getenv(self.name.upper() + '_PSW')
 
 
 @pytest.mark.optionalhook

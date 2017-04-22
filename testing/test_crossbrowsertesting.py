@@ -51,10 +51,12 @@ def test_missing_access_key_file(failure, monkeypatch, tmpdir):
     assert 'CrossBrowserTesting key must be set' in failure()
 
 
-def test_invalid_credentials_env(failure, monkeypatch, tmpdir):
+@pytest.mark.parametrize(('username', 'key'), [('CROSSBROWSERTESTING_USERNAME', 'CROSSBROWSERTESTING_AUTH_KEY'),
+                                               ('CROSSBROWSERTESTING_USR','CROSSBROWSERTESTING_PSW')])
+def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
-    monkeypatch.setenv('CROSSBROWSERTESTING_USERNAME', 'foo')
-    monkeypatch.setenv('CROSSBROWSERTESTING_AUTH_KEY', 'bar')
+    monkeypatch.setenv(username, 'foo')
+    monkeypatch.setenv(key, 'bar')
     out = failure()
     messages = ['You are not authorized to view this', 'basic auth failed']
     assert any(message in out for message in messages)
