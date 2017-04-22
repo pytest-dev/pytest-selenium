@@ -265,3 +265,12 @@ def pytest_addoption(parser):
                      metavar='str',
                      help='selenium eventlistener class, e.g. '
                           'package.module.EventListenerClassName.')
+    group._addoption('--host',
+                     metavar='str',
+                     help='host that selenium server is listening on. '
+                          '(default: %default)')
+    group._addoption('--port',
+                     type='int',
+                     metavar='num',
+                     help='port that selenium server is listening on. '
+                          '(default: %default)')

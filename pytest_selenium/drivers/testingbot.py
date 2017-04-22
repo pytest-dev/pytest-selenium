@@ -15,14 +15,18 @@ class TestingBot(Provider):
     API = 'https://api.testingbot.com/v1/tests/{session}'
     JOB = 'http://testingbot.com/members/tests/{session}'
 
+    def __init__(self, host=None, port=None):
+        super(TestingBot, self).__init__()
+        self._host = host
+        self._port = port
+
     @property
     def auth(self):
         return (self.key, self.secret)
 
     @property
     def executor(self):
-        return 'http://{0}:{1}@hub.testingbot.com/wd/hub'.format(
-            self.key, self.secret)
+        return 'http://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub'
 
     @property
     def key(self):
@@ -31,6 +35,14 @@ class TestingBot(Provider):
     @property
     def secret(self):
         return self.get_credential('secret', 'TESTINGBOT_SECRET')
+
+    @property
+    def host(self):
+        return self._host or 'hub.testingbot.com'
+
+    @property
+    def port(self):
+        return self._port or 80
 
 
 @pytest.mark.optionalhook
@@ -73,16 +85,17 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
             provider.name, e))
 
 
-def driver_kwargs(request, test, capabilities, **kwargs):
-    provider = TestingBot()
+def driver_kwargs(request, test, capabilities, host, port, **kwargs):
+    provider = TestingBot(host, port)
     keywords = request.node.keywords
     capabilities.setdefault('name', test)
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     groups = capabilities.get('groups', []) + markers
     if groups:
         capabilities['groups'] = groups
+
     kwargs = {
-        'command_executor': provider.executor,
+        'command_executor': provider.executor.format(provider),
         'desired_capabilities': capabilities}
     return kwargs
 
