@@ -40,7 +40,7 @@ def session_capabilities(pytestconfig):
     return pytestconfig._capabilities
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def capabilities(request, session_capabilities):
     """Returns combined capabilities"""
     capabilities = copy.deepcopy(session_capabilities)  # make a copy
@@ -51,7 +51,7 @@ def capabilities(request, session_capabilities):
     return capabilities
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def driver_kwargs(request, capabilities, driver_class, driver_path,
                   firefox_options, firefox_profile):
     kwargs = {}
@@ -68,7 +68,7 @@ def driver_kwargs(request, capabilities, driver_class, driver_path,
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def driver_class(request):
     driver = request.config.getoption('driver')
     if driver is None:
@@ -76,12 +76,12 @@ def driver_class(request):
     return getattr(webdriver, driver, webdriver.Remote)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def driver_path(request):
     return request.config.getoption('driver_path')
 
 
-@pytest.yield_fixture
+@pytest.yield_fixture(scope="session")
 def driver(request, driver_class, driver_kwargs):
     """Returns a WebDriver instance based on options and capabilities"""
     driver = driver_class(**driver_kwargs)
@@ -100,7 +100,7 @@ def driver(request, driver_class, driver_kwargs):
     driver.quit()
 
 
-@pytest.yield_fixture
+@pytest.yield_fixture(scope="session")
 def selenium(driver):
     yield driver
 
