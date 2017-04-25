@@ -35,12 +35,6 @@ class TestingBot(Provider):
         return self.get_credential('secret', ['TESTINGBOT_SECRET',
                                               'TESTINGBOT_PSW'])
 
-    def get_jenkins_credential(self, key):
-        if 'secret' == key:
-            return os.getenv(self.name.upper() + '_USR')
-        elif 'key' == key:
-            return os.getenv(self.name.upper() + '_PSW')
-
 
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
