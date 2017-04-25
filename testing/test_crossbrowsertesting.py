@@ -55,8 +55,8 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv('CROSSBROWSERTESTING_USERNAME', 'foo')
     monkeypatch.setenv('CROSSBROWSERTESTING_AUTH_KEY', 'bar')
-    out = failure()
-    messages = ['You are not authorized to view this', 'basic auth failed']
+    out = failure('--capability', 'browser_api_name', 'FF46')
+    messages = ['User not found!', 'basic auth failed']
     assert any(message in out for message in messages)
 
 
@@ -64,6 +64,6 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     config = tmpdir.join('.crossbrowsertesting')
     config.write('[credentials]\nusername=foo\nkey=bar')
-    out = failure()
-    messages = ['You are not authorized to view this', 'basic auth failed']
+    out = failure('--capability', 'browser_api_name', 'FF46')
+    messages = ['User not found!', 'basic auth failed']
     assert any(message in out for message in messages)
