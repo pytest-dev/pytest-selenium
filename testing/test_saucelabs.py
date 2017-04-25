@@ -51,8 +51,10 @@ def test_missing_api_key_file(failure, monkeypatch, tmpdir):
     assert 'Sauce Labs key must be set' in failure()
 
 
-@pytest.mark.parametrize(('username', 'key'), [('SAUCELABS_USERNAME', 'SAUCELABS_API_KEY'),
-                                               ('SAUCELABS_USR','SAUCELABS_PSW')])
+@pytest.mark.parametrize(('username', 'key'), [('SAUCELABS_USERNAME',
+                                                'SAUCELABS_API_KEY'),
+                                               ('SAUCELABS_USR',
+                                                'SAUCELABS_PSW')])
 def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv(username, 'foo')

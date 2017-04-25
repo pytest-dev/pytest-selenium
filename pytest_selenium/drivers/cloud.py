@@ -30,18 +30,17 @@ class Provider(object):
         config.read([name, os.path.join(os.path.expanduser('~'), name)])
         return config
 
-    def get_credential(self, key, env):
-        try:
-            value = self.config.get('credentials', key)
-        except (configparser.NoSectionError,
-                configparser.NoOptionError,
-                KeyError):
-            value = os.getenv(env)
-        if not value:
-            value = self.get_jenkins_credential(key)
-        if not value:
-            raise MissingCloudCredentialError(self.name, key, env)
-        return value
+    def get_credential(self, key, envs):
+        for env in envs:
+            try:
+                value = self.config.get('credentials', key)
+            except (configparser.NoSectionError,
+                    configparser.NoOptionError,
+                    KeyError):
+                value = os.getenv(env)
+            if value:
+                return value
+        raise MissingCloudCredentialError(self.name, key, envs)
 
     def get_jenkins_credential(self, key):
         if 'username' == key:
