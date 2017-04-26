@@ -30,13 +30,14 @@ class Provider(object):
         config.read([name, os.path.join(os.path.expanduser('~'), name)])
         return config
 
-    def get_credential(self, key, env):
+    def get_credential(self, key, envs):
         try:
-            value = self.config.get('credentials', key)
+            return self.config.get('credentials', key)
         except (configparser.NoSectionError,
                 configparser.NoOptionError,
                 KeyError):
-            value = os.getenv(env)
-        if not value:
-            raise MissingCloudCredentialError(self.name, key, env)
-        return value
+            for env in envs:
+                value = os.getenv(env)
+                if value:
+                    return value
+        raise MissingCloudCredentialError(self.name, key, envs)

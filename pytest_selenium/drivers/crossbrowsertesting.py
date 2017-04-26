@@ -24,11 +24,13 @@ class CrossBrowserTesting(Provider):
 
     @property
     def username(self):
-        return self.get_credential('username', 'CROSSBROWSERTESTING_USERNAME')
+        return self.get_credential('username', ['CROSSBROWSERTESTING_USERNAME',
+                                                'CROSSBROWSERTESTING_USR'])
 
     @property
     def key(self):
-        return self.get_credential('key', 'CROSSBROWSERTESTING_AUTH_KEY')
+        return self.get_credential('key', ['CROSSBROWSERTESTING_AUTH_KEY',
+                                           'CROSSBROWSERTESTING_PSW'])
 
 
 @pytest.mark.optionalhook

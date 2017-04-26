@@ -51,10 +51,14 @@ def test_missing_secret_file(failure, monkeypatch, tmpdir):
     assert 'TestingBot secret must be set' in failure()
 
 
-def test_invalid_credentials_env(failure, monkeypatch, tmpdir):
+@pytest.mark.parametrize(('key', 'secret'), [('TESTINGBOT_KEY',
+                                              'TESTINGBOT_SECRET'),
+                                             ('TESTINGBOT_PSW',
+                                              'TESTINGBOT_USR')])
+def test_invalid_credentials_env(failure, monkeypatch, tmpdir, key, secret):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
-    monkeypatch.setenv('TESTINGBOT_KEY', 'foo')
-    monkeypatch.setenv('TESTINGBOT_SECRET', 'bar')
+    monkeypatch.setenv(key, 'foo')
+    monkeypatch.setenv(secret, 'bar')
     out = failure('--capability', 'browserName', 'firefox')
     messages = ['incorrect TestingBot credentials', 'basic auth failed']
     assert any(message in out for message in messages)
