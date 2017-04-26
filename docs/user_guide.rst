@@ -231,10 +231,7 @@ credentials can be set as environment variables as follows:
     SAUCELABS = credentials('SAUCELABS')
   }
 
-For more information see Jenkins `docs`_.
-
-.. _Jenkins CI: <https://jenkins.io/>
-.. _docs: <https://jenkins.io/doc/pipeline/tour/environment/>
+For more information, see `using environment variables in Jenkins pipelines`_.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -281,7 +278,7 @@ credentials can be set as environment variables as follows:
     BROWSERSTACK = credentials('BROWSERSTACK')
   }
 
-For more information see Jenkins `docs`_.
+For more information, see `using environment variables in Jenkins pipelines`_.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -328,7 +325,7 @@ credentials can be set as environment variables as follows:
 
 Note that for TestingBot, ``username`` corresponds to ``key`` and ``password`` to ``secret``.
 
-For more information see Jenkins `docs`_.
+For more information, see `using environment variables in Jenkins pipelines`_.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -375,7 +372,7 @@ credentials can be set as environment variables as follows:
     CROSSBROWSERTESTING = credentials('CROSSBROWSERTESTING')
   }
 
-For more information see Jenkins `docs`_.
+For more information, see `using environment variables in Jenkins pipelines`_.
 
 Configuration
 ~~~~~~~~~~~~~
@@ -532,3 +529,6 @@ or set the ``SELENIUM_EXCLUDE_DEBUG`` environment variable to a list of the
 
 For example, to exclude HTML, logs, and screenshots from the report, you could
 set ``SELENIUM_EXCLUDE_DEBUG`` to ``html:logs:screenshot``.
+
+.. _Jenkins CI: https://jenkins.io/
+.. _using environment variables in Jenkins pipelines: https://jenkins.io/doc/pipeline/tour/environment/

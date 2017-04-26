@@ -6,7 +6,6 @@ import pytest
 from _pytest.mark import MarkInfo
 from py.xml import html
 import requests
-import os
 
 from pytest_selenium.drivers.cloud import Provider
 
