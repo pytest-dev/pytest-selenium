@@ -16,6 +16,8 @@ Release Notes
 * Only create a Firefox profile if :code:`--firefox-extension`,
   :code:`--firefox-preference`, or :code:`--firefox-profile` is specified.
 
+* Add :code:`chrome_options` fixture for configuring Google Chrome.
+
 **1.9.1 (2017-03-01)**
 
 * Add capabilities to metadata during :code:`pytest_configure` hook instead of

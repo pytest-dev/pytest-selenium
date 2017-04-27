@@ -144,6 +144,26 @@ option to indicate where it can be found::
 See the `ChromeDriver documentation <https://sites.google.com/a/chromium.org/chromedriver/>`_
 for more information.
 
+Configuration
+~~~~~~~~~~~~~
+
+A ``chrome_options`` fixture is available to configure various options for
+Chrome. The following example demonstrates specifying a binary path, adding
+an extension, and passing an argument to start Chrome in kiosk mode:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.fixture
+  def chrome_options(chrome_options):
+      chrome_options.binary_location = '/path/to/chrome'
+      chrome_options.add_extension('/path/to/extension.crx')
+      chrome_options.add_argument('--kiosk')
+      return chrome_options
+
+See the `Chrome options API documentation`_ for full details of what can be
+configured.
+
 Internet Explorer
 -----------------
 
@@ -515,3 +535,4 @@ set ``SELENIUM_EXCLUDE_DEBUG`` to ``html:logs:screenshot``.
 .. _Jenkins CI: https://jenkins.io/
 .. _using environment variables in Jenkins pipelines: https://jenkins.io/doc/pipeline/tour/environment/
 .. _Firefox options API documentation: https://seleniumhq.github.io/selenium/docs/api/py/webdriver_firefox/selenium.webdriver.firefox.options.html
+.. _Chrome options API documentation: https://seleniumhq.github.io/selenium/docs/api/py/webdriver_chrome/selenium.webdriver.chrome.options.html

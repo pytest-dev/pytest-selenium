@@ -52,12 +52,13 @@ def capabilities(request, session_capabilities):
 
 
 @pytest.fixture
-def driver_kwargs(request, capabilities, driver_class, driver_path,
-                  firefox_options, firefox_profile):
+def driver_kwargs(request, capabilities, chrome_options, driver_class,
+                  driver_path, firefox_options, firefox_profile):
     kwargs = {}
     driver = request.config.getoption('driver').lower()
     kwargs.update(getattr(drivers, driver).driver_kwargs(
         capabilities=capabilities,
+        chrome_options=chrome_options,
         driver_path=driver_path,
         firefox_options=firefox_options,
         firefox_profile=firefox_profile,
