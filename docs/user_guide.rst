@@ -22,9 +22,9 @@ Here's a simple example test that opens a website using Selenium:
 To run the above test you will need to specify the browser instance to be
 invoked. For example, to run it using Firefox installed in a default location:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Firefox
+  pytest --driver Firefox
 
 For full details of the Selenium API you can refer to the
 `documentation <http://seleniumhq.github.io/selenium/docs/api/py/api.html>`_.
@@ -85,9 +85,9 @@ An example using a :ref:`configuration file <configuration-files>`:
 
 An example using the command line:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --sensitive-url "example\.com"
+  pytest --sensitive-url "example\.com"
 
 Specifying a Browser
 ********************
@@ -101,9 +101,9 @@ Firefox
 To run your automated tests with Firefox version 47 or earlier, simply specify
 ``Firefox`` as your driver:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Firefox
+  pytest --driver Firefox
 
 For Firefox version 48 onwards, you will need to
 `download GeckoDriver <https://github.com/mozilla/geckodriver/releases>`_ and
@@ -111,9 +111,9 @@ For Firefox version 48 onwards, you will need to
 path, you can use the ``--driver-path`` option to indicate where it can be
 found:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Firefox --driver-path /path/to/geckodriver
+  pytest --driver Firefox --driver-path /path/to/geckodriver
 
 See the `GeckoDriver documentation <https://github.com/mozilla/geckodriver>`_
 for more information.
@@ -134,9 +134,9 @@ and specify ``Chrome`` for the ``--driver`` command line option. If the driver
 executable is not available on your path, you can use the ``--driver-path``
 option to indicate where it can be found:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Chrome --driver-path /path/to/chromedriver
+  pytest --driver Chrome --driver-path /path/to/chromedriver
 
 See the `ChromeDriver documentation <https://sites.google.com/a/chromium.org/chromedriver/>`_
 for more information.
@@ -150,9 +150,9 @@ and specify ``IE`` for the ``--driver`` command line option. If the driver
 executable is not available on your path, you can use the ``--driver-path``
 option to indicate where it can be found:
 
-.. code-block:: batch
+.. code-block::
 
-  > py.test --driver IE --driver-path \path\to\IEDriverServer.exe
+  pytest --driver IE --driver-path \path\to\IEDriverServer.exe
 
 PhantomJS
 ---------
@@ -162,9 +162,9 @@ and specify ``PhantomJS`` for the ``--driver`` command line option. If
 the driver executable is not available on your path, you can use the
 ``--driver-path`` option to indicate where it can be found:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver PhantomJS --driver-path /path/to/phantomjs
+  pytest --driver PhantomJS --driver-path /path/to/phantomjs
 
 See the `PhantomJS documentation <http://phantomjs.org/quick-start.html>`_ for
 more information.
@@ -177,9 +177,9 @@ Capitan or later, and ``selenium`` 3.0 or later. Once you have these
 prerequisites, simply specify ``Safari`` for the ``--driver`` command line
 option.
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Safari
+  pytest --driver Safari
 
 Selenium Server/Grid
 --------------------
@@ -200,17 +200,17 @@ for details of accepted values. There are also a number of
 that can be set. Be sure to also check the documentation for your chosen
 driver, as the accepted capabilities may differ:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Remote --capability browserName firefox
+  pytest --driver Remote --capability browserName firefox
 
 Note that if your server is not running locally or is running on an alternate
 port you will need to specify the ``--host`` and ``--port`` command line
 options:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Remote --host selenium.hostname --port 5555 --capability browserName firefox
+  pytest --driver Remote --host selenium.hostname --port 5555 --capability browserName firefox
 
 Sauce Labs
 ----------
@@ -248,9 +248,9 @@ Running tests
 
 To run your automated tests, simply specify ``SauceLabs`` as your driver:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver SauceLabs --capability browserName Firefox
+  pytest --driver SauceLabs --capability browserName Firefox
 
 See the `supported platforms <https://docs.saucelabs.com/reference/platforms-configurator/>`_
 to help you with your configuration. Additional capabilities can be set using
@@ -295,9 +295,9 @@ Running tests
 
 To run your automated tests, simply specify ``BrowserStack`` as your driver:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver BrowserStack --capability browserName Firefox
+  pytest --driver BrowserStack --capability browserName Firefox
 
 See the
 `capabilities documentation <https://www.browserstack.com/automate/capabilities>`_
@@ -342,9 +342,9 @@ Running tests
 
 To run your automated tests, simply specify ``TestingBot`` as your driver:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver TestingBot --capability browserName firefox --capability version 39 --capability platform WIN8
+  pytest --driver TestingBot --capability browserName firefox --capability version 39 --capability platform WIN8
 
 See the `list of available browsers <http://testingbot.com/support/getting-started/browsers.html>`_
 to help you with your configuration. Additional capabilities can be set using
@@ -390,9 +390,9 @@ Running tests
 To run your automated tests, simply specify ``CrossBrowserTesting`` as your
 driver:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver CrossBrowserTesting --capability os_api_name Win10 --capability browser_api_name FF46
+  pytest --driver CrossBrowserTesting --capability os_api_name Win10 --capability browser_api_name FF46
 
 Additional capabilities can be set using the ``--capability`` command line
 arguments. See the
@@ -411,9 +411,9 @@ Command Line Capabilities
 
 Simple capabilities can be set or overridden on the command line:
 
-.. code-block:: bash
+.. code-block::
 
-  $ py.test --driver Remote --capability browserName Firefox
+  pytest --driver Remote --capability browserName Firefox
 
 Capabilities Files
 ------------------
