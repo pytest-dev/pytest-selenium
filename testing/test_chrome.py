@@ -17,3 +17,22 @@ def test_launch(testdir, httpserver):
             assert webtext == u'Success!'
     """)
     testdir.quick_qa('--driver', 'Chrome', file_test, passed=1)
+
+
+@pytest.mark.chrome
+def test_options(testdir):
+    testdir.makepyfile("""
+        import pytest
+        @pytest.fixture
+        def chrome_options(chrome_options):
+            chrome_options.binary_location = '/foo/bar'
+            return chrome_options
+
+        @pytest.mark.nondestructive
+        def test_pass(selenium): pass
+    """)
+    reprec = testdir.inline_run('--driver', 'Chrome')
+    passed, skipped, failed = reprec.listoutcomes()
+    assert len(failed) == 1
+    out = failed[0].longrepr.reprcrash.message
+    assert 'no chrome binary at /foo/bar' in out
