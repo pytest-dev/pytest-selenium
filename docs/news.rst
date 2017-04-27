@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+**1.10.0 (unreleased)**
+
+* Add alternate credentials environment variables for Jenkins declarative
+  pipelines.
+
+  * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
 **1.9.1 (2017-03-01)**
 
 * Add capabilities to metadata during :code:`pytest_configure` hook instead of
