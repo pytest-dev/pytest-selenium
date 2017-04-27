@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import warnings
+
 import pytest
 from selenium.webdriver import FirefoxProfile
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
@@ -51,23 +53,53 @@ def firefox_options(request, firefox_path, firefox_profile):
 
 
 @pytest.fixture(scope='session')
-def firefox_path(request):
-    return request.config.getoption('firefox_path')
+def firefox_path(pytestconfig):
+    if pytestconfig.getoption('firefox_path'):
+        warnings.warn(
+            '--firefox-path has been deprecated and will be removed in a '
+            'future release. Please make sure the Firefox binary is in the '
+            'default location, or the system path. If you want to specify a '
+            'binary path then use the firefox_options fixture to and set this '
+            'using firefox_options.binary.', DeprecationWarning)
+        return pytestconfig.getoption('firefox_path')
 
 
 @pytest.fixture
-def firefox_profile(request):
-    profile = FirefoxProfile(request.config.getoption('firefox_profile'))
-    for preference in request.config.getoption('firefox_preferences'):
-        name, value = preference
-        if value.isdigit():
-            # handle integer preferences
-            value = int(value)
-        elif value.lower() in ['true', 'false']:
-            # handle boolean preferences
-            value = value.lower() == 'true'
-        profile.set_preference(name, value)
-    profile.update_preferences()
-    for extension in request.config.getoption('firefox_extensions'):
-        profile.add_extension(extension)
+def firefox_profile(pytestconfig):
+    profile = None
+    if pytestconfig.getoption('firefox_profile'):
+        profile = FirefoxProfile(pytestconfig.getoption('firefox_profile'))
+        warnings.warn(
+            '--firefox-profile has been deprecated and will be removed in '
+            'a future release. Please use the firefox_options fixture to '
+            'set a profile path or FirefoxProfile object using '
+            'firefox_options.profile.', DeprecationWarning)
+    if pytestconfig.getoption('firefox_preferences'):
+        profile = profile or FirefoxProfile()
+        warnings.warn(
+            '--firefox-preference has been deprecated and will be removed in '
+            'a future release. Please use the firefox_options fixture to set '
+            'preferences using firefox_options.set_preference. If you are '
+            'using Firefox 47 or earlier then you will need to create a '
+            'FirefoxProfile object with preferences and set this using '
+            'firefox_options.profile.', DeprecationWarning)
+        for preference in pytestconfig.getoption('firefox_preferences'):
+            name, value = preference
+            if value.isdigit():
+                # handle integer preferences
+                value = int(value)
+            elif value.lower() in ['true', 'false']:
+                # handle boolean preferences
+                value = value.lower() == 'true'
+            profile.set_preference(name, value)
+        profile.update_preferences()
+    if pytestconfig.getoption('firefox_extensions'):
+        profile = profile or FirefoxProfile()
+        warnings.warn(
+            '--firefox-extensions has been deprecated and will be removed in '
+            'a future release. Please use the firefox_options fixture to '
+            'create a FirefoxProfile object with extensions and set this '
+            'using firefox_options.profile.', DeprecationWarning)
+        for extension in pytestconfig.getoption('firefox_extensions'):
+            profile.add_extension(extension)
     return profile

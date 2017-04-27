@@ -121,10 +121,9 @@ for more information.
 Configuration
 ~~~~~~~~~~~~~
 
-The current implementation of the Firefox driver does not allow you to specify
-the binary path, preferences, profile path, or extensions via capabilities.
-There are therefore additional command line options for each of these. Check
-``--help`` for further details.
+A ``firefox_options`` fixture is available to configure various options for
+Firefox. See the `Firefox options API documentation`_ for full details of what
+can be configured.
 
 Chrome
 ------
@@ -532,3 +531,4 @@ set ``SELENIUM_EXCLUDE_DEBUG`` to ``html:logs:screenshot``.
 
 .. _Jenkins CI: https://jenkins.io/
 .. _using environment variables in Jenkins pipelines: https://jenkins.io/doc/pipeline/tour/environment/
+.. _Firefox options API documentation: https://seleniumhq.github.io/selenium/docs/api/py/webdriver_firefox/selenium.webdriver.firefox.options.html

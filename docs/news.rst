@@ -8,6 +8,14 @@ Release Notes
 
   * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
 
+* Deprecate :code:`--firefox-extension`, :code:`--firefox-path`,
+  :code:`--firefox-preference`, and :code:`--firefox-profile` command line
+  options. The preferred way to set these is now through the
+  :code:`firefox_options` fixture.
+
+* Only create a Firefox profile if :code:`--firefox-extension`,
+  :code:`--firefox-preference`, or :code:`--firefox-profile` is specified.
+
 **1.9.1 (2017-03-01)**
 
 * Add capabilities to metadata during :code:`pytest_configure` hook instead of
