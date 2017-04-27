@@ -22,6 +22,7 @@ setup(name='pytest-selenium',
           'crossbrowsertesting_driver = '
           'pytest_selenium.drivers.crossbrowsertesting',
           'chrome_driver = pytest_selenium.drivers.chrome',
+          'edge_driver = pytest_selenium.drivers.edge',
           'firefox_driver = pytest_selenium.drivers.firefox',
           'ie_driver = pytest_selenium.drivers.internet_explorer',
           'remote_driver = pytest_selenium.drivers.remote',
