@@ -13,13 +13,13 @@ def pytest_addoption(parser):
                      default=os.environ.get('SELENIUM_HOST', 'localhost'),
                      metavar='str',
                      help='host that selenium server is listening on. '
-                          '(default: %default)')
+                          '(default: %(default)s)')
     group._addoption('--port',
-                     type='int',
+                     type=int,
                      default=os.environ.get('SELENIUM_PORT', 4444),
                      metavar='num',
                      help='port that selenium server is listening on. '
-                          '(default: %default)')
+                          '(default: %(default)s)')
 
 
 def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
