@@ -1,7 +1,7 @@
 pytest-selenium
 ===============
 
-pytest-selenium is a plugin for `py.test <http://pytest.org>`_ that provides
+pytest-selenium is a plugin for `pytest <http://pytest.org>`_ that provides
 support for running `Selenium <http://seleniumhq.org/>`_ based tests.
 
 .. toctree::
