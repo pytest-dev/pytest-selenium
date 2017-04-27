@@ -122,8 +122,20 @@ Configuration
 ~~~~~~~~~~~~~
 
 A ``firefox_options`` fixture is available to configure various options for
-Firefox. See the `Firefox options API documentation`_ for full details of what
-can be configured.
+Firefox. The following example demonstrates specifying a binary path,
+preferences, and a command line argument:
+
+.. code-block:: python
+
+  @pytest.fixture
+  def firefox_options(firefox_options):
+      firefox_options.binary = '/path/to/firefox-bin'
+      firefox_options.add_argument('-foreground')
+      firefox_options.set_preference('browser.anchor_color', '#FF0000')
+      return firefox_options
+
+See the `Firefox options API documentation`_ for full details of what can be
+configured.
 
 Chrome
 ------
