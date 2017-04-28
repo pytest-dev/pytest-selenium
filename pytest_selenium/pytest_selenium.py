@@ -60,7 +60,8 @@ def driver_args():
 
 @pytest.fixture
 def driver_kwargs(request, capabilities, chrome_options, driver_args,
-                  driver_class, driver_path, firefox_options, firefox_profile):
+                  driver_class, driver_path, firefox_options, firefox_profile,
+                  pytestconfig):
     kwargs = {}
     driver = request.config.getoption('driver').lower()
     kwargs.update(getattr(drivers, driver).driver_kwargs(
@@ -73,6 +74,8 @@ def driver_kwargs(request, capabilities, chrome_options, driver_args,
         host=request.config.getoption('host'),
         port=request.config.getoption('port'),
         request=request,
+        log_path=None,
+        pytestconfig=pytestconfig,
         test='.'.join(split_class_and_test_names(request.node.nodeid))))
     return kwargs
 
@@ -207,6 +210,11 @@ def _gather_html(item, report, driver, summary, extra):
 
 
 def _gather_logs(item, report, driver, summary, extra):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if hasattr(item.config, '_driver_log'):
+        with open(item.config._driver_log, 'r') as driver_log:
+            extra.append(pytest_html.extras.text(
+                driver_log.read(), 'Driver Log'))
     try:
         types = driver.log_types
     except Exception as e:
@@ -220,7 +228,6 @@ def _gather_logs(item, report, driver, summary, extra):
             summary.append('WARNING: Failed to gather {0} log: {1}'.format(
                 name, e))
             return
-        pytest_html = item.config.pluginmanager.getplugin('html')
         if pytest_html is not None:
             extra.append(pytest_html.extras.text(
                 format_log(log), '%s Log' % name.title()))
