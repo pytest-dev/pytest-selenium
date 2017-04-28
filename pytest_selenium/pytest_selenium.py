@@ -52,13 +52,20 @@ def capabilities(request, session_capabilities):
 
 
 @pytest.fixture
-def driver_kwargs(request, capabilities, chrome_options, driver_class,
-                  driver_path, firefox_options, firefox_profile):
+def driver_args():
+    """Return arguments to pass to the driver service"""
+    return None
+
+
+@pytest.fixture
+def driver_kwargs(request, capabilities, chrome_options, driver_args,
+                  driver_class, driver_path, firefox_options, firefox_profile):
     kwargs = {}
     driver = request.config.getoption('driver').lower()
     kwargs.update(getattr(drivers, driver).driver_kwargs(
         capabilities=capabilities,
         chrome_options=chrome_options,
+        driver_args=driver_args,
         driver_path=driver_path,
         firefox_options=firefox_options,
         firefox_profile=firefox_profile,

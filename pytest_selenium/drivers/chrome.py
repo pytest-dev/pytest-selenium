@@ -6,10 +6,13 @@ import pytest
 from selenium.webdriver.chrome.options import Options
 
 
-def driver_kwargs(capabilities, driver_path, chrome_options, **kwargs):
+def driver_kwargs(capabilities, driver_args, driver_path, chrome_options,
+                  **kwargs):
     kwargs = {
         'desired_capabilities': capabilities,
         'chrome_options': chrome_options}
+    if driver_args is not None:
+        kwargs['service_args'] = driver_args
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
     return kwargs
