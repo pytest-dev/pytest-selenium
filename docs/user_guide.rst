@@ -164,6 +164,20 @@ an extension, and passing an argument to start Chrome in kiosk mode:
 See the `Chrome options API documentation`_ for full details of what can be
 configured.
 
+The ChromeDriver supports various command line arguments. These can be passed
+by implementing a ``driver_args`` fixture and returning a list of the desired
+arguments. The following example specifies the log file path:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.fixture
+  def driver_args():
+      return ['--log-path=chromedriver.log']
+
+For a full list of supported command line arguments, run
+``chromedriver --help`` in your terminal.
+
 Internet Explorer
 -----------------
 
@@ -187,6 +201,23 @@ the driver executable is not available on your path, you can use the
 
 See the `PhantomJS documentation <http://phantomjs.org/quick-start.html>`_ for
 more information.
+
+Configuration
+~~~~~~~~~~~~~
+
+PhantomJS supports various command line arguments. These can be passed by
+implementing a ``driver_args`` fixture and returning a list of the desired
+arguments. The following example specifies the log file path:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.fixture
+  def driver_args():
+      return ['--webdriver-logfile=phantomjs.log']
+
+For a full list of supported command line arguments, run ``phantomjs --help``
+in your terminal.
 
 Safari
 ------

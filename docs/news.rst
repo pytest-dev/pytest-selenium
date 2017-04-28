@@ -18,6 +18,9 @@ Release Notes
 
 * Add :code:`chrome_options` fixture for configuring Google Chrome.
 
+* Add :code:`driver_args` fixture for adding command line arguments to the
+  driver services. Currently only used by Chrome and PhantomJS.
+
 **1.9.1 (2017-03-01)**
 
 * Add capabilities to metadata during :code:`pytest_configure` hook instead of
