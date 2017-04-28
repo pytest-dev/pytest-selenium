@@ -148,7 +148,7 @@ def test_exclude_debug_config(testdir, httpserver, monkeypatch, exclude):
 
 
 def test_driver_log(testdir, httpserver):
-    driver_log_regex = '<a class="text" href=".*" target="_blank">Driver Log</a>' #noqa
+    driver_log_regex = '<a class="text" href=".*" target="_blank">Driver Log</a>'  # noqa
     httpserver.serve_content(content='<h1>Success!</h1><p>Ё</p>')
     result, html = run(testdir)
     assert re.search(driver_log_regex, html) is not None
