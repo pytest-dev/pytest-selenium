@@ -17,16 +17,17 @@ class TestingBot(Provider):
 
     def __init__(self, host=None, port=None):
         super(TestingBot, self).__init__()
-        self._host = host
-        self._port = port
+        self.host = host or 'hub.testingbot.com'
+        self.port = port or 80
 
     @property
     def auth(self):
-        return (self.key, self.secret)
+        return self.key, self.secret
 
     @property
     def executor(self):
-        return 'http://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub'
+        return 'http://{0.key}:{0.secret}' \
+               '@{0.host}:{0.port}/wd/hub'.format(self)
 
     @property
     def key(self):
@@ -37,14 +38,6 @@ class TestingBot(Provider):
     def secret(self):
         return self.get_credential('secret', ['TESTINGBOT_SECRET',
                                               'TESTINGBOT_PSW'])
-
-    @property
-    def host(self):
-        return self._host or 'hub.testingbot.com'
-
-    @property
-    def port(self):
-        return self._port or 80
 
 
 @pytest.mark.optionalhook
@@ -97,7 +90,7 @@ def driver_kwargs(request, test, capabilities, host, port, **kwargs):
         capabilities['groups'] = groups
 
     kwargs = {
-        'command_executor': provider.executor.format(provider),
+        'command_executor': provider.executor,
         'desired_capabilities': capabilities}
     return kwargs
 

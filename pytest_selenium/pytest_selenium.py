@@ -242,7 +242,7 @@ def split_class_and_test_names(nodeid):
     classnames = names[:-1]
     classname = '.'.join(classnames)
     name = names[-1]
-    return (classname, name)
+    return classname, name
 
 
 def pytest_addoption(parser):
@@ -275,10 +275,12 @@ def pytest_addoption(parser):
                           'package.module.EventListenerClassName.')
     group._addoption('--host',
                      metavar='str',
-                     help='host that selenium server is listening on. '
-                          '(default: %default)')
+                     help='host that the selenium server is listening on, '
+                          'which will default to the cloud provider default '
+                          'or localhost.')
     group._addoption('--port',
                      type='int',
                      metavar='num',
-                     help='port that selenium server is listening on. '
-                          '(default: %default)')
+                     help='port that the selenium server is listening on, '
+                          'which will default to the cloud provider default '
+                          'or localhost.')

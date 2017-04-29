@@ -14,18 +14,12 @@ def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
     capabilities.setdefault('version', '')  # default to any version
     capabilities.setdefault('platform', 'ANY')  # default to any platform
 
-    executor = 'http://{host}:{port}/wd/hub'.format(host=host or get_host(),
-                                                    port=port or get_port())
+    executor = 'http://{host}:{port}/wd/hub'.format(
+        host=host or os.environ.get('SELENIUM_HOST', 'localhost'),
+        port=port or os.environ.get('SELENIUM_PORT', 4444))
+
     kwargs = {
         'command_executor': executor,
         'desired_capabilities': capabilities,
         'browser_profile': firefox_profile}
     return kwargs
-
-
-def get_host():
-    return os.environ.get('SELENIUM_HOST', 'localhost')
-
-
-def get_port():
-    return os.environ.get('SELENIUM_PORT', 4444)
