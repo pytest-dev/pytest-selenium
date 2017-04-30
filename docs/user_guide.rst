@@ -390,6 +390,14 @@ the ``--capability`` command line arguments. See the
 `test options <http://testingbot.com/support/other/test-options>`_
 for full details of what can be configured.
 
+Local tunnel
+____________
+
+To run the tests using `TestingBots local tunnel <https://testingbot.com/support/other/tunnel>`_
+you'll also need to set the ``--host`` and ``--port`` command line arguments::
+
+    --host localhost --port 4445
+
 CrossBrowserTesting
 -------------------
 

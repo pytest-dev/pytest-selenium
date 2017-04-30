@@ -3,23 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-
 import pytest
-
-
-def pytest_addoption(parser):
-    group = parser.getgroup('selenium', 'selenium')
-    group._addoption('--host',
-                     default=os.environ.get('SELENIUM_HOST', 'localhost'),
-                     metavar='str',
-                     help='host that selenium server is listening on. '
-                          '(default: %(default)s)')
-    group._addoption('--port',
-                     type=int,
-                     default=os.environ.get('SELENIUM_PORT', 4444),
-                     metavar='num',
-                     help='port that selenium server is listening on. '
-                          '(default: %(default)s)')
 
 
 def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
@@ -30,7 +14,10 @@ def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
     capabilities.setdefault('version', '')  # default to any version
     capabilities.setdefault('platform', 'ANY')  # default to any platform
 
-    executor = 'http://{host}:{port}/wd/hub'.format(host=host, port=port)
+    executor = 'http://{host}:{port}/wd/hub'.format(
+        host=host or os.environ.get('SELENIUM_HOST', 'localhost'),
+        port=port or os.environ.get('SELENIUM_PORT', 4444))
+
     kwargs = {
         'command_executor': executor,
         'desired_capabilities': capabilities,

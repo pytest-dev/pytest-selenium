@@ -273,3 +273,15 @@ def pytest_addoption(parser):
                      metavar='str',
                      help='selenium eventlistener class, e.g. '
                           'package.module.EventListenerClassName.')
+    group._addoption('--host',
+                     default=os.environ.get('SELENIUM_HOST', 'localhost'),
+                     metavar='str',
+                     help='host that the selenium server is listening on, '
+                          'which will default to the cloud provider default '
+                          'or localhost.')
+    group._addoption('--port',
+                     type=int,
+                     metavar='num',
+                     help='port that the selenium server is listening on, '
+                          'which will default to the cloud provider default '
+                          'or localhost.')
