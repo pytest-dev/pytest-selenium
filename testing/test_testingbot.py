@@ -70,3 +70,10 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     out = failure('--capability', 'browserName', 'firefox')
     messages = ['incorrect TestingBot credentials', 'basic auth failed']
     assert any(message in out for message in messages)
+
+
+def test_invalid_host(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
+    tmpdir.join('.testingbot').write('[credentials]\nkey=foo\nsecret=bar')
+    out = failure('--host', 'foo.bar.com')
+    assert "urlopen error" in out
