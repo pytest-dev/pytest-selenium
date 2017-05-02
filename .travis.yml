@@ -9,7 +9,7 @@ sudo: required
 env:
   global:
   - DISPLAY=:99.0
-  - PYTEST_ADDOPTS="-m 'not (chrome or safari or phantomjs)'"
+  - PYTEST_ADDOPTS="-m 'not (chrome or edge or safari or phantomjs)'"
   matrix:
   - TOXENV=pytest29
   - TOXENV=pytest30
