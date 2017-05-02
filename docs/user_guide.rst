@@ -391,12 +391,10 @@ the ``--capability`` command line arguments. See the
 for full details of what can be configured.
 
 Local tunnel
-____________
+~~~~~~~~~~~~
 
-To run the tests using `TestingBots local tunnel <https://testingbot.com/support/other/tunnel>`_
-you'll also need to set the ``--host`` and ``--port`` command line arguments::
-
-    --host localhost --port 4445
+To run the tests using `TestingBot's local tunnel <https://testingbot.com/support/other/tunnel>`_
+you'll also need to set the ``--host`` and ``--port`` command line arguments.
 
 CrossBrowserTesting
 -------------------
