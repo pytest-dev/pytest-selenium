@@ -21,6 +21,12 @@ Release Notes
 * Add :code:`driver_args` fixture for adding command line arguments to the
   driver services. Currently only used by Chrome and PhantomJS.
 
+* Add support for TestingBot local tunnel via :code:`--host` and :code:`--port`
+  command line options.
+
+  * Thanks to `@micheletest <https://github.com/micheletest>`_ for the report
+    and to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
 **1.9.1 (2017-03-01)**
 
 * Add capabilities to metadata during :code:`pytest_configure` hook instead of
