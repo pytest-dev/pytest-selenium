@@ -27,6 +27,10 @@ Release Notes
   * Thanks to `@micheletest <https://github.com/micheletest>`_ for the report
     and to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
 
+* Add support for Microsoft Edge.
+
+  * Thanks to `@birdsarah <https://github.com/birdsarah>`_ for the PR
+
 **1.9.1 (2017-03-01)**
 
 * Add capabilities to metadata during :code:`pytest_configure` hook instead of
