@@ -31,6 +31,10 @@ Release Notes
 
   * Thanks to `@birdsarah <https://github.com/birdsarah>`_ for the PR
 
+* Add driver logs to HTML report.
+
+  * Thanks to `@jrbenny35 <https://github.com/jrbenny35>`_ for the PR
+
 **1.9.1 (2017-03-01)**
 
 * Add capabilities to metadata during :code:`pytest_configure` hook instead of
