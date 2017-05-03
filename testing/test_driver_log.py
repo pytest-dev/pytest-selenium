@@ -25,7 +25,7 @@ def test_driver_log(testdir, httpserver):
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is not None
-    assert os.path.exists(testdir.tmpdir.join('driver.log'))
+    assert os.path.exists(str(testdir.tmpdir.join('driver.log')))
 
 
 def test_driver_log_fixture(testdir, httpserver):
@@ -41,7 +41,7 @@ def test_driver_log_fixture(testdir, httpserver):
             assert webtext == u'Success!'
     """)
     testdir.quick_qa(file_test, passed=1)
-    assert os.path.exists(testdir.tmpdir.join('foo.log'))
+    assert os.path.exists(str(testdir.tmpdir.join('foo.log')))
 
 
 def test_no_driver_log(testdir, httpserver):
@@ -61,4 +61,4 @@ def test_no_driver_log(testdir, httpserver):
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is None
-    assert not os.path.exists(testdir.tmpdir.join('driver.log'))
+    assert not os.path.exists(str(testdir.tmpdir.join('driver.log')))

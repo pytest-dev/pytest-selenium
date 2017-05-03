@@ -45,6 +45,10 @@ def test_args(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.fixture
+        def driver_log():
+            return None
+
+        @pytest.fixture
         def driver_args():
             return ['--log-path=foo.log']
 
@@ -52,4 +56,4 @@ def test_args(testdir):
         def test_pass(selenium): pass
     """)
     testdir.quick_qa('--driver', 'Chrome', file_test, passed=1)
-    assert os.path.exists(testdir.tmpdir.join('foo.log'))
+    assert os.path.exists(str(testdir.tmpdir.join('foo.log')))

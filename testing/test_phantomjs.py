@@ -33,4 +33,4 @@ def test_args(testdir):
         def test_pass(selenium): pass
     """)
     testdir.quick_qa('--driver', 'PhantomJS', file_test, passed=1)
-    assert os.path.exists(testdir.tmpdir.join('foo.log'))
+    assert os.path.exists(str(testdir.tmpdir.join('foo.log')))
