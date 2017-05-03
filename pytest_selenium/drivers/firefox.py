@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import warnings
-import os
 
 import pytest
 from selenium.webdriver import FirefoxProfile
@@ -34,15 +33,15 @@ def pytest_addoption(parser):
                      help='path to a firefox extension.')
 
 
-def driver_kwargs(capabilities, driver_path, firefox_options, log_path,
-                  pytestconfig, **kwargs):
+def driver_kwargs(capabilities, driver_log, driver_path, firefox_options,
+                  **kwargs):
     kwargs = {}
     if capabilities:
         kwargs['capabilities'] = capabilities
+    if driver_log is not None:
+        kwargs['log_path'] = driver_log
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
-    log_path = os.path.realpath('geckodriver.log')
-    kwargs['log_path'] = pytestconfig._driver_log = log_path
     kwargs['firefox_options'] = firefox_options
     return kwargs
 
