@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-1.10.0 (unreleased)
+1.10.0 (2017-05-04)
 -------------------
 
 * Add alternate credentials environment variables for Jenkins declarative
