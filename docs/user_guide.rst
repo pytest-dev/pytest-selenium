@@ -35,7 +35,7 @@ Configuration Files
 There are a number of options and values that can be set in an INI-style
 configuration file. For details of the expected name, format, and location of
 these configuration files, check the
-`pytest documentation <http://pytest.org/latest/customize.html#command-line-options-and-configuration-file-settings>`_.
+`pytest documentation <http://pytest.org/en/latest/customize.html#command-line-options-and-configuration-file-settings>`_.
 
 
 Specifying a Base URL
