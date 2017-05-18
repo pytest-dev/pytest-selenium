@@ -25,7 +25,8 @@ def test_driver_log(testdir, httpserver):
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is not None
-    assert os.path.exists(str(testdir.tmpdir.join('driver.log')))
+    log_path = testdir.tmpdir.dirpath('basetemp', 'test_fail0', 'driver.log')
+    assert os.path.exists(str(log_path))
 
 
 def test_driver_log_fixture(testdir, httpserver):
@@ -61,4 +62,5 @@ def test_no_driver_log(testdir, httpserver):
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is None
-    assert not os.path.exists(str(testdir.tmpdir.join('driver.log')))
+    log_path = testdir.tmpdir.dirpath('basetemp', 'test_fail0', 'driver.log')
+    assert not os.path.exists(str(log_path))
