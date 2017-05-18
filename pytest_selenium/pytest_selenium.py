@@ -90,9 +90,9 @@ def driver_class(request):
 
 
 @pytest.fixture
-def driver_log():
+def driver_log(tmpdir):
     """Return path to driver log"""
-    return os.path.realpath('driver.log')
+    return str(tmpdir.join('driver.log'))
 
 
 @pytest.fixture
@@ -218,9 +218,10 @@ def _gather_html(item, report, driver, summary, extra):
 
 def _gather_logs(item, report, driver, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin('html')
-    if os.path.exists(item.config._driver_log):
+    if item.config._driver_log and os.path.exists(item.config._driver_log):
         with open(item.config._driver_log, 'r') as f:
             extra.append(pytest_html.extras.text(f.read(), 'Driver Log'))
+        summary.append('Driver log: {0}'.format(item.config._driver_log))
     try:
         types = driver.log_types
     except Exception as e:

@@ -1,6 +1,11 @@
 Release Notes
 =============
 
+1.11.0 (unreleased)
+-------------------
+
+* Use a separate log file for each driver instance.
+
 1.10.0 (2017-05-04)
 -------------------
 
