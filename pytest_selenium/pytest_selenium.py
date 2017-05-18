@@ -92,7 +92,7 @@ def driver_class(request):
 @pytest.fixture
 def driver_log(tmpdir):
     """Return path to driver log"""
-    return tmpdir.join('driver.log')
+    return str(tmpdir.join('driver.log'))
 
 
 @pytest.fixture
