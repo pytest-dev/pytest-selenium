@@ -17,7 +17,7 @@ def test_driver_log(testdir, httpserver):
     testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_fail(webtext):
+        def test_driver_log(webtext):
             assert False
     """)
     path = testdir.tmpdir.join('report.html')
@@ -25,7 +25,8 @@ def test_driver_log(testdir, httpserver):
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is not None
-    log_path = testdir.tmpdir.dirpath('basetemp', 'test_fail0', 'driver.log')
+    log_path = testdir.tmpdir.dirpath(
+        'basetemp', 'test_driver_log0', 'driver.log')
     assert os.path.exists(str(log_path))
 
 
@@ -54,7 +55,7 @@ def test_no_driver_log(testdir, httpserver):
             return None
 
         @pytest.mark.nondestructive
-        def test_fail(webtext):
+        def test_no_driver_log(webtext):
             assert False
     """)
     path = testdir.tmpdir.join('report.html')
@@ -62,5 +63,6 @@ def test_no_driver_log(testdir, httpserver):
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is None
-    log_path = testdir.tmpdir.dirpath('basetemp', 'test_fail0', 'driver.log')
+    log_path = testdir.tmpdir.dirpath(
+        'basetemp', 'test_no_driver_log0', 'driver.log')
     assert not os.path.exists(str(log_path))
