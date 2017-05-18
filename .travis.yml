@@ -32,6 +32,7 @@ before_script:
 - gunzip -c geckodriver.tar.gz | tar xopf -
 - chmod +x geckodriver && sudo mv geckodriver /usr/local/bin
 - sh -e /etc/init.d/xvfb start
+- geckodriver --version
 script:
 - tox
 addons:
