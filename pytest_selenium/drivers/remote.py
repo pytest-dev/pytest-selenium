@@ -6,7 +6,7 @@ import os
 import pytest
 
 
-def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
+def driver_kwargs(capabilities, browser_profile, host, port, **kwargs):
     if 'browserName' not in capabilities:
         # remote instances must at least specify a browserName capability
         raise pytest.UsageError('The \'browserName\' capability must be '
@@ -21,5 +21,5 @@ def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
     kwargs = {
         'command_executor': executor,
         'desired_capabilities': capabilities,
-        'browser_profile': firefox_profile}
+        'browser_profile': browser_profile}
     return kwargs
