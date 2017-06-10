@@ -44,6 +44,12 @@ Specifying a Base URL
 To specify a base URL, refer to the documentation for the
 `pytest-base-url <https://github.com/pytest-dev/pytest-base-url>`_ plugin.
 
+.. note::
+
+  By default, any tests using a base URL will be skipped. This is because all tests
+  are considered destructive, and all environments are considered sensitive. See
+  `Sensitive Environments`_ for further details.
+
 Sensitive Environments
 **********************
 
