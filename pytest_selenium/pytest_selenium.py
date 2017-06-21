@@ -43,9 +43,16 @@ def session_capabilities(pytestconfig):
 
 
 @pytest.fixture
-def capabilities(request, session_capabilities):
+def capabilities(request, driver_class, chrome_options, firefox_options,
+                 session_capabilities):
     """Returns combined capabilities"""
     capabilities = copy.deepcopy(session_capabilities)  # make a copy
+    if driver_class == webdriver.Remote:
+        browser_name = str(capabilities.get('browserName')).lower()
+        if browser_name == 'chrome':
+            capabilities.update(chrome_options.to_capabilities())
+        elif browser_name == 'firefox':
+            capabilities.update(firefox_options.to_capabilities())
     capabilities_marker = request.node.get_marker('capabilities')
     if capabilities_marker is not None:
         # add capabilities from the marker
