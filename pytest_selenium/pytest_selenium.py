@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import argparse
 import copy
 from datetime import datetime
 import os
@@ -136,8 +137,9 @@ def pytest_configure(config):
     if hasattr(config, '_metadata'):
         config._metadata['Driver'] = config.getoption('driver')
         config._metadata['Capabilities'] = config._capabilities
-        if config.option.driver == 'Remote':
-            config._metadata['Server'] = 'http://{0}:{1}'.format(
+        config._metadata['Capabilities'] = config._capabilities
+        if all((config.getoption('host'), config.getoption('port'))):
+            config._metadata['Server'] = '{0}:{1}'.format(
                 config.getoption('host'),
                 config.getoption('port'))
 
@@ -260,6 +262,16 @@ def split_class_and_test_names(nodeid):
     return (classname, name)
 
 
+class DriverAction(argparse.Action):
+
+    def __call__(self, parser, namespace, values, option_string=None):
+        setattr(namespace, self.dest, values)
+        driver = getattr(drivers, values.lower())
+        # set the default host and port if specified in the driver module
+        setattr(namespace, 'host', getattr(driver, 'HOST', None))
+        setattr(namespace, 'port', getattr(driver, 'PORT', None))
+
+
 def pytest_addoption(parser):
     _capture_choices = ('never', 'failure', 'always')
     parser.addini('selenium_capture_debug',
@@ -271,6 +283,7 @@ def pytest_addoption(parser):
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--driver',
+                     action=DriverAction,
                      choices=SUPPORTED_DRIVERS,
                      help='webdriver implementation.',
                      metavar='str')

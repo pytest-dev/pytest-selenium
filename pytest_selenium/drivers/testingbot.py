@@ -9,6 +9,9 @@ import requests
 
 from pytest_selenium.drivers.cloud import Provider
 
+HOST = 'hub.testingbot.com'
+PORT = 80
+
 
 class TestingBot(Provider):
 
@@ -17,8 +20,8 @@ class TestingBot(Provider):
 
     def __init__(self, host=None, port=None):
         super(TestingBot, self).__init__()
-        self.host = host or 'hub.testingbot.com'
-        self.port = port or 80
+        self.host = host
+        self.port = port
 
     @property
     def auth(self):

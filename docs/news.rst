@@ -4,6 +4,8 @@ Release Notes
 1.11.0 (unreleased)
 -------------------
 
+* Restore host and port in HTML report when using defaults.
+
 * Warn in pytest header when the sensitive URL matches the base URL.
 
   * Thanks to `@Jenselme <https://github.com/Jenselme>`_ for the PR

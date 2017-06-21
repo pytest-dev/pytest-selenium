@@ -5,6 +5,9 @@
 import os
 import pytest
 
+HOST = os.environ.get('SELENIUM_HOST', 'localhost')
+PORT = os.environ.get('SELENIUM_PORT', 4444)
+
 
 def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
     if 'browserName' not in capabilities:
@@ -14,9 +17,7 @@ def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
     capabilities.setdefault('version', '')  # default to any version
     capabilities.setdefault('platform', 'ANY')  # default to any platform
 
-    executor = 'http://{host}:{port}/wd/hub'.format(
-        host=host or os.environ.get('SELENIUM_HOST', 'localhost'),
-        port=port or os.environ.get('SELENIUM_PORT', 4444))
+    executor = 'http://{0}:{1}/wd/hub'.format(host, port)
 
     kwargs = {
         'command_executor': executor,
