@@ -96,3 +96,25 @@ def test_extension(testdir):
             assert 'Test Extension (empty)' in extensions
     """)
     testdir.quick_qa('--firefox-extension', extension, file_test, passed=1)
+
+
+def test_preferences_marker(testdir, httpserver):
+    """Test that preferences can be specified using the marker."""
+    httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        @pytest.mark.firefox_preferences({
+            'browser.anchor_color': '#FF69B4',
+            'browser.display.foreground_color': '#FF0000',
+            'browser.display.use_document_colors': False})
+        def test_preferences(base_url, selenium):
+            selenium.get(base_url)
+            header = selenium.find_element_by_tag_name('h1')
+            anchor = selenium.find_element_by_tag_name('a')
+            header_color = header.value_of_css_property('color')
+            anchor_color = anchor.value_of_css_property('color')
+            assert header_color == 'rgb(255, 0, 0)'
+            assert anchor_color == 'rgb(255, 105, 180)'
+    """)
+    testdir.quick_qa(file_test, passed=1)

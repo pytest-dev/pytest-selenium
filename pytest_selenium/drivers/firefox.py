@@ -33,6 +33,18 @@ def pytest_addoption(parser):
                      help='path to a firefox extension.')
 
 
+def pytest_configure(config):
+    config.addinivalue_line(
+        'markers', "firefox_arguments(args): arguments to be passed to "
+        "Firefox. This marker will be ignored for other browsers. For "
+        "example: firefox_arguments('-foreground')")
+    config.addinivalue_line(
+        'markers', "firefox_preferences(dict): preferences to be passed to "
+        "Firefox. This marker will be ignored for other browsers. For "
+        "example: firefox_preferences({'browser.startup.homepage': "
+        "'https://pytest.org/'})")
+
+
 def driver_kwargs(capabilities, driver_log, driver_path, firefox_options,
                   **kwargs):
     kwargs = {}
@@ -52,6 +64,17 @@ def firefox_options(request, firefox_path, firefox_profile):
     options.profile = firefox_profile
     if firefox_path is not None:
         options.binary = FirefoxBinary(firefox_path)
+
+    args = request.node.get_marker('firefox_arguments')
+    if args is not None:
+        for arg in args.args:
+            options.add_argument(arg)
+
+    prefs = request.node.get_marker('firefox_preferences')
+    if prefs is not None:
+        for name, value in prefs.args[0].items():
+            options.set_preference(name, value)
+
     return options
 
 
