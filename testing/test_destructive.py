@@ -12,6 +12,15 @@ def test_skip_destructive_by_default(testdir):
     testdir.quick_qa(file_test, passed=0, failed=0, skipped=1)
 
 
+def test_warn_when_url_is_sensitive(testdir, httpserver, monkeypatch, capsys):
+    monkeypatch.setenv('SENSITIVE_URL', '127\.0\.0\.1')
+    file_test = testdir.makepyfile('def test_pass(): pass')
+    testdir.quick_qa(file_test, '--verbose', passed=0, failed=0, skipped=1)
+    out, err = capsys.readouterr()
+    msg = '*** WARNING: sensitive url matches {} ***'.format(httpserver.url)
+    assert msg in out
+
+
 def test_skip_destructive_when_sensitive_command_line(testdir, httpserver):
     file_test = testdir.makepyfile('def test_pass(): pass')
     print(httpserver.url)
