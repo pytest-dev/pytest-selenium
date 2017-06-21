@@ -5,6 +5,9 @@ Release Notes
 -------------------
 
 * Warn in pytest header when the sensitive URL matches the base URL.
+
+  * Thanks to `@Jenselme <https://github.com/Jenselme>`_ for the PR
+
 * Use a separate log file for each driver instance.
 
 1.10.0 (2017-05-04)
