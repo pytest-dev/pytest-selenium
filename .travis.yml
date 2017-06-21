@@ -10,6 +10,9 @@ env:
   global:
   - DISPLAY=:99.0
   - PYTEST_ADDOPTS="-m 'not (chrome or edge or safari or phantomjs)'"
+  matrix:
+  - TOXENV=pytest29
+  - TOXENV=pytest30
 matrix:
   include:
   - python: 2.7
@@ -44,4 +47,4 @@ deploy:
     tags: true
     repo: pytest-dev/pytest-selenium
     python: 3.6
-    condition: "$TOXENV" = ""
+    condition: "$TOXENV = pytest30"

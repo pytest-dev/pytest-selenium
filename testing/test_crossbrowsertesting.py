@@ -60,11 +60,15 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv(username, 'foo')
     monkeypatch.setenv(key, 'bar')
-    failure('--capability', 'browser_api_name', 'FF46')
+    out = failure('--capability', 'browser_api_name', 'FF46')
+    messages = ['User not found!', 'basic auth failed']
+    assert any(message in out for message in messages)
 
 
 def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     config = tmpdir.join('.crossbrowsertesting')
     config.write('[credentials]\nusername=foo\nkey=bar')
-    failure('--capability', 'browser_api_name', 'FF46')
+    out = failure('--capability', 'browser_api_name', 'FF46')
+    messages = ['User not found!', 'basic auth failed']
+    assert any(message in out for message in messages)
