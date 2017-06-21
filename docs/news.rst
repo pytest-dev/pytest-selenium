@@ -6,6 +6,8 @@ Release Notes
 
 * Add Chrome and Firefox options to capabilities for remote servers.
 
+* Avoid unnecessarily sending Firefox profile to remote servers.
+
 * Add :code:`firefox_arguments` and :code:`firefox_preferences` markers to
   specify arguments and preferences to pass to the :code:`firefox_options`
   fixture. Run :code:`pytest --markers` for details.
