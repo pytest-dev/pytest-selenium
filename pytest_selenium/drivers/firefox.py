@@ -61,7 +61,10 @@ def driver_kwargs(capabilities, driver_log, driver_path, firefox_options,
 @pytest.fixture
 def firefox_options(request, firefox_path, firefox_profile):
     options = Options()
-    options.profile = firefox_profile
+
+    if firefox_profile is not None:
+        options.profile = firefox_profile
+
     if firefox_path is not None:
         options.binary = FirefoxBinary(firefox_path)
 
