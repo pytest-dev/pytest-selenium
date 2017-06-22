@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-1.11.0 (unreleased)
+1.11.0 (2017-06-22)
 -------------------
 
 * Add Chrome and Firefox options to capabilities for remote servers.
