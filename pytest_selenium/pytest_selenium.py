@@ -228,7 +228,7 @@ def _gather_html(item, report, driver, summary, extra):
 def _gather_logs(item, report, driver, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin('html')
     if item.config._driver_log and os.path.exists(item.config._driver_log):
-        if pytest_html:
+        if pytest_html is not None:
             with open(item.config._driver_log, 'r') as f:
                 extra.append(pytest_html.extras.text(f.read(), 'Driver Log'))
         summary.append('Driver log: {0}'.format(item.config._driver_log))
