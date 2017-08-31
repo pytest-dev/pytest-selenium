@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+1.11.1 (2017-08-31)
+-------------------
+
+* Fix exception when pytest-html plugin is not available.
+
+  * Thanks to `@wlach <https://github.com/wlach>`_ for the PR
+
 1.11.0 (2017-06-22)
 -------------------
 
