@@ -1,47 +1,50 @@
 language: python
-python:
-- 2.7
-- 3.6
-- pypy-5.4.1
-- pypy3.3-5.2-alpha1
-- nightly
+jobs:
+  include:
+    - stage:
+      python: 3.6
+      env: TOXENV=flake8
+    - stage:
+      python: 3.6
+      env: TOXENV=docs
+    - stage:
+      python: 2.7
+      env: TOXENV=py27
+    - stage:
+      python: 3.6
+      env: TOXENV=py36
+    - stage:
+      python: pypy-5.6.0
+      env: TOXENV=pypy
+    - stage: deploy
+      python: 3.6
+      before_install: skip
+      install: skip
+      before_script: skip
+      script: skip
+      deploy:
+        provider: pypi
+        user: davehunt
+        password:
+          secure: JqMVLhBMAinN9MmRHr52D149IFO62cJa0PDEn6d/eEDBX5VjABMSbo7+qbFFXeSdD+Yz8FqNo29SJnVQ99OUan12Wd+XNtw7f94YisMtcJrrcXrj3HM10NRcZS6RHXMbezNyYPcnp+8KDfFvHnwiBmrpOcKgpfWF7KT/7gZnKwbV6yZ8aofMU3CF2JRp1imPrVSeeRh7o0+TdwPXaKQ0XKk9gugrmMzcsjIlsM8nJbTxaRAgG1pUP+0+CQhgcGY/e172F8ZpfWgHJ03LDirxNsFEL1kQlxCwnaibljiAeGJqGn3bpDubt96fmdwwcA3aSlVb8xu4rLzNpDvxYryPpCipY127gykMBYWR4xtpxqqzyGQu0ZackFQGOUQmtNwlJVYjBhLQScevIBQE88nHal5FElrbxm5I7j/d1IY3MSkwqFs0ve+FtdUBJcair2EQZ4ZdXsETJSYejetJTGm9foqTYqhCchpA7u3qRCG/ruTiD64nt5PWnIRYaftXbI6VsQTXOPZRQpt3gt2jOHM8Bxr5m5j37taIfMBI3ltWIJukmC1czAFIOQT50XB2yAl6zFupnI2eF48sJgovIKacizw535C8FcinyIyq6ZftgTUrw61/cZvM9kNTK09SgF55Lddw0aNYqkHGm/ooSvdZOh7bZPSlNPQBNoY6rb3hHzI=
+          distributions: sdist bdist_wheel
+          on:
+            tags: true
+            repo: pytest-dev/pytest-selenium
 sudo: required
 env:
   global:
   - DISPLAY=:99.0
   - PYTEST_ADDOPTS="-m 'not (chrome or edge or safari or phantomjs)'"
-matrix:
-  include:
-  - python: 2.7
-    env: TOXENV=docs
-  - python: 2.7
-    env: TOXENV=flake8
-  - python: 3.6
-    env: TOXENV=docs
-  - python: 3.6
-    env: TOXENV=flake8
-install:
-- pip install tox-travis
-before_script:
-- firefox --version
-- export GECKODRIVER_DOWNLOAD=`curl -s 'https://api.github.com/repos/mozilla/geckodriver/releases/latest' | python -c "import sys, json; r = json.load(sys.stdin); print([a for a in r['assets'] if 'linux64' in a['name']][0]['browser_download_url']);"`
-- curl -L -o geckodriver.tar.gz $GECKODRIVER_DOWNLOAD
-- gunzip -c geckodriver.tar.gz | tar xopf -
-- chmod +x geckodriver && sudo mv geckodriver /usr/local/bin
-- sh -e /etc/init.d/xvfb start
-- geckodriver --version
-script:
-- tox
+cache: pip
+before_install:
+  - export GECKODRIVER_DOWNLOAD=`curl -s 'https://api.github.com/repos/mozilla/geckodriver/releases/latest' | python -c "import sys, json; r = json.load(sys.stdin); print([a for a in r['assets'] if 'linux64' in a['name']][0]['browser_download_url']);"`
+  - curl -L -o /tmp/geckodriver.tar.gz $GECKODRIVER_DOWNLOAD
+  - mkdir $HOME/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C $HOME/geckodriver
+  - export PATH=$HOME/geckodriver:$PATH
+  - geckodriver --version
+install: pip install tox
+before_script: sh -e /etc/init.d/xvfb start
+script: tox
 addons:
   firefox: latest
-deploy:
-  provider: pypi
-  user: davehunt
-  password:
-    secure: JqMVLhBMAinN9MmRHr52D149IFO62cJa0PDEn6d/eEDBX5VjABMSbo7+qbFFXeSdD+Yz8FqNo29SJnVQ99OUan12Wd+XNtw7f94YisMtcJrrcXrj3HM10NRcZS6RHXMbezNyYPcnp+8KDfFvHnwiBmrpOcKgpfWF7KT/7gZnKwbV6yZ8aofMU3CF2JRp1imPrVSeeRh7o0+TdwPXaKQ0XKk9gugrmMzcsjIlsM8nJbTxaRAgG1pUP+0+CQhgcGY/e172F8ZpfWgHJ03LDirxNsFEL1kQlxCwnaibljiAeGJqGn3bpDubt96fmdwwcA3aSlVb8xu4rLzNpDvxYryPpCipY127gykMBYWR4xtpxqqzyGQu0ZackFQGOUQmtNwlJVYjBhLQScevIBQE88nHal5FElrbxm5I7j/d1IY3MSkwqFs0ve+FtdUBJcair2EQZ4ZdXsETJSYejetJTGm9foqTYqhCchpA7u3qRCG/ruTiD64nt5PWnIRYaftXbI6VsQTXOPZRQpt3gt2jOHM8Bxr5m5j37taIfMBI3ltWIJukmC1czAFIOQT50XB2yAl6zFupnI2eF48sJgovIKacizw535C8FcinyIyq6ZftgTUrw61/cZvM9kNTK09SgF55Lddw0aNYqkHGm/ooSvdZOh7bZPSlNPQBNoY6rb3hHzI=
-  distributions: sdist bdist_wheel
-  on:
-    tags: true
-    repo: pytest-dev/pytest-selenium
-    python: 3.6
-    condition: '"$TOXENV" = ""'
