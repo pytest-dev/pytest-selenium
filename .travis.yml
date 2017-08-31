@@ -27,10 +27,10 @@ jobs:
         user: davehunt
         password:
           secure: JqMVLhBMAinN9MmRHr52D149IFO62cJa0PDEn6d/eEDBX5VjABMSbo7+qbFFXeSdD+Yz8FqNo29SJnVQ99OUan12Wd+XNtw7f94YisMtcJrrcXrj3HM10NRcZS6RHXMbezNyYPcnp+8KDfFvHnwiBmrpOcKgpfWF7KT/7gZnKwbV6yZ8aofMU3CF2JRp1imPrVSeeRh7o0+TdwPXaKQ0XKk9gugrmMzcsjIlsM8nJbTxaRAgG1pUP+0+CQhgcGY/e172F8ZpfWgHJ03LDirxNsFEL1kQlxCwnaibljiAeGJqGn3bpDubt96fmdwwcA3aSlVb8xu4rLzNpDvxYryPpCipY127gykMBYWR4xtpxqqzyGQu0ZackFQGOUQmtNwlJVYjBhLQScevIBQE88nHal5FElrbxm5I7j/d1IY3MSkwqFs0ve+FtdUBJcair2EQZ4ZdXsETJSYejetJTGm9foqTYqhCchpA7u3qRCG/ruTiD64nt5PWnIRYaftXbI6VsQTXOPZRQpt3gt2jOHM8Bxr5m5j37taIfMBI3ltWIJukmC1czAFIOQT50XB2yAl6zFupnI2eF48sJgovIKacizw535C8FcinyIyq6ZftgTUrw61/cZvM9kNTK09SgF55Lddw0aNYqkHGm/ooSvdZOh7bZPSlNPQBNoY6rb3hHzI=
-          distributions: sdist bdist_wheel
-          on:
-            tags: true
-            repo: pytest-dev/pytest-selenium
+        distributions: sdist bdist_wheel
+        on:
+          tags: true
+          repo: pytest-dev/pytest-selenium
 sudo: required
 env:
   global:
