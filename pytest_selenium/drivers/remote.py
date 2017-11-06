@@ -14,8 +14,6 @@ def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
         # remote instances must at least specify a browserName capability
         raise pytest.UsageError('The \'browserName\' capability must be '
                                 'specified when using the remote driver.')
-    capabilities.setdefault('version', '')  # default to any version
-    capabilities.setdefault('platform', 'ANY')  # default to any platform
 
     executor = 'http://{0}:{1}/wd/hub'.format(host, port)
 
