@@ -59,7 +59,7 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv(username, 'foo')
     monkeypatch.setenv(key, 'bar')
-    out = failure('--capability', 'browserName', 'Firefox')
+    out = failure()
     messages = ['Sauce Labs Authentication Error', 'basic auth failed']
     assert any(message in out for message in messages)
 
@@ -67,6 +67,6 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
 def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     tmpdir.join('.saucelabs').write('[credentials]\nusername=foo\nkey=bar')
-    out = failure('--capability', 'browserName', 'Firefox')
+    out = failure()
     messages = ['Sauce Labs Authentication Error', 'basic auth failed']
     assert any(message in out for message in messages)

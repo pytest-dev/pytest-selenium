@@ -59,7 +59,7 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, key, secret):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv(key, 'foo')
     monkeypatch.setenv(secret, 'bar')
-    out = failure('--capability', 'browserName', 'firefox')
+    out = failure()
     messages = ['incorrect TestingBot credentials', 'basic auth failed']
     assert any(message in out for message in messages)
 
@@ -67,7 +67,7 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, key, secret):
 def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     tmpdir.join('.testingbot').write('[credentials]\nkey=foo\nsecret=bar')
-    out = failure('--capability', 'browserName', 'firefox')
+    out = failure()
     messages = ['incorrect TestingBot credentials', 'basic auth failed']
     assert any(message in out for message in messages)
 

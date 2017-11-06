@@ -3,18 +3,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import pytest
 
 HOST = os.environ.get('SELENIUM_HOST', 'localhost')
 PORT = os.environ.get('SELENIUM_PORT', 4444)
 
 
 def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
-    if 'browserName' not in capabilities:
-        # remote instances must at least specify a browserName capability
-        raise pytest.UsageError('The \'browserName\' capability must be '
-                                'specified when using the remote driver.')
-
     executor = 'http://{0}:{1}/wd/hub'.format(host, port)
 
     kwargs = {
