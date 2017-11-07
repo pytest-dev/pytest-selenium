@@ -58,12 +58,10 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
         browser = capabilities.get('browserName', '').upper()
         key, options = (None, None)
         if browser == 'CHROME':
+            key = 'goog:chromeOptions'
             options = chrome_options.to_capabilities()
-            if 'chromeOptions' in options:
+            if key not in options:
                 key = 'chromeOptions'
-            else:
-                # the key changed in Selenium 3.7.0
-                key = 'goog:chromeOptions'
         elif browser == 'FIREFOX':
             key = firefox_options.KEY
             options = firefox_options.to_capabilities()
