@@ -58,14 +58,17 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
         browser = capabilities.get('browserName', '').upper()
         key, options = (None, None)
         if browser == 'CHROME':
-            key = 'goog:chromeOptions'
-            options = chrome_options
+            options = chrome_options.to_capabilities()
+            if 'chromeOptions' in options:
+                key = 'chromeOptions'
+            else:
+                # the key changed in Selenium 3.7.0
+                key = 'goog:chromeOptions'
         elif browser == 'FIREFOX':
             key = firefox_options.KEY
-            options = firefox_options
+            options = firefox_options.to_capabilities()
         if all([key, options]):
-            capabilities.setdefault(key, {}).update(
-                options.to_capabilities().get(key, {}))
+            capabilities.setdefault(key, {}).update(options.get(key, {}))
     capabilities_marker = request.node.get_marker('capabilities')
     if capabilities_marker is not None:
         # add capabilities from the marker
