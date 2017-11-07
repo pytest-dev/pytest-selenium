@@ -43,7 +43,7 @@ def session_capabilities(pytestconfig):
     driver = pytestconfig.getoption('driver').upper()
     capabilities = getattr(DesiredCapabilities, driver, {}).copy()
     if driver == 'REMOTE':
-        browser = capabilities.get('browserName').upper()
+        browser = capabilities.get('browserName', '').upper()
         capabilities.update(getattr(DesiredCapabilities, browser, {}))
     capabilities.update(pytestconfig._capabilities)
     return capabilities
@@ -55,7 +55,7 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
     """Returns combined capabilities"""
     capabilities = copy.deepcopy(session_capabilities)  # make a copy
     if driver_class == webdriver.Remote:
-        browser = str(capabilities.get('browserName')).upper()
+        browser = capabilities.get('browserName', '').upper()
         key, options = (None, None)
         if browser == 'CHROME':
             key = 'goog:chromeOptions'
@@ -65,7 +65,7 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
             options = firefox_options
         if all([key, options]):
             capabilities.setdefault(key, {}).update(
-                options.to_capabilities()[key])
+                options.to_capabilities().get(key, {}))
     capabilities_marker = request.node.get_marker('capabilities')
     if capabilities_marker is not None:
         # add capabilities from the marker
