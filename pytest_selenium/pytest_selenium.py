@@ -64,8 +64,8 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
             key = firefox_options.KEY
             options = firefox_options
         if all([key, options]):
-            options = capabilities.setdefault(key, {})
-            options.update(options.to_capabilities()[key])
+            capabilities.setdefault(key, {}).update(
+                options.to_capabilities()[key])
     capabilities_marker = request.node.get_marker('capabilities')
     if capabilities_marker is not None:
         # add capabilities from the marker
