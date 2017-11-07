@@ -9,6 +9,7 @@ import os
 
 import pytest
 from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
 
@@ -39,7 +40,13 @@ def pytest_addhooks(pluginmanager):
 @pytest.fixture(scope='session')
 def session_capabilities(pytestconfig):
     """Returns combined capabilities from pytest-variables and command line"""
-    return pytestconfig._capabilities
+    driver = pytestconfig.getoption('driver').upper()
+    capabilities = getattr(DesiredCapabilities, driver, {}).copy()
+    if driver == 'REMOTE':
+        browser = capabilities.get('browserName').upper()
+        capabilities.update(getattr(DesiredCapabilities, browser, {}))
+    capabilities.update(pytestconfig._capabilities)
+    return capabilities
 
 
 @pytest.fixture
@@ -48,11 +55,17 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
     """Returns combined capabilities"""
     capabilities = copy.deepcopy(session_capabilities)  # make a copy
     if driver_class == webdriver.Remote:
-        browser_name = str(capabilities.get('browserName')).lower()
-        if browser_name == 'chrome':
-            capabilities.update(chrome_options.to_capabilities())
-        elif browser_name == 'firefox':
-            capabilities.update(firefox_options.to_capabilities())
+        browser = str(capabilities.get('browserName')).upper()
+        key, options = (None, None)
+        if browser == 'CHROME':
+            key = 'goog:chromeOptions'
+            options = chrome_options
+        elif browser == 'FIREFOX':
+            key = firefox_options.KEY
+            options = firefox_options
+        if all([key, options]):
+            options = capabilities.setdefault(key, {})
+            options.update(options.to_capabilities()[key])
     capabilities_marker = request.node.get_marker('capabilities')
     if capabilities_marker is not None:
         # add capabilities from the marker
@@ -134,21 +147,20 @@ def selenium(driver):
 
 @pytest.hookimpl(trylast=True)
 def pytest_configure(config):
-    config._capabilities = config._variables.get('capabilities', {})
-    config._capabilities.update({
-        k: v for k, v in config.getoption('capabilities')})
+    capabilities = config._variables.get('capabilities', {})
+    capabilities.update({k: v for k, v in config.getoption('capabilities')})
     config.addinivalue_line(
         'markers', 'capabilities(kwargs): add or change existing '
         'capabilities. specify capabilities as keyword arguments, for example '
         'capabilities(foo=''bar'')')
     if hasattr(config, '_metadata'):
         config._metadata['Driver'] = config.getoption('driver')
-        config._metadata['Capabilities'] = config._capabilities
-        config._metadata['Capabilities'] = config._capabilities
+        config._metadata['Capabilities'] = capabilities
         if all((config.getoption('host'), config.getoption('port'))):
             config._metadata['Server'] = '{0}:{1}'.format(
                 config.getoption('host'),
                 config.getoption('port'))
+    config._capabilities = capabilities
 
 
 def pytest_report_header(config, startdir):
