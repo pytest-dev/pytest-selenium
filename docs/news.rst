@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+1.11.2 (2017-11-08)
+-------------------
+
+* Remove superfluous :code:`version` and :code:`platform` default capabilities
+  from the remote driver due to issues with the latest Selenium server release.
+
+* Set default capabilities based on the selected driver or :code:`browserName`
+  capability if using the remote driver.
+
+* Filter out unrelated capabilities from browser options to allow options
+  fixtures to be function scoped without overriding such capabilities.
+
 1.11.1 (2017-08-31)
 -------------------
 
