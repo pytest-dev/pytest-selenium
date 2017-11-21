@@ -15,18 +15,18 @@ from selenium.webdriver.support.event_firing_webdriver import \
 
 from . import drivers
 
-SUPPORTED_DRIVERS = [
-    'BrowserStack',
-    'CrossBrowserTesting',
-    'Chrome',
-    'Edge',
-    'Firefox',
-    'Ie',
-    'PhantomJS',
-    'Remote',
-    'Safari',
-    'SauceLabs',
-    'TestingBot']
+SUPPORTED_DRIVERS = {
+    'browserstack': 'BrowserStack',
+    'crossbrowsertesting': 'CrossBrowserTesting',
+    'chrome': 'Chrome',
+    'edge': 'Edge',
+    'firefox': 'Firefox',
+    'ie': 'Ie',
+    'phantomjs': 'PhantomJS',
+    'remote': 'Remote',
+    'safari': 'Safari',
+    'saucelabs': 'SauceLabs',
+    'testingbot': 'TestingBot'}
 
 
 def pytest_addhooks(pluginmanager):
@@ -280,12 +280,18 @@ def split_class_and_test_names(nodeid):
     classnames = names[:-1]
     classname = '.'.join(classnames)
     name = names[-1]
-    return (classname, name)
+    return classname, name
 
 
 class DriverAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
+        allowed_drivers = [v.lower() for v in SUPPORTED_DRIVERS.values()]
+        if values.lower() not in allowed_drivers:
+            message = ("invalid choice: {0} (choose from {1})".format(
+                values, ', '.join(SUPPORTED_DRIVERS.values())))
+            raise argparse.ArgumentError(self, message)
+
         setattr(namespace, self.dest, values)
         driver = getattr(drivers, values.lower())
         # set the default host and port if specified in the driver module
@@ -305,7 +311,6 @@ def pytest_addoption(parser):
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--driver',
                      action=DriverAction,
-                     choices=SUPPORTED_DRIVERS,
                      help='webdriver implementation.',
                      metavar='str')
     group._addoption('--driver-path',
