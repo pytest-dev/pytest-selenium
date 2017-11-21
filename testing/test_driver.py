@@ -31,9 +31,30 @@ def failure(testdir, testfile, httpserver_base_url):
     return partial(failure_with_output, testdir, testfile, httpserver_base_url)
 
 
+def test_driver_case_insensitive(testdir):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(): pass
+    """)
+    testdir.quick_qa('--driver', 'firefox', file_test, passed=1)
+
+
 def test_missing_driver(failure):
     out = failure()
     assert 'UsageError: --driver must be specified' in out
+
+
+def test_invalid_driver(testdir):
+    testdir.makepyfile("""
+            import pytest
+            @pytest.mark.nondestructive
+            def test_pass(): pass
+        """)
+    invalid_driver = 'noop'
+    result = testdir.runpytest('--driver', invalid_driver)
+    message = '--driver: invalid choice: {}'.format(invalid_driver)
+    assert message in result.errlines[1]
 
 
 def test_driver_quit(testdir):
