@@ -18,6 +18,17 @@ def test_launch(testdir, httpserver):
     testdir.quick_qa(file_test, passed=1)
 
 
+def test_launch_case_insensitive(testdir, httpserver):
+    httpserver.serve_content(content='<h1>Success!</h1>')
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(webtext):
+            assert webtext == u'Success!'
+    """)
+    testdir.quick_qa('--driver', 'firefox', file_test, passed=1)
+
+
 def test_profile(testdir, httpserver):
     """Test that specified profile is used when starting Firefox.
 

@@ -16,21 +16,22 @@ from selenium.webdriver.support.event_firing_webdriver import \
 from . import drivers
 
 SUPPORTED_DRIVERS = {
-    'browserstack': 'BrowserStack',
-    'crossbrowsertesting': 'CrossBrowserTesting',
-    'chrome': 'Chrome',
-    'edge': 'Edge',
-    'firefox': 'Firefox',
-    'ie': 'Ie',
-    'phantomjs': 'PhantomJS',
-    'remote': 'Remote',
-    'safari': 'Safari',
-    'saucelabs': 'SauceLabs',
-    'testingbot': 'TestingBot'}
+    'browserstack': webdriver.Remote,
+    'crossbrowsertesting': webdriver.Remote,
+    'chrome': webdriver.Chrome,
+    'edge': webdriver.Edge,
+    'firefox': webdriver.Firefox,
+    'ie': webdriver.Ie,
+    'phantomjs': webdriver.PhantomJS,
+    'remote': webdriver.Remote,
+    'safari': webdriver.Safari,
+    'saucelabs': webdriver.Remote,
+    'testingbot': webdriver.Remote}
 
 
 def pytest_addhooks(pluginmanager):
     from . import hooks
+
     method = getattr(pluginmanager, 'add_hookspecs', None)
     if method is None:
         method = pluginmanager.addhooks
@@ -108,7 +109,8 @@ def driver_class(request):
     driver = request.config.getoption('driver')
     if driver is None:
         raise pytest.UsageError('--driver must be specified')
-    return getattr(webdriver, driver, webdriver.Remote)
+    driver = SUPPORTED_DRIVERS[driver.lower()]
+    return driver
 
 
 @pytest.fixture
@@ -286,10 +288,9 @@ def split_class_and_test_names(nodeid):
 class DriverAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
-        allowed_drivers = [v.lower() for v in SUPPORTED_DRIVERS.values()]
-        if values.lower() not in allowed_drivers:
+        if values.lower() not in SUPPORTED_DRIVERS.keys():
             message = ("invalid choice: {0} (choose from {1})".format(
-                values, ', '.join(SUPPORTED_DRIVERS.values())))
+                values, ', '.join(SUPPORTED_DRIVERS.keys())))
             raise argparse.ArgumentError(self, message)
 
         setattr(namespace, self.dest, values)
