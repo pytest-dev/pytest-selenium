@@ -290,8 +290,8 @@ class DriverAction(argparse.Action):
         setattr(namespace, self.dest, values)
         driver = getattr(drivers, values.lower())
         # set the default host and port if specified in the driver module
-        setattr(namespace, 'host', getattr(driver, 'HOST', None))
-        setattr(namespace, 'port', getattr(driver, 'PORT', None))
+        namespace.host = namespace.host or getattr(driver, 'HOST', None)
+        namespace.port = namespace.port or getattr(driver, 'PORT', None)
 
 
 def pytest_addoption(parser):

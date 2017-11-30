@@ -73,3 +73,45 @@ def test_driver_quit(testdir):
         'WARNING: Failed to gather log types: *'])
     outcomes = result.parseoutcomes()
     assert outcomes.get('failed') == 1
+
+
+def test_default_host_port(testdir):
+    host = 'localhost'
+    port = 4444
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert driver_kwargs['command_executor'] == 'http://{}:{}/wd/hub'
+    """.format(host, port))
+    testdir.quick_qa('--driver', 'Remote', file_test, passed=1)
+
+
+def test_arguments_order(testdir):
+    host = 'notlocalhost'
+    port = 4441
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert driver_kwargs['command_executor'] == 'http://{}:{}/wd/hub'
+    """.format(host, port))
+    testdir.quick_qa('--driver', 'Remote',
+                     '--host', host,
+                     '--port', port,
+                     file_test, passed=1)
+
+
+def test_arguments_order_random(testdir):
+    host = 'notlocalhost'
+    port = 4441
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert driver_kwargs['command_executor'] == 'http://{}:{}/wd/hub'
+    """.format(host, port))
+    testdir.quick_qa('--host', host,
+                     '--driver', 'Remote',
+                     '--port', port,
+                     file_test, passed=1)
