@@ -53,7 +53,7 @@ def test_invalid_driver(testdir):
         """)
     invalid_driver = 'noop'
     result = testdir.runpytest('--driver', invalid_driver)
-    message = '--driver: invalid choice: {}'.format(invalid_driver)
+    message = "--driver: invalid choice: '{}'".format(invalid_driver)
     assert message in result.errlines[1]
 
 
