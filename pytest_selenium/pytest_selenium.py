@@ -94,8 +94,12 @@ def driver_kwargs(request, capabilities, chrome_options, driver_args,
         driver_path=driver_path,
         firefox_options=firefox_options,
         firefox_profile=firefox_profile,
-        host=pytestconfig.getoption('host'),
-        port=pytestconfig.getoption('port'),
+        host=pytestconfig.getoption('host',
+                                    getattr(driver, 'HOST', None),
+                                    True),
+        port=pytestconfig.getoption('port',
+                                    getattr(driver, 'PORT', None),
+                                    True),
         request=request,
         log_path=None,
         test='.'.join(split_class_and_test_names(request.node.nodeid))))
@@ -287,10 +291,6 @@ class DriverAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values)
-        driver = getattr(drivers, values.lower())
-        # set the default host and port if specified in the driver module
-        setattr(namespace, 'host', getattr(driver, 'HOST', None))
-        setattr(namespace, 'port', getattr(driver, 'PORT', None))
 
 
 def pytest_addoption(parser):
