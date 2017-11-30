@@ -8,6 +8,7 @@ from datetime import datetime
 import os
 
 import pytest
+from requests.structures import CaseInsensitiveDict
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.event_firing_webdriver import \
@@ -15,23 +16,22 @@ from selenium.webdriver.support.event_firing_webdriver import \
 
 from . import drivers
 
-SUPPORTED_DRIVERS = {
-    'browserstack': webdriver.Remote,
-    'crossbrowsertesting': webdriver.Remote,
-    'chrome': webdriver.Chrome,
-    'edge': webdriver.Edge,
-    'firefox': webdriver.Firefox,
-    'ie': webdriver.Ie,
-    'phantomjs': webdriver.PhantomJS,
-    'remote': webdriver.Remote,
-    'safari': webdriver.Safari,
-    'saucelabs': webdriver.Remote,
-    'testingbot': webdriver.Remote}
+SUPPORTED_DRIVERS = CaseInsensitiveDict({
+    'BrowserStack': webdriver.Remote,
+    'CrossBrowserTesting': webdriver.Remote,
+    'Chrome': webdriver.Chrome,
+    'Edge': webdriver.Edge,
+    'Firefox': webdriver.Firefox,
+    'IE': webdriver.Ie,
+    'PhantomJS': webdriver.PhantomJS,
+    'Remote': webdriver.Remote,
+    'Safari': webdriver.Safari,
+    'SauceLabs': webdriver.Remote,
+    'TestingBot': webdriver.Remote})
 
 
 def pytest_addhooks(pluginmanager):
     from . import hooks
-
     method = getattr(pluginmanager, 'add_hookspecs', None)
     if method is None:
         method = pluginmanager.addhooks
@@ -109,8 +109,7 @@ def driver_class(request):
     driver = request.config.getoption('driver')
     if driver is None:
         raise pytest.UsageError('--driver must be specified')
-    driver = SUPPORTED_DRIVERS[driver.lower()]
-    return driver
+    return SUPPORTED_DRIVERS[driver]
 
 
 @pytest.fixture
@@ -288,11 +287,6 @@ def split_class_and_test_names(nodeid):
 class DriverAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
-        if values.lower() not in SUPPORTED_DRIVERS.keys():
-            message = ("invalid choice: {0} (choose from {1})".format(
-                values, ', '.join(SUPPORTED_DRIVERS.keys())))
-            raise argparse.ArgumentError(self, message)
-
         setattr(namespace, self.dest, values)
         driver = getattr(drivers, values.lower())
         # set the default host and port if specified in the driver module
@@ -312,6 +306,7 @@ def pytest_addoption(parser):
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--driver',
                      action=DriverAction,
+                     choices=SUPPORTED_DRIVERS,
                      help='webdriver implementation.',
                      metavar='str')
     group._addoption('--driver-path',
