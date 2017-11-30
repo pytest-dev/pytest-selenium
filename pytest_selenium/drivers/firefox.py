@@ -1,10 +1,11 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-
+from distutils.version import LooseVersion
 import warnings
 
 import pytest
+from selenium import __version__ as SELENIUM_VERSION
 from selenium.webdriver import FirefoxProfile
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.firefox.options import Options
@@ -54,7 +55,12 @@ def driver_kwargs(capabilities, driver_log, driver_path, firefox_options,
         kwargs['log_path'] = driver_log
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
-    kwargs['firefox_options'] = firefox_options
+
+    # Selenium 3.8.0 deprecated firefox_options in favour of options
+    if LooseVersion(SELENIUM_VERSION) < LooseVersion('3.8.0'):
+        kwargs['firefox_options'] = firefox_options
+    else:
+        kwargs['options'] = firefox_options
     return kwargs
 
 
