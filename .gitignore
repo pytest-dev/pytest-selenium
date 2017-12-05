@@ -8,8 +8,4 @@ __pycache__
 .eggs
 build
 dist
-<<<<<<< HEAD
 Pipfile*
-=======
-*Pipfile*
->>>>>>> 6bda4e8... Fix command line argument ordering issue
