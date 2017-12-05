@@ -1,6 +1,23 @@
 Release Notes
 =============
 
+1.11.3 (2017-12-05)
+-------------------
+
+* Allow :code:`--host` and :code:`--port` command line arguments to be
+  specified before the :code:`--driver` argument.
+
+  * Thanks to `@micheletest <https://github.com/micheletest>`_ for the report
+    and to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
+* Make :code:`--driver` command line option case insensitive.
+
+  * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
+* Fixed a deprecation warning on Selenium 3.8 and later.
+
+  * Thanks to `@D3X <https://github.com/D3X>`_ for the PR
+
 1.11.2 (2017-11-08)
 -------------------
 
