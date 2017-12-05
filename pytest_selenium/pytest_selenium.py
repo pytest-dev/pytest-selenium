@@ -284,13 +284,17 @@ def split_class_and_test_names(nodeid):
     classnames = names[:-1]
     classname = '.'.join(classnames)
     name = names[-1]
-    return (classname, name)
+    return classname, name
 
 
 class DriverAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values)
+        driver = getattr(drivers, values.lower())
+        # set the default host and port if specified in the driver module
+        namespace.host = namespace.host or getattr(driver, 'HOST', None)
+        namespace.port = namespace.port or getattr(driver, 'PORT', None)
 
 
 def pytest_addoption(parser):
