@@ -19,7 +19,7 @@ class SauceLabs(Provider):
 
     @property
     def auth(self):
-        return (self.username, self.key)
+        return self.username, self.key
 
     @property
     def executor(self):
@@ -62,7 +62,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 
     # Add the job URL to the summary
     provider = SauceLabs()
-    job_url = provider.JOB.format(session=session_id)
+    job_url = get_job_url(item.config, provider, session_id)
     summary.append('{0} Job: {1}'.format(provider.name, job_url))
     pytest_html = item.config.pluginmanager.getplugin('html')
     # Add the job URL to the HTML report
@@ -143,3 +143,38 @@ def _video_html(session):
         id='player{session}'.format(session=session),
         style='border:1px solid #e6e6e6; float:right; height:240px;'
               'margin-left:5px; overflow:hidden; width:320px'))
+
+
+def get_job_url(config, provider, session_id):
+    from datetime import datetime
+
+    job_url = provider.JOB
+    job_auth = config.getini('saucelabs_job_auth').lower()
+
+    if job_auth == 'none':
+        return job_url.format(session=session_id)
+
+    if job_auth == 'token':
+        key = '{0.username}:{0.key}'.format(provider)
+    else:
+        time_format = '%Y-%m-%d'
+        if job_auth == 'hour':
+            time_format = '%Y-%m-%d-%H'
+        elif job_auth != 'day':
+            raise ValueError("Invalid authorization type: {}".format(job_auth))
+
+        ttl = datetime.utcnow().strftime(time_format)
+        key = '{0.username}:{0.key}:{1}'.format(provider, ttl)
+
+    return get_auth_url(job_url, key, session_id)
+
+
+def get_auth_url(url, key, session_id):
+    import hmac
+    from hashlib import md5
+
+    auth_url = url.format(session='{}?auth={}')
+    auth_token = hmac.new(key.encode('utf-8'),
+                          session_id.encode('utf-8'),
+                          md5).hexdigest()
+    return auth_url.format(session_id, auth_token)
