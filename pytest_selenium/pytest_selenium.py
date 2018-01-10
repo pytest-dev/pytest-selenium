@@ -6,6 +6,7 @@ import argparse
 import copy
 from datetime import datetime
 import os
+import io
 
 import pytest
 from requests.structures import CaseInsensitiveDict
@@ -243,7 +244,7 @@ def _gather_logs(item, report, driver, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin('html')
     if item.config._driver_log and os.path.exists(item.config._driver_log):
         if pytest_html is not None:
-            with open(item.config._driver_log, 'r') as f:
+            with io.open(item.config._driver_log, 'r', encoding = 'utf8') as f:
                 extra.append(pytest_html.extras.text(f.read(), 'Driver Log'))
         summary.append('Driver log: {0}'.format(item.config._driver_log))
     try:
