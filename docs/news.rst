@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+1.11.4 (2018-01-11)
+-------------------
+
+* Encode driver log as UTF-8.
+
+  * Thanks to `@MuckT <https://github.com/MuckT>`_ for the PR
+
 1.11.3 (2017-12-05)
 -------------------
 
