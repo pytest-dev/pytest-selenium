@@ -198,6 +198,8 @@ def pytest_runtest_makereport(item, call):
                 item=item, report=report, extra=extra)
         item.config.hook.pytest_selenium_runtest_makereport(
             item=item, report=report, summary=summary, extra=extra)
+    # always gather driver logs
+    _gather_driver_logs(item, summary, extra)
     if summary:
         report.sections.append(('pytest-selenium', '\n'.join(summary)))
     report.extra = extra
@@ -242,11 +244,6 @@ def _gather_html(item, report, driver, summary, extra):
 
 def _gather_logs(item, report, driver, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin('html')
-    if item.config._driver_log and os.path.exists(item.config._driver_log):
-        if pytest_html is not None:
-            with io.open(item.config._driver_log, 'r', encoding='utf8') as f:
-                extra.append(pytest_html.extras.text(f.read(), 'Driver Log'))
-        summary.append('Driver log: {0}'.format(item.config._driver_log))
     try:
         types = driver.log_types
     except Exception as e:
@@ -263,6 +260,16 @@ def _gather_logs(item, report, driver, summary, extra):
         if pytest_html is not None:
             extra.append(pytest_html.extras.text(
                 format_log(log), '%s Log' % name.title()))
+
+
+def _gather_driver_logs(item, summary, extra):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if hasattr(item.config, '_driver_log') and \
+       os.path.exists(item.config._driver_log):
+        if pytest_html is not None:
+            with io.open(item.config._driver_log, 'r', encoding='utf8') as f:
+                extra.append(pytest_html.extras.text(f.read(), 'Driver Log'))
+            summary.append('Driver log: {0}'.format(item.config._driver_log))
 
 
 def format_log(log):
