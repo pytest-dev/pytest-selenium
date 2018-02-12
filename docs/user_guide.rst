@@ -95,7 +95,7 @@ Specifying a Browser
 ********************
 
 To indicate the browser you want to run your tests against you will need to
-specify a driver and optional capabilties.
+specify a driver and optional capabilities.
 
 Firefox
 -------
@@ -477,7 +477,7 @@ Capabilities Files
 
 To specify capabilities, you can provide a JSON file on the command line using
 the `pytest-variables <https://github.com/pytest-dev/pytest-variables>`_ plugin.
-For example if you had a ``capabilties.json`` containing your capabilities, you
+For example if you had a ``capabilities.json`` containing your capabilities, you
 would need to include ``--variables capabilities.json`` on your command line.
 
 The following is an example of a variables file including capabilities:
