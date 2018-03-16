@@ -183,9 +183,13 @@ def pytest_runtest_makereport(item, call):
     failure = (report.skipped and xfail) or (report.failed and not xfail)
     when = item.config.getini('selenium_capture_debug').lower()
     capture_debug = when == 'always' or (when == 'failure' and failure)
-    if driver is not None:
-        if capture_debug:
-            exclude = item.config.getini('selenium_exclude_debug').lower()
+    if capture_debug:
+        exclude = item.config.getini('selenium_exclude_debug').lower()
+        if 'logs' not in exclude:
+            # gather logs that do not depend on a driver instance
+            _gather_driver_log(item, summary, extra)
+        if driver is not None:
+            # gather debug that depends on a driver instance
             if 'url' not in exclude:
                 _gather_url(item, report, driver, summary, extra)
             if 'screenshot' not in exclude:
@@ -194,12 +198,13 @@ def pytest_runtest_makereport(item, call):
                 _gather_html(item, report, driver, summary, extra)
             if 'logs' not in exclude:
                 _gather_logs(item, report, driver, summary, extra)
+            # gather debug from hook implementations
             item.config.hook.pytest_selenium_capture_debug(
                 item=item, report=report, extra=extra)
+    if driver is not None:
+        # allow hook implementations to further modify the report
         item.config.hook.pytest_selenium_runtest_makereport(
             item=item, report=report, summary=summary, extra=extra)
-    # always gather driver logs
-    _gather_driver_logs(item, summary, extra)
     if summary:
         report.sections.append(('pytest-selenium', '\n'.join(summary)))
     report.extra = extra
@@ -262,7 +267,7 @@ def _gather_logs(item, report, driver, summary, extra):
                 format_log(log), '%s Log' % name.title()))
 
 
-def _gather_driver_logs(item, summary, extra):
+def _gather_driver_log(item, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin('html')
     if hasattr(item.config, '_driver_log') and \
        os.path.exists(item.config._driver_log):
