@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+1.12.0 (unreleased)
+-------------------
+
+* Include driver logs in the HTML report when the driver fails to start.
+
+  * Thanks to `@jrbenny35 <https://github.com/jrbenny35>`_ for the PR
+
 1.11.4 (2018-01-11)
 -------------------
 
