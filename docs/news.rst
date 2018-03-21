@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-1.12.0 (unreleased)
+1.12.0 (2018-03-21)
 -------------------
 
 * Include driver logs in the HTML report when the driver fails to start.
