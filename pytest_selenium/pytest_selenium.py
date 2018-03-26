@@ -6,6 +6,7 @@ import argparse
 import copy
 from datetime import datetime
 import os
+import io
 
 import pytest
 from requests.structures import CaseInsensitiveDict
@@ -182,9 +183,13 @@ def pytest_runtest_makereport(item, call):
     failure = (report.skipped and xfail) or (report.failed and not xfail)
     when = item.config.getini('selenium_capture_debug').lower()
     capture_debug = when == 'always' or (when == 'failure' and failure)
-    if driver is not None:
-        if capture_debug:
-            exclude = item.config.getini('selenium_exclude_debug').lower()
+    if capture_debug:
+        exclude = item.config.getini('selenium_exclude_debug').lower()
+        if 'logs' not in exclude:
+            # gather logs that do not depend on a driver instance
+            _gather_driver_log(item, summary, extra)
+        if driver is not None:
+            # gather debug that depends on a driver instance
             if 'url' not in exclude:
                 _gather_url(item, report, driver, summary, extra)
             if 'screenshot' not in exclude:
@@ -193,8 +198,11 @@ def pytest_runtest_makereport(item, call):
                 _gather_html(item, report, driver, summary, extra)
             if 'logs' not in exclude:
                 _gather_logs(item, report, driver, summary, extra)
+            # gather debug from hook implementations
             item.config.hook.pytest_selenium_capture_debug(
                 item=item, report=report, extra=extra)
+    if driver is not None:
+        # allow hook implementations to further modify the report
         item.config.hook.pytest_selenium_runtest_makereport(
             item=item, report=report, summary=summary, extra=extra)
     if summary:
@@ -241,11 +249,6 @@ def _gather_html(item, report, driver, summary, extra):
 
 def _gather_logs(item, report, driver, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin('html')
-    if item.config._driver_log and os.path.exists(item.config._driver_log):
-        if pytest_html is not None:
-            with open(item.config._driver_log, 'r') as f:
-                extra.append(pytest_html.extras.text(f.read(), 'Driver Log'))
-        summary.append('Driver log: {0}'.format(item.config._driver_log))
     try:
         types = driver.log_types
     except Exception as e:
@@ -262,6 +265,16 @@ def _gather_logs(item, report, driver, summary, extra):
         if pytest_html is not None:
             extra.append(pytest_html.extras.text(
                 format_log(log), '%s Log' % name.title()))
+
+
+def _gather_driver_log(item, summary, extra):
+    pytest_html = item.config.pluginmanager.getplugin('html')
+    if hasattr(item.config, '_driver_log') and \
+       os.path.exists(item.config._driver_log):
+        if pytest_html is not None:
+            with io.open(item.config._driver_log, 'r', encoding='utf8') as f:
+                extra.append(pytest_html.extras.text(f.read(), 'Driver Log'))
+            summary.append('Driver log: {0}'.format(item.config._driver_log))
 
 
 def format_log(log):

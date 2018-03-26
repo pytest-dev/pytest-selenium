@@ -1,11 +1,12 @@
 __pycache__
-*.egg-info/
-*.pyc
 .cache
 .DS_Store
-.tox
-.idea
 .eggs
+.idea
+.pytest_cache
+.tox
+*.egg-info/
+*.pyc
 build
 dist
 Pipfile*
