@@ -317,6 +317,32 @@ the ``--capability`` command line arguments. See the
 `test configuration documentation <https://docs.saucelabs.com/reference/test-configuration/>`_
 for full details of what can be configured.
 
+Test result links
+~~~~~~~~~~~~~~~~~
+
+By default, links to Sauce Labs jobs are only visible to users logged in to the account
+that ran the job. To make a job visible without having to log in, you can create a link
+with an authentication token.
+
+This can be configured by setting the ``SAUCELABS_JOB_AUTH`` environment variable or by
+using a :ref:`configuration file <configuration-files>`
+
+An example using a :ref:`configuration file <configuration-files>`:
+
+.. code-block:: ini
+
+  [pytest]
+  saucelabs_job_auth = TOKEN
+
+You can also control the time to live for that link by setting the environment variable
+or :ref:`configuration file <configuration-files>`: value to ``DAY`` or ``HOUR``.
+
+Note that ``DAY`` means within the same day that the test was ran,
+_not_ "24 hours from test-run", likewise for ``HOUR``
+
+For more information, see
+`building links to test results <https://wiki.saucelabs.com/display/DOCS/Building+Links+to+Test+Results>`_
+
 BrowserStack
 ------------
 

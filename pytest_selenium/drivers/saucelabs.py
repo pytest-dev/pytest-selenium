@@ -148,33 +148,33 @@ def _video_html(session):
 def get_job_url(config, provider, session_id):
     from datetime import datetime
 
-    job_url = provider.JOB
+    job_url = provider.JOB.format(session=session_id)
     job_auth = config.getini('saucelabs_job_auth').lower()
 
     if job_auth == 'none':
-        return job_url.format(session=session_id)
+        return job_url
 
     if job_auth == 'token':
-        key = '{0.username}:{0.key}'.format(provider)
-    else:
+        return get_auth_url(job_url, provider, session_id)
+    elif job_auth == 'hour':
+        time_format = '%Y-%m-%d-%H'
+    elif job_auth == 'day':
         time_format = '%Y-%m-%d'
-        if job_auth == 'hour':
-            time_format = '%Y-%m-%d-%H'
-        elif job_auth != 'day':
-            raise ValueError("Invalid authorization type: {}".format(job_auth))
+    else:
+        raise ValueError("Invalid authorization type: {}".format(job_auth))
 
-        ttl = datetime.utcnow().strftime(time_format)
-        key = '{0.username}:{0.key}:{1}'.format(provider, ttl)
-
-    return get_auth_url(job_url, key, session_id)
+    ttl = datetime.utcnow().strftime(time_format)
+    return get_auth_url(job_url, provider, session_id, ttl)
 
 
-def get_auth_url(url, key, session_id):
+def get_auth_url(url, provider, session_id, ttl=None):
     import hmac
     from hashlib import md5
 
-    auth_url = url.format(session='{}?auth={}')
-    auth_token = hmac.new(key.encode('utf-8'),
-                          session_id.encode('utf-8'),
-                          md5).hexdigest()
-    return auth_url.format(session_id, auth_token)
+    key = '{0.username}:{0.key}'.format(provider)
+    if ttl:
+        key += ':{}'.format(ttl)
+    token = hmac.new(key.encode('utf-8'),
+                     session_id.encode('utf-8'),
+                     md5).hexdigest()
+    return '{}?auth={}'.format(url, token)
