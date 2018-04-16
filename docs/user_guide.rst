@@ -338,7 +338,7 @@ You can also control the time to live for that link by setting the environment v
 or :ref:`configuration file <configuration-files>`: value to ``DAY`` or ``HOUR``.
 
 Note that ``DAY`` means within the same day that the test was ran,
-_not_ "24 hours from test-run", likewise for ``HOUR``
+*not* "24 hours from test-run", likewise for ``HOUR``
 
 For more information, see
 `building links to test results <https://wiki.saucelabs.com/display/DOCS/Building+Links+to+Test+Results>`_
