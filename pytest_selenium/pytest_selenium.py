@@ -316,11 +316,11 @@ def pytest_addoption(parser):
                   help='debug to exclude from capture',
                   default=os.getenv('SELENIUM_EXCLUDE_DEBUG'))
 
-    _auth_choices = ('NONE', 'TOKEN', 'HOUR', 'DAY')
+    _auth_choices = ('none', 'token', 'hour', 'day')
     parser.addini('saucelabs_job_auth',
                   help='Authorization options for the Sauce Labs job: {0}'.
                   format(_auth_choices),
-                  default=os.getenv('SAUCELABS_JOB_AUTH', 'NONE'))
+                  default=os.getenv('SAUCELABS_JOB_AUTH', 'none'))
 
     group = parser.getgroup('selenium', 'selenium')
     group._addoption('--driver',

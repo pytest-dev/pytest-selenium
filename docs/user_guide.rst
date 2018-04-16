@@ -332,13 +332,13 @@ An example using a :ref:`configuration file <configuration-files>`:
 .. code-block:: ini
 
   [pytest]
-  saucelabs_job_auth = TOKEN
+  saucelabs_job_auth = token
 
 You can also control the time to live for that link by setting the environment variable
-or :ref:`configuration file <configuration-files>`: value to ``DAY`` or ``HOUR``.
+or :ref:`configuration file <configuration-files>`: value to ``day`` or ``hour``.
 
-Note that ``DAY`` means within the same day that the test was ran,
-*not* "24 hours from test-run", likewise for ``HOUR``
+Note that ``day`` means within the same day that the test was run,
+*not* "24 hours from test-run", likewise for ``hour``
 
 For more information, see
 `building links to test results <https://wiki.saucelabs.com/display/DOCS/Building+Links+to+Test+Results>`_
