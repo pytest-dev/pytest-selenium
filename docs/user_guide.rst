@@ -279,8 +279,10 @@ Sauce Labs
 To run your automated tests using `Sauce Labs <https://saucelabs.com/>`_, you
 must provide a valid username and API key. This can be done either by using
 a ``.saucelabs`` configuration file in the working directory or your home
-directory, or by setting the ``SAUCELABS_USERNAME`` and ``SAUCELABS_API_KEY``
-environment variables.
+directory, by setting the ``SAUCELABS_USERNAME`` and ``SAUCELABS_API_KEY``
+environment variables, or by using the environment variables as detailed
+`here <https://wiki.saucelabs.com/display/DOCS/
+Best+Practice%3A+Use+Environment+Variables+for+Authentication+Credentials>`_
 
 Alternatively, when using `Jenkins CI`_ declarative pipelines,
 credentials can be set as environment variables as follows:
