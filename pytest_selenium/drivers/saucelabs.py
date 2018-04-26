@@ -33,12 +33,14 @@ class SauceLabs(Provider):
     @property
     def username(self):
         return self.get_credential('username', ['SAUCELABS_USERNAME',
-                                                'SAUCELABS_USR'])
+                                                'SAUCELABS_USR',
+                                                'SAUCE_USERNAME'])
 
     @property
     def key(self):
         return self.get_credential('key', ['SAUCELABS_API_KEY',
-                                           'SAUCELABS_PSW'])
+                                           'SAUCELABS_PSW',
+                                           'SAUCE_ACCESS_KEY'])
 
 
 @pytest.mark.optionalhook

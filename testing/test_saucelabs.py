@@ -54,7 +54,9 @@ def test_missing_api_key_file(failure, monkeypatch, tmpdir):
 @pytest.mark.parametrize(('username', 'key'), [('SAUCELABS_USERNAME',
                                                 'SAUCELABS_API_KEY'),
                                                ('SAUCELABS_USR',
-                                                'SAUCELABS_PSW')])
+                                                'SAUCELABS_PSW'),
+                                               ('SAUCE_USERNAME',
+                                                'SAUCE_ACCESS_KEY')])
 def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv(username, 'foo')
