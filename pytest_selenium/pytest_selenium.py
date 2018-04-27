@@ -105,7 +105,7 @@ def driver_kwargs(request, capabilities, chrome_options, driver_args,
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_class(request):
     driver = request.config.getoption('driver')
     if driver is None:
