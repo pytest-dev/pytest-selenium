@@ -43,8 +43,8 @@ def pytest_addhooks(pluginmanager):
 def session_capabilities(pytestconfig):
     """Returns combined capabilities from pytest-variables and command line"""
     driver = pytestconfig.getoption('driver').upper()
-    capabilities = getattr(DesiredCapabilities, driver.upper(), {}).copy()
-    if driver.upper() == 'REMOTE':
+    capabilities = getattr(DesiredCapabilities, driver, {}).copy()
+    if driver == 'REMOTE':
         browser = capabilities.get('browserName', '').upper()
         capabilities.update(getattr(DesiredCapabilities, browser, {}))
     capabilities.update(pytestconfig._capabilities)
