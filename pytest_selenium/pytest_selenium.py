@@ -42,10 +42,7 @@ def pytest_addhooks(pluginmanager):
 @pytest.fixture(scope='session')
 def session_capabilities(pytestconfig):
     """Returns combined capabilities from pytest-variables and command line"""
-    driver = pytestconfig.getoption('driver')
-    if driver is None:
-        raise pytest.UsageError('--driver must be specified')
-
+    driver = pytestconfig.getoption('driver').upper()
     capabilities = getattr(DesiredCapabilities, driver.upper(), {}).copy()
     if driver.upper() == 'REMOTE':
         browser = capabilities.get('browserName', '').upper()
@@ -108,7 +105,7 @@ def driver_kwargs(request, capabilities, chrome_options, driver_args,
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope='session')
 def driver_class(request):
     driver = request.config.getoption('driver')
     if driver is None:
