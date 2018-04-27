@@ -75,10 +75,11 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     assert any(message in out for message in messages)
 
 
-@pytest.mark.parametrize(('auth_type', 'auth_token'), [('none', ''),
-                                                       ('token', '5d5b3d4fe1fcb72edf5f8c431eb10175'),
-                                                       ('day', 'e9480f85e8183e94e39fc69af685831c'),
-                                                       ('hour', '441bac7116b1eeb026fed2a0942aad57')])
+@pytest.mark.parametrize(('auth_type', 'auth_token'),
+                         [('none', ''),
+                          ('token', '5d5b3d4fe1fcb72edf5f8c431eb10175'),
+                          ('day', 'e9480f85e8183e94e39fc69af685831c'),
+                          ('hour', '441bac7116b1eeb026fed2a0942aad57')])
 def test_auth_token(monkeypatch, auth_type, auth_token):
     import datetime
     from pytest_selenium.drivers.saucelabs import SauceLabs, get_job_url
