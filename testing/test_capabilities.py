@@ -2,6 +2,8 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import json
+
 import pytest
 
 pytestmark = pytest.mark.nondestructive
@@ -24,6 +26,22 @@ def test_command_line(testfile, testdir):
 def test_file(testfile, testdir):
     variables = testdir.makefile('.json', '{"capabilities": {"foo": "bar"}}')
     testdir.quick_qa('--variables', variables, testfile, passed=1)
+
+
+def test_file_remote(testdir):
+    key = 'goog:chromeOptions'
+    capabilities = {'browserName': 'chrome', key: {'args': ['foo']}}
+    variables = testdir.makefile('.json', '{{"capabilities": {}}}'.format(
+        json.dumps(capabilities)))
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_capabilities(session_capabilities, capabilities):
+            assert session_capabilities['{0}']['args'] == ['foo']
+            assert capabilities['{0}']['args'] == ['foo']
+    """.format(key))
+    testdir.quick_qa(
+        '--driver', 'Remote', '--variables', variables, file_test, passed=1)
 
 
 def test_fixture(testfile, testdir):

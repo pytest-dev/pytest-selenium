@@ -31,6 +31,29 @@ SUPPORTED_DRIVERS = CaseInsensitiveDict({
     'TestingBot': webdriver.Remote})
 
 
+def _merge(a, b):
+    """ merges b and a configurations.
+        Based on http://bit.ly/2uFUHgb
+     """
+    for key in b:
+        if key in a:
+            if isinstance(a[key], dict) and isinstance(b[key], dict):
+                _merge(a[key], b[key], [] + [str(key)])
+            elif a[key] == b[key]:
+                pass  # same leaf value
+            elif isinstance(a[key], list):
+                if isinstance(b[key], list):
+                    a[key].extend(b[key])
+                else:
+                    a[key].append(b[key])
+            else:
+                # b wins
+                a[key] = b[key]
+        else:
+            a[key] = b[key]
+    return a
+
+
 def pytest_addhooks(pluginmanager):
     from . import hooks
     method = getattr(pluginmanager, 'add_hookspecs', None)
@@ -68,7 +91,8 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
             key = firefox_options.KEY
             options = firefox_options.to_capabilities()
         if all([key, options]):
-            capabilities.setdefault(key, {}).update(options.get(key, {}))
+            capabilities[key] = _merge(
+                capabilities.get(key, {}), options.get(key, {}))
     capabilities_marker = request.node.get_marker('capabilities')
     if capabilities_marker is not None:
         # add capabilities from the marker
