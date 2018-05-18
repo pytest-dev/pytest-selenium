@@ -14,8 +14,8 @@ from pytest_selenium.drivers.cloud import Provider
 
 class SauceLabs(Provider):
 
-    API = 'http://saucelabs.com/rest/v1/{username}/jobs/{session}'
-    JOB = 'http://saucelabs.com/jobs/{session}'
+    API = 'https://saucelabs.com/rest/v1/{username}/jobs/{session}'
+    JOB = 'https://saucelabs.com/jobs/{session}'
 
     @property
     def auth(self):
@@ -23,7 +23,7 @@ class SauceLabs(Provider):
 
     @property
     def executor(self):
-        return 'http://{0}:{1}@ondemand.saucelabs.com:80/wd/hub'.format(
+        return 'https://{0}:{1}@ondemand.saucelabs.com:80/wd/hub'.format(
             self.username, self.key)
 
     @property
