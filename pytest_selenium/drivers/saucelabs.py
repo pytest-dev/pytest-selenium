@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
 import json
 
 from _pytest.mark import MarkInfo
@@ -92,7 +93,7 @@ def driver_kwargs(request, test, capabilities, **kwargs):
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
 
     _capabilities = capabilities
-    if capabilities.get('w3c'):
+    if os.getenv('SAUCE_W3C') == 'true':
         _capabilities = capabilities.setdefault('sauce:options', {})
 
     _capabilities.setdefault('name', test)
