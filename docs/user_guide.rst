@@ -325,7 +325,7 @@ W3C compliant capabilities
 Starting with selenium version 3.8.0 Sauce Labs supports the selenium W3C compliant capabilities.
 To use the W3C capabilities you have to set the ``SAUCELABS_W3C`` environment variable to ``true``
 and update your :ref:`capabilities <capabilities>` according to the Sauce labs
-`W3C documentation <https://wiki.saucelabs.com/display/DOCS/Selenium+W3C+Capabilities+Support+-+Beta>`.
+`W3C documentation <https://wiki.saucelabs.com/display/DOCS/Selenium+W3C+Capabilities+Support+-+Beta>`_.
 
 Test result links
 ~~~~~~~~~~~~~~~~~
