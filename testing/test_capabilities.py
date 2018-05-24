@@ -73,8 +73,7 @@ def test_no_sauce_options(monkeypatch, testdir):
     capabilities = {'browserName': 'chrome'}
     variables = testdir.makefile('.json', '{{"capabilities": {}}}'.format(
         json.dumps(capabilities)))
-    expected = {'name': 'test_no_sauce_options.test_sauce_capabilities',
-                'tags': ['nondestructive']}
+
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
@@ -84,7 +83,7 @@ def test_no_sauce_options(monkeypatch, testdir):
                 raise AssertionError('<sauce:options> should not be present!')
             except KeyError:
                 pass
-    """.format(expected))
+    """)
 
     testdir.quick_qa(
         '--driver', 'saucelabs', '--variables',
