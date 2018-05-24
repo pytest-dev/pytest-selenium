@@ -66,6 +66,31 @@ def test_mark(testdir):
     testdir.quick_qa(file_test, passed=1)
 
 
+def test_no_sauce_options(monkeypatch, testdir):
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+
+    capabilities = {'browserName': 'chrome'}
+    variables = testdir.makefile('.json', '{{"capabilities": {}}}'.format(
+        json.dumps(capabilities)))
+    expected = {'name': 'test_no_sauce_options.test_sauce_capabilities',
+                'tags': ['nondestructive']}
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_sauce_capabilities(driver_kwargs):
+            try:
+                driver_kwargs['desired_capabilities']['sauce:options']
+                raise AssertionError('<sauce:options> should not be present!')
+            except KeyError:
+                pass
+    """.format(expected))
+
+    testdir.quick_qa(
+        '--driver', 'saucelabs', '--variables',
+        variables, file_test, passed=1)
+
+
 def test_empty_sauce_options(monkeypatch, testdir):
     capabilities = {'browserName': 'chrome'}
     expected = {'name': 'test_empty_sauce_options.test_sauce_capabilities',
