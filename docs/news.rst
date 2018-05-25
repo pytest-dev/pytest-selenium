@@ -1,6 +1,28 @@
 Release Notes
 =============
 
+1.13.0 (2018-05-25)
+-------------------
+
+* Use https for Sauce Labs URLs.
+
+  * Thanks to `@stephendonner <https://github.com/stephendonner>`_ for the PR
+
+* Support W3C compliant capabilities with Sauce Labs.
+
+  * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
+* Support Sauce Labs token authentication for job URLs.
+
+  * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
+* Merge browser options within capabilities when using a remote driver.
+
+* Accept ``SAUCE_USERNAME`` and ``SAUCE_ACCESS_KEY`` as alternate environment
+  variables for Sauce Labs credentials.
+
+  * Thanks to `@BeyondEvil <https://github.com/BeyondEvil>`_ for the PR
+
 1.12.0 (2018-03-21)
 -------------------
 
