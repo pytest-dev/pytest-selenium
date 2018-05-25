@@ -91,7 +91,7 @@ def test_auth_token(monkeypatch, auth_type, auth_token):
     monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
 
     session_id = '12345678'
-    url = 'http://saucelabs.com/jobs/{}'.format(session_id)
+    url = 'https://saucelabs.com/jobs/{}'.format(session_id)
 
     if auth_type != 'none':
         url += '?auth={}'.format(auth_token)
