@@ -23,7 +23,7 @@ class SauceLabs(Provider):
 
     @property
     def executor(self):
-        return 'https://{0}:{1}@ondemand.saucelabs.com:80/wd/hub'.format(
+        return 'https://{0}:{1}@ondemand.saucelabs.com/wd/hub'.format(
             self.username, self.key)
 
     @property
