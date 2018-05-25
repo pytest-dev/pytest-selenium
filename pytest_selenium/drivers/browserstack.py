@@ -18,7 +18,7 @@ class BrowserStack(Provider):
 
     @property
     def executor(self):
-        return 'http://{0}:{1}@hub.browserstack.com:80/wd/hub'.format(
+        return 'https://{0}:{1}@hub.browserstack.com/wd/hub'.format(
             self.username, self.key)
 
     @property
