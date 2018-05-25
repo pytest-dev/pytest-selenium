@@ -319,6 +319,14 @@ the ``--capability`` command line arguments. See the
 `test configuration documentation <https://docs.saucelabs.com/reference/test-configuration/>`_
 for full details of what can be configured.
 
+W3C compliant capabilities
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Starting with selenium version 3.11.0 Sauce Labs supports the selenium W3C compliant capabilities.
+To use the W3C capabilities you have to set the ``SAUCELABS_W3C`` environment variable to ``true``
+and update your :ref:`capabilities <capabilities>` according to the Sauce labs
+`W3C documentation <https://wiki.saucelabs.com/display/DOCS/Selenium+W3C+Capabilities+Support+-+Beta>`_.
+
 Test result links
 ~~~~~~~~~~~~~~~~~
 
@@ -485,6 +493,8 @@ Additional capabilities can be set using the ``--capability`` command line
 arguments. See the
 `automation capabilities <https://help.crossbrowsertesting.com/selenium-testing/general/crossbrowsertesting-automation-capabilities/>`_
 for full details of what can be configured.
+
+.. _capabilities:
 
 Specifying Capabilities
 ***********************

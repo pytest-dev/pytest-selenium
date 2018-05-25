@@ -64,3 +64,71 @@ def test_mark(testdir):
             assert capabilities['foo'] == 'bar'
     """)
     testdir.quick_qa(file_test, passed=1)
+
+
+def test_no_sauce_options(monkeypatch, testdir):
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+
+    capabilities = {'browserName': 'chrome'}
+    variables = testdir.makefile('.json', '{{"capabilities": {}}}'.format(
+        json.dumps(capabilities)))
+
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_sauce_capabilities(driver_kwargs):
+            try:
+                driver_kwargs['desired_capabilities']['sauce:options']
+                raise AssertionError('<sauce:options> should not be present!')
+            except KeyError:
+                pass
+    """)
+
+    testdir.quick_qa(
+        '--driver', 'saucelabs', '--variables',
+        variables, file_test, passed=1)
+
+
+def test_empty_sauce_options(monkeypatch, testdir):
+    capabilities = {'browserName': 'chrome'}
+    expected = {'name': 'test_empty_sauce_options.test_sauce_capabilities',
+                'tags': ['nondestructive']}
+    run_sauce_test(capabilities, expected, monkeypatch, testdir)
+
+
+def test_merge_sauce_options(monkeypatch, testdir):
+    version = {'seleniumVersion': '3.8.1'}
+    capabilities = {'browserName': 'chrome', 'sauce:options': version}
+    expected = {'name': 'test_merge_sauce_options.test_sauce_capabilities',
+                'tags': ['nondestructive']}
+    expected.update(version)
+    run_sauce_test(capabilities, expected, monkeypatch, testdir)
+
+
+def test_merge_sauce_options_with_conflict(monkeypatch, testdir):
+    name = 'conflict'
+    capabilities = {'browserName': 'chrome', 'sauce:options': {'name': name}}
+    expected = {'name': name, 'tags': ['nondestructive']}
+    run_sauce_test(capabilities, expected, monkeypatch, testdir)
+
+
+def run_sauce_test(capabilities, expected_result, monkeypatch, testdir):
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+    monkeypatch.setenv('SAUCELABS_W3C', 'true')
+
+    variables = testdir.makefile('.json', '{{"capabilities": {}}}'.format(
+        json.dumps(capabilities)))
+
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_sauce_capabilities(driver_kwargs):
+            actual = driver_kwargs['desired_capabilities']['sauce:options']
+            assert actual == {}
+    """.format(expected_result))
+
+    testdir.quick_qa(
+        '--driver', 'saucelabs', '--variables',
+        variables, file_test, passed=1)

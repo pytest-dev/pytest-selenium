@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+import os
 import json
 
 from _pytest.mark import MarkInfo
@@ -89,11 +90,17 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 def driver_kwargs(request, test, capabilities, **kwargs):
     provider = SauceLabs()
     keywords = request.node.keywords
-    capabilities.setdefault('name', test)
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
-    tags = capabilities.get('tags', []) + markers
+
+    _capabilities = capabilities
+    if os.getenv('SAUCELABS_W3C') == 'true':
+        _capabilities = capabilities.setdefault('sauce:options', {})
+
+    _capabilities.setdefault('name', test)
+    tags = _capabilities.get('tags', []) + markers
     if tags:
-        capabilities['tags'] = tags
+        _capabilities['tags'] = tags
+
     kwargs = {
         'command_executor': provider.executor,
         'desired_capabilities': capabilities}
