@@ -29,7 +29,7 @@ class TestingBot(Provider):
 
     @property
     def executor(self):
-        return 'https://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub'.format(
+        return 'http://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub'.format(
             self)
 
     @property
