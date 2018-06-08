@@ -77,27 +77,59 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     assert any(message in out for message in messages)
 
 
+USERNAME = 'foo'
+API_KEY = 'bar'
+SESSION_ID = '12345678'
+TOKEN = '{}:{}{}+{}'.format(USERNAME, API_KEY, '{}', SESSION_ID)
+
+
 @pytest.mark.parametrize(('auth_type', 'auth_token'),
                          [('none', ''),
-                          ('token', '5d5b3d4fe1fcb72edf5f8c431eb10175'),
-                          ('day', 'e9480f85e8183e94e39fc69af685831c'),
-                          ('hour', '441bac7116b1eeb026fed2a0942aad57')])
+                          ('token', TOKEN),
+                          ('day', TOKEN),
+                          ('hour', TOKEN)])
 def test_auth_token(monkeypatch, auth_type, auth_token):
     import datetime
+    import hmac
     from pytest_selenium.drivers.saucelabs import SauceLabs, get_job_url
 
     monkeypatch.setattr(datetime, 'datetime', MonkeyDatetime)
-    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+    monkeypatch.setattr(hmac, 'new', hmac_new)
+    monkeypatch.setenv('SAUCELABS_USERNAME', USERNAME)
+    monkeypatch.setenv('SAUCELABS_API_KEY', API_KEY)
 
-    session_id = '12345678'
-    url = 'https://saucelabs.com/jobs/{}'.format(session_id)
+    url = 'https://saucelabs.com/jobs/{}'.format(SESSION_ID)
+
+    time_format = None
+    if auth_type == 'token':
+        auth_token = auth_token.format('')
+    elif auth_type == 'hour':
+        time_format = '%Y-%m-%d-%H'
+    elif auth_type == 'day':
+        time_format = '%Y-%m-%d'
+
+    if time_format:
+        monkey = MonkeyDatetime().utcnow().strftime(time_format)
+        auth_token = auth_token.format(':' + monkey)
 
     if auth_type != 'none':
         url += '?auth={}'.format(auth_token)
 
-    result = get_job_url(Config(auth_type), SauceLabs(), session_id)
+    result = get_job_url(Config(auth_type), SauceLabs(), SESSION_ID)
     assert result == url
+
+
+def hmac_new(key, msg, _):
+    return HMAC(key, msg)
+
+
+class HMAC:
+
+    def __init__(self, key, msg):
+        self._digest = key.decode('utf-8') + '+' + msg.decode('utf-8')
+
+    def hexdigest(self):
+        return self._digest
 
 
 class MonkeyDatetime:
