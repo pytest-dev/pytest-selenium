@@ -4,11 +4,8 @@
 
 from functools import partial
 import os
-import datetime
 
 import pytest
-
-monkeytime = datetime.datetime(2020, 12, 25, 17)
 
 pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
@@ -76,34 +73,31 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     assert any(message in out for message in messages)
 
 
-@pytest.mark.parametrize(('auth_type', 'auth_token'),
-                         [('none', ''),
-                          ('token', '5d5b3d4fe1fcb72edf5f8c431eb10175'),
-                          ('day', 'e9480f85e8183e94e39fc69af685831c'),
-                          ('hour', '441bac7116b1eeb026fed2a0942aad57')])
-def test_auth_token(monkeypatch, auth_type, auth_token):
-    import datetime
+def test_auth_type_none(monkeypatch):
     from pytest_selenium.drivers.saucelabs import SauceLabs, get_job_url
 
-    monkeypatch.setattr(datetime, 'datetime', MonkeyDatetime)
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
     monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
 
-    session_id = '12345678'
-    url = 'https://saucelabs.com/jobs/{}'.format(session_id)
-
-    if auth_type != 'none':
-        url += '?auth={}'.format(auth_token)
-
-    result = get_job_url(Config(auth_type), SauceLabs(), session_id)
-    assert result == url
+    session_id = '123456'
+    expected = 'https://saucelabs.com/jobs/{}'.format(session_id)
+    actual = get_job_url(Config('none'), SauceLabs(), session_id)
+    assert actual == expected
 
 
-class MonkeyDatetime:
+@pytest.mark.parametrize('auth_type', ['token', 'day', 'hour'])
+def test_auth_type_expiration(monkeypatch, auth_type):
+    import re
+    from pytest_selenium.drivers.saucelabs import SauceLabs, get_job_url
 
-    @classmethod
-    def utcnow(cls):
-        return monkeytime
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+
+    session_id = '123456'
+    expected_pattern = r'https://saucelabs\.com/jobs/' \
+                       r'{}\?auth=[a-f0-9]{{32}}$'.format(session_id)
+    actual = get_job_url(Config(auth_type), SauceLabs(), session_id)
+    assert re.match(expected_pattern, actual)
 
 
 class Config(object):
