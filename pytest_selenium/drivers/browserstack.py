@@ -22,10 +22,6 @@ class BrowserStack(Provider):
             self.username, self.key)
 
     @property
-    def name(self):
-        return type(self).__name__
-
-    @property
     def username(self):
         return self.get_credential('username', ['BROWSERSTACK_USERNAME',
                                                 'BROWSERSTACK_USR'])
@@ -39,7 +35,7 @@ class BrowserStack(Provider):
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     provider = BrowserStack()
-    if item.config.getoption('driver') != provider.driver:
+    if not provider.uses_driver(item.config.getoption('driver')):
         return
 
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))

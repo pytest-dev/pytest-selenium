@@ -33,10 +33,6 @@ class TestingBot(Provider):
             self)
 
     @property
-    def name(self):
-        return type(self).__name__
-
-    @property
     def key(self):
         return self.get_credential('key', ['TESTINGBOT_KEY',
                                            'TESTINGBOT_USR'])
@@ -50,7 +46,7 @@ class TestingBot(Provider):
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
     provider = TestingBot()
-    if item.config.getoption('driver') != provider.driver:
+    if not provider.uses_driver(item.config.getoption('driver')):
         return
 
     pytest_html = item.config.pluginmanager.getplugin('html')
@@ -60,7 +56,7 @@ def pytest_selenium_capture_debug(item, report, extra):
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     provider = TestingBot()
-    if item.config.getoption('driver') != provider.driver:
+    if not provider.uses_driver(item.config.getoption('driver')):
         return
 
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))

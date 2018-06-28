@@ -3,6 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from functools import partial
+from pytest_selenium.drivers import saucelabs
+from pytest_selenium.drivers import testingbot
+from pytest_selenium.drivers import crossbrowsertesting
+from pytest_selenium.drivers import browserstack
 
 import pytest
 
@@ -35,9 +39,10 @@ def test_driver_case_insensitive(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_pass(): pass
+        def test_pass(request):
+            assert request.config.getoption('driver') == 'SaUcELaBs'
     """)
-    testdir.quick_qa('--driver', 'firefox', file_test, passed=1)
+    testdir.quick_qa('--driver', 'SaUcELaBs', file_test, passed=1)
 
 
 def test_missing_driver(failure):
@@ -117,35 +122,12 @@ def test_arguments_order_random(testdir):
                      file_test, passed=1)
 
 
-def test_driver_lowercase(testdir):
-    file_test = testdir.makepyfile("""
-        import pytest
-        @pytest.mark.nondestructive
-        def test_pass(request):
-            assert request.config.getoption('driver') == 'saucelabs'
-    """)
-    testdir.quick_qa('--driver', 'SauceLabs',
-                     file_test, passed=1)
-
-
-def test_provider_lowercase():
-    from pytest_selenium.drivers.saucelabs import SauceLabs
-    from pytest_selenium.drivers.testingbot import TestingBot
-    from pytest_selenium.drivers.crossbrowsertesting import CrossBrowserTesting
-    from pytest_selenium.drivers.browserstack import BrowserStack
-
-    sl = SauceLabs()
-    assert sl.driver == 'saucelabs'
-    assert sl.name == 'Sauce Labs'
-
-    tb = TestingBot()
-    assert tb.driver == 'testingbot'
-    assert tb.name == 'TestingBot'
-
-    cbt = CrossBrowserTesting()
-    assert cbt.driver == 'crossbrowsertesting'
-    assert cbt.name == 'CrossBrowserTesting'
-
-    bs = BrowserStack()
-    assert bs.driver == 'browserstack'
-    assert bs.name == 'BrowserStack'
+@pytest.mark.parametrize(('module_name', 'class_name'),
+                         [(saucelabs, 'Sauce Labs'),
+                          (testingbot, 'TestingBot'),
+                          (crossbrowsertesting, 'CrossBrowserTesting'),
+                          (browserstack, 'BrowserStack')])
+def test_provider_naming(module_name, class_name):
+    provider = getattr(module_name, class_name.replace(' ', ''))()
+    assert provider.driver == class_name.replace(' ', '').lower()
+    assert provider.name == class_name

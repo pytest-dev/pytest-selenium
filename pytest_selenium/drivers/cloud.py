@@ -7,6 +7,7 @@ import sys
 
 from pytest_selenium.exceptions import MissingCloudCredentialError
 
+
 if sys.version_info[0] == 2:
     import ConfigParser as configparser
 else:
@@ -17,11 +18,11 @@ class Provider(object):
 
     @property
     def driver(self):
-        return type(self).__name__.lower()
+        return self.name.lower()
 
     @property
     def name(self):
-        return self.driver
+        return type(self).__name__
 
     @property
     def config(self):
@@ -41,3 +42,6 @@ class Provider(object):
                 if value:
                     return value
         raise MissingCloudCredentialError(self.name, key, envs)
+
+    def uses_driver(self, driver):
+        return driver.lower() == self.driver
