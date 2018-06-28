@@ -3,10 +3,8 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from functools import partial
-from pytest_selenium.drivers import saucelabs
-from pytest_selenium.drivers import testingbot
-from pytest_selenium.drivers import crossbrowsertesting
-from pytest_selenium.drivers import browserstack
+from pytest_selenium.drivers import saucelabs, testingbot,\
+    crossbrowsertesting, browserstack
 
 import pytest
 
