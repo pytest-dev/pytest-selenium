@@ -115,3 +115,14 @@ def test_arguments_order_random(testdir):
                      '--driver', 'Remote',
                      '--port', port,
                      file_test, passed=1)
+
+
+def test_driver_lowercase(testdir):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(request):
+            assert request.config.getoption('driver') == 'saucelabs'
+    """)
+    testdir.quick_qa('--driver', 'SauceLabs',
+                     file_test, passed=1)
