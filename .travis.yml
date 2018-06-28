@@ -36,9 +36,10 @@ env:
   global:
   - DISPLAY=:99.0
   - PYTEST_ADDOPTS="-m 'not (chrome or edge or safari or phantomjs)'"
+  - secure: FDwROueJ4CSki98tJRl7cBAx5IbmtD82FsGJuWGBKlqHeE7/18nN9Jl7F9LSbAeb2Vztw5ETX7A6YurzUDANfPLf/ODTZYIsvABpYCX0aoKiZ4wXDndN+tRWioVm3sKPqPjIMpZLHwdxPnqnn+txSx1UHOhLMl9m+fzTqt9Rfi6Z4NON9EwRHX7zD5Cj9tnDO/vvvYr1SZkkAlw5dT6OZul4VYyR9fgdYtab6RIiJ5aeXWxwHuHpCsFgmxqIycKDA2hbNskm3Sa95AFombmn2akLm9GgFYUdkHRPIykFmJEIp4SwvvlAQrLv1dAiD8gQBa2b6CxU3exYVZkjDjicyla7Tqd/UTr8zdLrOSvupmHSzcAY8q7aK2cmbdwwHpr7lNy5mfCMUcwcKtq/TafzcPpxfoRFjtWNbKGRSR+gpeEw+jbjW/QK06vLUsn8hj3Tf7Iq5iTxBw9QJH6tzs2uB6XiOddniby1FOkSNfLnxddhQEamc1GJ3nK906p4y35RP1TNq12uBjWZhae3ypohvMf1sbsGOi+L8s/4/UIQrWK3ERn22FHiR//vWSjARAvpVJeeR2vB1ZgbvHkDXKQbfAPZhXQt6sRNEDG4f7vqPIQlikY6sOCPIHu/5BDrMYT9FMbJ/VxM9oeUOJAluk+LM6jhfrOtnUobNSxVTvxOhBk=
 cache: pip
 before_install:
-  - export GECKODRIVER_DOWNLOAD=`curl -s 'https://api.github.com/repos/mozilla/geckodriver/releases/latest' | python -c "import sys, json; r = json.load(sys.stdin); print([a for a in r['assets'] if 'linux64' in a['name']][0]['browser_download_url']);"`
+  - export GECKODRIVER_DOWNLOAD=`curl -H "Authorization: $GITHUB_AUTH_TOKEN" -s 'https://api.github.com/repos/mozilla/geckodriver/releases/latest' | python -c "import sys, json; r = json.load(sys.stdin); print([a for a in r['assets'] if 'linux64' in a['name']][0]['browser_download_url']);"`
   - curl -L -o /tmp/geckodriver.tar.gz $GECKODRIVER_DOWNLOAD
   - mkdir $HOME/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C $HOME/geckodriver
   - export PATH=$HOME/geckodriver:$PATH
