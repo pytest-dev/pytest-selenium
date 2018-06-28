@@ -25,12 +25,16 @@ class TestingBot(Provider):
 
     @property
     def auth(self):
-        return (self.key, self.secret)
+        return self.key, self.secret
 
     @property
     def executor(self):
         return 'http://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub'.format(
             self)
+
+    @property
+    def name(self):
+        return type(self).__name__
 
     @property
     def key(self):

@@ -14,12 +14,16 @@ class BrowserStack(Provider):
 
     @property
     def auth(self):
-        return (self.username, self.key)
+        return self.username, self.key
 
     @property
     def executor(self):
         return 'http://{0}:{1}@hub.browserstack.com:80/wd/hub'.format(
             self.username, self.key)
+
+    @property
+    def name(self):
+        return type(self).__name__
 
     @property
     def username(self):
