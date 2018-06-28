@@ -128,7 +128,24 @@ def test_driver_lowercase(testdir):
                      file_test, passed=1)
 
 
-def test_provider_driver_lowercase():
+def test_provider_lowercase():
     from pytest_selenium.drivers.saucelabs import SauceLabs
+    from pytest_selenium.drivers.testingbot import TestingBot
+    from pytest_selenium.drivers.crossbrowsertesting import CrossBrowserTesting
+    from pytest_selenium.drivers.browserstack import BrowserStack
 
-    assert SauceLabs().driver == 'saucelabs'
+    sl = SauceLabs()
+    assert sl.driver == 'saucelabs'
+    assert sl.name == 'Sauce Labs'
+
+    tb = TestingBot()
+    assert tb.driver == 'testingbot'
+    assert tb.name == 'TestingBot'
+
+    cbt = CrossBrowserTesting()
+    assert cbt.driver == 'crossbrowsertesting'
+    assert cbt.name == 'CrossBrowserTesting'
+
+    bs = BrowserStack()
+    assert bs.driver == 'browserstack'
+    assert bs.name == 'BrowserStack'
