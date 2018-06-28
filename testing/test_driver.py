@@ -126,3 +126,9 @@ def test_driver_lowercase(testdir):
     """)
     testdir.quick_qa('--driver', 'SauceLabs',
                      file_test, passed=1)
+
+
+def test_provider_driver_lowercase():
+    from pytest_selenium.drivers.saucelabs import SauceLabs
+
+    assert SauceLabs().driver == 'saucelabs'

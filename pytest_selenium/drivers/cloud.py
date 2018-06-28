@@ -25,7 +25,7 @@ class Provider(object):
 
     @property
     def config(self):
-        name = '.{0}'.format(self.driver.lower())
+        name = '.{0}'.format(self.driver)
         config = configparser.ConfigParser()
         config.read([name, os.path.join(os.path.expanduser('~'), name)])
         return config
