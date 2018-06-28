@@ -17,7 +17,7 @@ class Provider(object):
 
     @property
     def driver(self):
-        return type(self).__name__
+        return type(self).__name__.lower()
 
     @property
     def name(self):

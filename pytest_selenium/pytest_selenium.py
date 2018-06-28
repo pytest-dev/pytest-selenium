@@ -111,7 +111,7 @@ def driver_kwargs(request, capabilities, chrome_options, driver_args,
                   driver_class, driver_log, driver_path, firefox_options,
                   firefox_profile, pytestconfig):
     kwargs = {}
-    driver = getattr(drivers, pytestconfig.getoption('driver').lower())
+    driver = getattr(drivers, pytestconfig.getoption('driver'))
     kwargs.update(driver.driver_kwargs(
         capabilities=capabilities,
         chrome_options=chrome_options,
@@ -324,7 +324,7 @@ def split_class_and_test_names(nodeid):
 class DriverAction(argparse.Action):
 
     def __call__(self, parser, namespace, values, option_string=None):
-        setattr(namespace, self.dest, values)
+        setattr(namespace, self.dest, values.lower())
         driver = getattr(drivers, values.lower())
         # set the default host and port if specified in the driver module
         namespace.host = namespace.host or getattr(driver, 'HOST', None)
