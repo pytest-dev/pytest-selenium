@@ -127,5 +127,5 @@ def test_arguments_order_random(testdir):
                           (browserstack, 'BrowserStack')])
 def test_provider_naming(module_name, class_name):
     provider = getattr(module_name, class_name.replace(' ', ''))()
-    assert provider.driver == class_name.replace(' ', '').lower()
+    assert provider.uses_driver(class_name.replace(' ', ''))
     assert provider.name == class_name
