@@ -13,7 +13,7 @@ def test_skip_destructive_by_default(testdir):
 
 
 def test_warn_when_url_is_sensitive(testdir, httpserver, monkeypatch, capsys):
-    monkeypatch.setenv('SENSITIVE_URL', '127\.0\.0\.1')
+    monkeypatch.setenv('SENSITIVE_URL', r'127\.0\.0\.1')
     file_test = testdir.makepyfile('def test_pass(): pass')
     testdir.quick_qa(file_test, '--verbose', passed=0, failed=0, skipped=1)
     out, err = capsys.readouterr()
@@ -24,18 +24,18 @@ def test_warn_when_url_is_sensitive(testdir, httpserver, monkeypatch, capsys):
 def test_skip_destructive_when_sensitive_command_line(testdir, httpserver):
     file_test = testdir.makepyfile('def test_pass(): pass')
     print(httpserver.url)
-    testdir.quick_qa('--sensitive-url', '127\.0\.0\.1', file_test, passed=0,
+    testdir.quick_qa('--sensitive-url', r'127\.0\.0\.1', file_test, passed=0,
                      failed=0, skipped=1)
 
 
 def test_skip_destructive_when_sensitive_config_file(testdir, httpserver):
-    testdir.makefile('.ini', pytest='[pytest]\nsensitive_url=127\.0\.0\.1')
+    testdir.makefile('.ini', pytest='[pytest]\nsensitive_url=127\\.0\\.0\\.1')
     file_test = testdir.makepyfile('def test_pass(): pass')
     testdir.quick_qa(file_test, passed=0, failed=0, skipped=1)
 
 
 def test_skip_destructive_when_sensitive_env(testdir, httpserver, monkeypatch):
-    monkeypatch.setenv('SENSITIVE_URL', '127\.0\.0\.1')
+    monkeypatch.setenv('SENSITIVE_URL', r'127\.0\.0\.1')
     file_test = testdir.makepyfile('def test_pass(): pass')
     testdir.quick_qa(file_test, passed=0, failed=0, skipped=1)
 
