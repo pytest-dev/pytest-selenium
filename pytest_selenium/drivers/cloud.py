@@ -17,16 +17,12 @@ else:
 class Provider(object):
 
     @property
-    def driver(self):
-        return self.name.lower()
-
-    @property
     def name(self):
         return type(self).__name__
 
     @property
     def config(self):
-        name = '.{0}'.format(self.driver)
+        name = '.{0}'.format(self.name.lower())
         config = configparser.ConfigParser()
         config.read([name, os.path.join(os.path.expanduser('~'), name)])
         return config
@@ -44,4 +40,4 @@ class Provider(object):
         raise MissingCloudCredentialError(self.name, key, envs)
 
     def uses_driver(self, driver):
-        return driver.lower() == self.driver
+        return driver.lower() == self.name.lower()

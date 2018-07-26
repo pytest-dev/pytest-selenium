@@ -28,14 +28,6 @@ class SauceLabs(Provider):
             self.username, self.key)
 
     @property
-    def driver(self):
-        return 'saucelabs'
-
-    @property
-    def name(self):
-        return 'Sauce Labs'
-
-    @property
     def username(self):
         return self.get_credential('username', ['SAUCELABS_USERNAME',
                                                 'SAUCELABS_USR',
@@ -46,6 +38,9 @@ class SauceLabs(Provider):
         return self.get_credential('key', ['SAUCELABS_API_KEY',
                                            'SAUCELABS_PSW',
                                            'SAUCE_ACCESS_KEY'])
+
+    def uses_driver(self, driver):
+        return driver.lower() == self.name.lower()
 
 
 @pytest.mark.optionalhook

@@ -120,12 +120,18 @@ def test_arguments_order_random(testdir):
                      file_test, passed=1)
 
 
-@pytest.mark.parametrize(('module_name', 'class_name'),
-                         [(saucelabs, 'Sauce Labs'),
-                          (testingbot, 'TestingBot'),
-                          (crossbrowsertesting, 'CrossBrowserTesting'),
-                          (browserstack, 'BrowserStack')])
-def test_provider_naming(module_name, class_name):
-    provider = getattr(module_name, class_name.replace(' ', ''))()
-    assert provider.uses_driver(class_name.replace(' ', ''))
-    assert provider.name == class_name
+@pytest.mark.parametrize('name',
+                         ['SauceLabs',
+                          'TestingBot',
+                          'CrossBrowserTesting',
+                          'BrowserStack'])
+def test_provider_naming(name):
+    import importlib
+
+    #driver = name.replace(' ', '')
+    driver = name
+    module = importlib.import_module(
+        'pytest_selenium.drivers.{}'.format(driver.lower()))
+    provider = getattr(module, driver)()
+    assert provider.uses_driver(driver)
+    assert provider.name == name
