@@ -3,8 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 from functools import partial
-from pytest_selenium.drivers import saucelabs, testingbot,\
-    crossbrowsertesting, browserstack
 
 import pytest
 
@@ -128,7 +126,6 @@ def test_arguments_order_random(testdir):
 def test_provider_naming(name):
     import importlib
 
-    #driver = name.replace(' ', '')
     driver = name
     module = importlib.import_module(
         'pytest_selenium.drivers.{}'.format(driver.lower()))
