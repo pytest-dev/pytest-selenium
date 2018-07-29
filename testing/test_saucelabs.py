@@ -78,28 +78,40 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     assert any(message in out for message in messages)
 
 
-def test_no_sauce_options(monkeypatch, testdir):
-    username = 'foo'
-    access_key = 'bar'
-    monkeypatch.setenv('SAUCELABS_USERNAME', username)
-    monkeypatch.setenv('SAUCELABS_API_KEY', access_key)
-
-    capabilities = {'browserName': 'chrome'}
-    variables = testdir.makefile('.json', '{{"capabilities": {}}}'.format(
-        json.dumps(capabilities)))
-
+def test_credentials_in_capabilities(monkeypatch, testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_sauce_capabilities(driver_kwargs):
-            assert driver_kwargs['desired_capabilities']['username'] == '{}'
-            assert driver_kwargs['desired_capabilities']['accessKey'] == '{}'
+            assert driver_kwargs['desired_capabilities']['username'] == 'foo'
+            assert driver_kwargs['desired_capabilities']['accessKey'] == 'bar'
+    """)
+
+    run_sauce_test(monkeypatch, testdir, file_test)
+
+
+def test_no_sauce_options(monkeypatch, testdir):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_sauce_capabilities(driver_kwargs):
             try:
                 driver_kwargs['desired_capabilities']['sauce:options']
                 raise AssertionError('<sauce:options> should not be present!')
             except KeyError:
                 pass
-    """.format(username, access_key))
+    """)
+
+    run_sauce_test(monkeypatch, testdir, file_test)
+
+
+def run_sauce_test(monkeypatch, testdir, file_test):
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
+
+    capabilities = {'browserName': 'chrome'}
+    variables = testdir.makefile('.json', '{{"capabilities": {}}}'.format(
+        json.dumps(capabilities)))
 
     testdir.quick_qa(
         '--driver', 'saucelabs', '--variables',
@@ -109,7 +121,7 @@ def test_no_sauce_options(monkeypatch, testdir):
 def test_empty_sauce_options(monkeypatch, testdir):
     capabilities = {'browserName': 'chrome'}
     expected = {'name': 'test_empty_sauce_options.test_sauce_capabilities'}
-    run_sauce_test(capabilities, expected, monkeypatch, testdir)
+    run_w3c_sauce_test(capabilities, expected, monkeypatch, testdir)
 
 
 def test_merge_sauce_options(monkeypatch, testdir):
@@ -117,17 +129,17 @@ def test_merge_sauce_options(monkeypatch, testdir):
     capabilities = {'browserName': 'chrome', 'sauce:options': version}
     expected = {'name': 'test_merge_sauce_options.test_sauce_capabilities'}
     expected.update(version)
-    run_sauce_test(capabilities, expected, monkeypatch, testdir)
+    run_w3c_sauce_test(capabilities, expected, monkeypatch, testdir)
 
 
 def test_merge_sauce_options_with_conflict(monkeypatch, testdir):
     name = 'conflict'
     capabilities = {'browserName': 'chrome', 'sauce:options': {'name': name}}
     expected = {'name': name}
-    run_sauce_test(capabilities, expected, monkeypatch, testdir)
+    run_w3c_sauce_test(capabilities, expected, monkeypatch, testdir)
 
 
-def run_sauce_test(capabilities, expected_result, monkeypatch, testdir):
+def run_w3c_sauce_test(capabilities, expected_result, monkeypatch, testdir):
     username = 'foo'
     access_key = 'bar'
 
