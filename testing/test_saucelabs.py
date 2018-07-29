@@ -4,14 +4,10 @@
 
 from functools import partial
 import os
-import datetime
 
 import pytest
 
-monkeytime = datetime.datetime(2020, 12, 25, 17)
-
-pytestmark = pytestmark = [pytest.mark.skip_selenium,
-                           pytest.mark.nondestructive]
+pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
 
 @pytest.fixture
@@ -77,66 +73,31 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     assert any(message in out for message in messages)
 
 
-USERNAME = 'foo'
-API_KEY = 'bar'
-SESSION_ID = '12345678'
-TOKEN = '{}:{}{}+{}'.format(USERNAME, API_KEY, '{}', SESSION_ID)
-
-
-@pytest.mark.parametrize(('auth_type', 'auth_token'),
-                         [('none', ''),
-                          ('token', TOKEN),
-                          ('day', TOKEN),
-                          ('hour', TOKEN)])
-def test_auth_token(monkeypatch, auth_type, auth_token):
-    import datetime
-    import hmac
+def test_auth_type_none(monkeypatch):
     from pytest_selenium.drivers.saucelabs import SauceLabs, get_job_url
 
-    monkeypatch.setattr(datetime, 'datetime', MonkeyDatetime)
-    monkeypatch.setattr(hmac, 'new', hmac_new)
-    monkeypatch.setenv('SAUCELABS_USERNAME', USERNAME)
-    monkeypatch.setenv('SAUCELABS_API_KEY', API_KEY)
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
 
-    url = 'https://saucelabs.com/jobs/{}'.format(SESSION_ID)
-
-    time_format = None
-    if auth_type == 'token':
-        auth_token = auth_token.format('')
-    elif auth_type == 'hour':
-        time_format = '%Y-%m-%d-%H'
-    elif auth_type == 'day':
-        time_format = '%Y-%m-%d'
-
-    if time_format:
-        monkey = MonkeyDatetime().utcnow().strftime(time_format)
-        auth_token = auth_token.format(':' + monkey)
-
-    if auth_type != 'none':
-        url += '?auth={}'.format(auth_token)
-
-    result = get_job_url(Config(auth_type), SauceLabs(), SESSION_ID)
-    assert result == url
+    session_id = '123456'
+    expected = 'https://saucelabs.com/jobs/{}'.format(session_id)
+    actual = get_job_url(Config('none'), SauceLabs(), session_id)
+    assert actual == expected
 
 
-def hmac_new(key, msg, _):
-    return HMAC(key, msg)
+@pytest.mark.parametrize('auth_type', ['token', 'day', 'hour'])
+def test_auth_type_expiration(monkeypatch, auth_type):
+    import re
+    from pytest_selenium.drivers.saucelabs import SauceLabs, get_job_url
 
+    monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
+    monkeypatch.setenv('SAUCELABS_API_KEY', 'bar')
 
-class HMAC:
-
-    def __init__(self, key, msg):
-        self._digest = key.decode('utf-8') + '+' + msg.decode('utf-8')
-
-    def hexdigest(self):
-        return self._digest
-
-
-class MonkeyDatetime:
-
-    @classmethod
-    def utcnow(cls):
-        return monkeytime
+    session_id = '123456'
+    expected_pattern = r'https://saucelabs\.com/jobs/' \
+                       r'{}\?auth=[a-f0-9]{{32}}$'.format(session_id)
+    actual = get_job_url(Config(auth_type), SauceLabs(), session_id)
+    assert re.match(expected_pattern, actual)
 
 
 class Config(object):
