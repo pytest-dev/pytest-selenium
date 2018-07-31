@@ -7,8 +7,7 @@ import os
 
 import pytest
 
-pytestmark = pytestmark = [pytest.mark.skip_selenium,
-                           pytest.mark.nondestructive]
+pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
 
 @pytest.fixture

@@ -35,9 +35,10 @@ def test_driver_case_insensitive(testdir):
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
-        def test_pass(): pass
+        def test_pass(request):
+            assert request.config.getoption('driver') == 'SaUcELaBs'
     """)
-    testdir.quick_qa('--driver', 'firefox', file_test, passed=1)
+    testdir.quick_qa('--driver', 'SaUcELaBs', file_test, passed=1)
 
 
 def test_missing_driver(failure):
@@ -115,3 +116,19 @@ def test_arguments_order_random(testdir):
                      '--driver', 'Remote',
                      '--port', port,
                      file_test, passed=1)
+
+
+@pytest.mark.parametrize('name',
+                         ['SauceLabs',
+                          'TestingBot',
+                          'CrossBrowserTesting',
+                          'BrowserStack'])
+def test_provider_naming(name):
+    import importlib
+
+    driver = name
+    module = importlib.import_module(
+        'pytest_selenium.drivers.{}'.format(driver.lower()))
+    provider = getattr(module, driver)()
+    assert provider.uses_driver(driver)
+    assert provider.name == name
