@@ -19,7 +19,7 @@ class CrossBrowserTesting(Provider):
 
     @property
     def executor(self):
-        return 'http://{0}:{1}@hub.crossbrowsertesting.com:80/wd/hub'.format(
+        return 'https://{0}:{1}@hub.crossbrowsertesting.com/wd/hub'.format(
             self.username, self.key)
 
     @property

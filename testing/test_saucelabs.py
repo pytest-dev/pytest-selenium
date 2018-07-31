@@ -8,7 +8,7 @@ import datetime
 
 import pytest
 
-monkeytime = datetime.datetime(2020, 12, 25, 17)
+monkeytime = datetime.datetime(2020, 12, 25, 17, 10, 10, 10, tzinfo=None)
 
 pytestmark = pytestmark = [pytest.mark.skip_selenium,
                            pytest.mark.nondestructive]
