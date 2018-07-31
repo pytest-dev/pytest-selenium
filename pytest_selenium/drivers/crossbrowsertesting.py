@@ -15,7 +15,7 @@ class CrossBrowserTesting(Provider):
 
     @property
     def auth(self):
-        return (self.username, self.key)
+        return self.username, self.key
 
     @property
     def executor(self):
@@ -36,7 +36,7 @@ class CrossBrowserTesting(Provider):
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
     provider = CrossBrowserTesting()
-    if item.config.getoption('driver') != provider.driver:
+    if not provider.uses_driver(item.config.getoption('driver')):
         return
 
     videos = requests.get(
@@ -52,7 +52,7 @@ def pytest_selenium_capture_debug(item, report, extra):
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     provider = CrossBrowserTesting()
-    if item.config.getoption('driver') != provider.driver:
+    if not provider.uses_driver(item.config.getoption('driver')):
         return
 
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))

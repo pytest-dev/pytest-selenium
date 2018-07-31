@@ -10,8 +10,7 @@ import pytest
 
 monkeytime = datetime.datetime(2020, 12, 25, 17)
 
-pytestmark = pytestmark = [pytest.mark.skip_selenium,
-                           pytest.mark.nondestructive]
+pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
 
 @pytest.fixture
@@ -39,19 +38,19 @@ def failure(testdir, testfile, httpserver_base_url):
 
 def test_missing_username(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
-    assert 'Sauce Labs username must be set' in failure()
+    assert 'SauceLabs username must be set' in failure()
 
 
 def test_missing_api_key_env(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     monkeypatch.setenv('SAUCELABS_USERNAME', 'foo')
-    assert 'Sauce Labs key must be set' in failure()
+    assert 'SauceLabs key must be set' in failure()
 
 
 def test_missing_api_key_file(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     tmpdir.join('.saucelabs').write('[credentials]\nusername=foo')
-    assert 'Sauce Labs key must be set' in failure()
+    assert 'SauceLabs key must be set' in failure()
 
 
 @pytest.mark.parametrize(('username', 'key'), [('SAUCELABS_USERNAME',

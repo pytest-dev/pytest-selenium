@@ -28,10 +28,6 @@ class SauceLabs(Provider):
             self.username, self.key)
 
     @property
-    def name(self):
-        return 'Sauce Labs'
-
-    @property
     def username(self):
         return self.get_credential('username', ['SAUCELABS_USERNAME',
                                                 'SAUCELABS_USR',
@@ -43,11 +39,14 @@ class SauceLabs(Provider):
                                            'SAUCELABS_PSW',
                                            'SAUCE_ACCESS_KEY'])
 
+    def uses_driver(self, driver):
+        return driver.lower() == self.name.lower()
+
 
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
     provider = SauceLabs()
-    if item.config.getoption('driver') != provider.driver:
+    if not provider.uses_driver(item.config.getoption('driver')):
         return
 
     pytest_html = item.config.pluginmanager.getplugin('html')
@@ -57,7 +56,7 @@ def pytest_selenium_capture_debug(item, report, extra):
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     provider = SauceLabs()
-    if item.config.getoption('driver') != provider.driver:
+    if not provider.uses_driver(item.config.getoption('driver')):
         return
 
     passed = report.passed or (report.failed and hasattr(report, 'wasxfail'))
