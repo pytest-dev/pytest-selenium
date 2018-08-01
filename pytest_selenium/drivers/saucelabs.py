@@ -24,8 +24,7 @@ class SauceLabs(Provider):
 
     @property
     def executor(self):
-        return 'https://{0}:{1}@ondemand.saucelabs.com/wd/hub'.format(
-            self.username, self.key)
+        return 'https://ondemand.saucelabs.com/wd/hub'
 
     @property
     def username(self):
@@ -95,6 +94,8 @@ def driver_kwargs(request, test, capabilities, **kwargs):
     if os.getenv('SAUCELABS_W3C') == 'true':
         _capabilities = capabilities.setdefault('sauce:options', {})
 
+    _capabilities.setdefault('username', provider.username)
+    _capabilities.setdefault('accessKey', provider.key)
     _capabilities.setdefault('name', test)
     tags = _capabilities.get('tags', []) + markers
     if tags:

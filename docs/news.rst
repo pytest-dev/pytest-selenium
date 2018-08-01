@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+
+1.14.0 (unreleased)
+-------------------
+
+* Move Sauce Labs credentials to capabilities instead of URL.
+
+  * Thanks to `@RonnyPfannschmidt <https://github.com/RonnyPfannschmidt>`_ for pointing out the vulnerability
+
 1.13.0 (2018-05-25)
 -------------------
 
