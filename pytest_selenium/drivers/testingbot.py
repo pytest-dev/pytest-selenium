@@ -16,7 +16,7 @@ PORT = 80
 class TestingBot(Provider):
 
     API = 'https://api.testingbot.com/v1/tests/{session}'
-    JOB = 'https://testingbot.com/members/tests/{session}'
+    JOB = 'http://testingbot.com/members/tests/{session}'
 
     def __init__(self, host=None, port=None):
         super(TestingBot, self).__init__()
@@ -29,7 +29,7 @@ class TestingBot(Provider):
 
     @property
     def executor(self):
-        return 'https://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub'.format(
+        return 'http://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub'.format(
             self)
 
     @property
@@ -104,12 +104,12 @@ def _video_html(session):
             "provider":"rtmp"}},\
         "plugins":{{\
             "controls":{{\
-                "url":"https://testingbot.com/assets/\
+                "url":"http://testingbot.com/assets/\
                     flowplayer.controls-3.2.14.swf",\
                 "mute":null,\
                 "volume":null}},\
             "rtmp":{{\
-                "url":"https://testingbot.com/assets/\
+                "url":"http://testingbot.com/assets/\
                     flowplayer.rtmp-3.2.11.swf",\
                 "netConnectionUrl":"rtmp://s2tuay45tyrz3f.cloudfront.net/\
                     cfx/st"}}}},\
