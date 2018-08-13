@@ -75,4 +75,4 @@ def test_invalid_host(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     tmpdir.join('.testingbot').write('[credentials]\nkey=foo\nsecret=bar')
     out = failure('--host', 'foo.bar.com')
-    assert "urlopen error" in out
+    assert "[Errno 8] nodename nor servname provided, or not known" in out
