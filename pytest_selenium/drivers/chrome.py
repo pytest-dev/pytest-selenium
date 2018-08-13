@@ -8,11 +8,9 @@ from selenium import __version__ as SELENIUM_VERSION
 from selenium.webdriver.chrome.options import Options
 
 
-def driver_kwargs(capabilities, driver_args, driver_log, driver_path,
+def driver_kwargs(capabilities, driver_args, driver_path,
                   chrome_options, **kwargs):
-    kwargs = {
-        'desired_capabilities': capabilities,
-    }
+    kwargs = {'desired_capabilities': capabilities}
 
     # Selenium 3.8.0 deprecated chrome_options in favour of options
     if LooseVersion(SELENIUM_VERSION) < LooseVersion('3.8.0'):
@@ -22,8 +20,6 @@ def driver_kwargs(capabilities, driver_args, driver_log, driver_path,
 
     if driver_args is not None:
         kwargs['service_args'] = driver_args
-    if driver_log is not None:
-        kwargs['service_log_path'] = driver_log
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
     return kwargs

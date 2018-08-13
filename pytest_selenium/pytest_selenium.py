@@ -116,15 +116,15 @@ def driver_kwargs(request, capabilities, chrome_options, driver_args,
         capabilities=capabilities,
         chrome_options=chrome_options,
         driver_args=driver_args,
-        driver_log=driver_log,
         driver_path=driver_path,
         firefox_options=firefox_options,
         firefox_profile=firefox_profile,
         host=pytestconfig.getoption('host'),
         port=pytestconfig.getoption('port'),
         request=request,
-        log_path=None,
         test='.'.join(split_class_and_test_names(request.node.nodeid))))
+    if driver_log is not None:
+        kwargs['service_log_path'] = driver_log
     pytestconfig._driver_log = driver_log
     return kwargs
 

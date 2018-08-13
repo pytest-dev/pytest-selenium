@@ -46,13 +46,10 @@ def pytest_configure(config):
         "'https://pytest.org/'})")
 
 
-def driver_kwargs(capabilities, driver_log, driver_path, firefox_options,
-                  **kwargs):
+def driver_kwargs(capabilities, driver_path, firefox_options, **kwargs):
     kwargs = {}
     if capabilities:
         kwargs['capabilities'] = capabilities
-    if driver_log is not None:
-        kwargs['log_path'] = driver_log
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
 
