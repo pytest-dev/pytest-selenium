@@ -24,7 +24,7 @@ def testdir(request, httpserver_base_url):
     if 'testdir' not in item.funcargnames:
         return
 
-    testdir = request.getfuncargvalue('testdir')
+    testdir = request.getfixturevalue('testdir')
 
     testdir.makepyfile(conftest="""
         import pytest
