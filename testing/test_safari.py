@@ -9,7 +9,7 @@ pytestmark = pytest.mark.nondestructive
 
 @pytest.mark.safari
 def test_launch(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
+    httpserver.serve_content(content='<body><h1>Success!</h1></body>')
     file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
