@@ -5,13 +5,13 @@ from distutils.version import LooseVersion
 from selenium import __version__ as SELENIUM_VERSION
 
 
-def driver_kwargs(capabilities, driver_path, service_log_path, **kwargs):
+def driver_kwargs(capabilities, driver_log, driver_path, **kwargs):
 
     # Selenium 3.14.0 deprecated log_file in favour of service_log_path
     if LooseVersion(SELENIUM_VERSION) < LooseVersion('3.14.0'):
-        kwargs = {'log_file': service_log_path}
+        kwargs = {'log_file': driver_log}
     else:
-        kwargs = {'service_log_path': service_log_path}
+        kwargs = {'service_log_path': driver_log}
 
     if capabilities:
         kwargs['capabilities'] = capabilities

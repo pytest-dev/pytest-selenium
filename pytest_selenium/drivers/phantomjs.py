@@ -3,10 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 
-def driver_kwargs(capabilities, driver_args, driver_path, service_log_path,
+def driver_kwargs(capabilities, driver_args, driver_log, driver_path,
                   **kwargs):
     kwargs = {'desired_capabilities': capabilities,
-              'service_log_path': service_log_path}
+              'service_log_path': driver_log}
     if driver_args is not None:
         kwargs['service_args'] = driver_args
     if driver_path is not None:
