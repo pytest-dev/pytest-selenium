@@ -132,3 +132,29 @@ def test_provider_naming(name):
     provider = getattr(module, driver)()
     assert provider.uses_driver(driver)
     assert provider.name == name
+
+
+def test_service_log_path(testdir):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert driver_kwargs['service_log_path'] is not None
+    """)
+    testdir.quick_qa('--driver', 'Firefox',
+                     file_test, passed=1)
+
+
+def test_no_service_log_path(testdir):
+    file_test = testdir.makepyfile("""
+        import pytest
+        @pytest.fixture
+        def driver_log():
+            return None
+
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert driver_kwargs['service_log_path'] is None
+    """)
+    testdir.quick_qa('--driver', 'Firefox',
+                     file_test, passed=1)

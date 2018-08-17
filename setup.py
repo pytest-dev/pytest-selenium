@@ -13,7 +13,7 @@ setup(name='pytest-selenium',
           'pytest-base-url',
           'pytest-html>=1.14.0',
           'pytest-variables>=1.5.0',
-          'selenium>=3.14.0',
+          'selenium>=3.0.0',
           'requests'],
       entry_points={'pytest11': [
           'selenium = pytest_selenium.pytest_selenium',
