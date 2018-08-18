@@ -122,8 +122,8 @@ def driver_kwargs(request, capabilities, chrome_options, driver_args,
         firefox_profile=firefox_profile,
         host=pytestconfig.getoption('host'),
         port=pytestconfig.getoption('port'),
+        service_log_path=None,
         request=request,
-        log_path=None,
         test='.'.join(split_class_and_test_names(request.node.nodeid))))
     pytestconfig._driver_log = driver_log
     return kwargs

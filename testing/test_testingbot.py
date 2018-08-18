@@ -75,4 +75,6 @@ def test_invalid_host(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, 'expanduser', lambda p: str(tmpdir))
     tmpdir.join('.testingbot').write('[credentials]\nkey=foo\nsecret=bar')
     out = failure('--host', 'foo.bar.com')
-    assert "urlopen error" in out
+    messages = ['nodename nor servname provided, or not known',
+                'Name or service not known']
+    assert any(message in out for message in messages)

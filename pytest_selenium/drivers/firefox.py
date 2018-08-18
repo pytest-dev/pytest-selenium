@@ -48,11 +48,15 @@ def pytest_configure(config):
 
 def driver_kwargs(capabilities, driver_log, driver_path, firefox_options,
                   **kwargs):
-    kwargs = {}
+
+    # Selenium 3.14.0 deprecated log_path in favour of service_log_path
+    if LooseVersion(SELENIUM_VERSION) < LooseVersion('3.14.0'):
+        kwargs = {'log_path': driver_log}
+    else:
+        kwargs = {'service_log_path': driver_log}
+
     if capabilities:
         kwargs['capabilities'] = capabilities
-    if driver_log is not None:
-        kwargs['log_path'] = driver_log
     if driver_path is not None:
         kwargs['executable_path'] = driver_path
 
