@@ -7,6 +7,7 @@ import copy
 from datetime import datetime
 import os
 import io
+import logging
 
 import pytest
 from requests.structures import CaseInsensitiveDict
@@ -16,6 +17,9 @@ from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
 
 from . import drivers
+
+LOGGER = logging.getLogger(__name__)
+
 
 SUPPORTED_DRIVERS = CaseInsensitiveDict({
     'BrowserStack': webdriver.Remote,
@@ -93,11 +97,25 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
         if all([key, options]):
             capabilities[key] = _merge(
                 capabilities.get(key, {}), options.get(key, {}))
-    capabilities_marker = request.node.get_marker('capabilities')
-    if capabilities_marker is not None:
+    capabilities_marker = _get_marker(request.node, 'capabilities')
+    LOGGER.debug('Capabilities from marker: {}'.format(capabilities_marker))
+    if capabilities_marker:
         # add capabilities from the marker
-        capabilities.update(capabilities_marker.kwargs)
+        capabilities.update(capabilities_marker)
     return capabilities
+
+
+def _get_marker(node, name):
+    # get_marker is deprecated
+    # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
+    try:
+        markers = dict()
+        for each in node.iter_markers(name):
+            markers.update(each.kwargs)
+        return markers
+    except AttributeError:  # backwards-compat
+        marker = node.get_marker(name)
+        return marker.kwargs if marker else {}
 
 
 @pytest.fixture

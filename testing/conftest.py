@@ -34,6 +34,14 @@ def testdir(request, httpserver_base_url):
             return selenium.find_element_by_tag_name('h1').text
         """)
 
+    testdir.makefile('.cfg', setup="""
+        [tool:pytest]
+        filterwarnings =
+            error::DeprecationWarning
+            ignore:--firefox-\w+ has been deprecated:DeprecationWarning
+            ignore:MarkInfo:DeprecationWarning:pytest_selenium.drivers.firefox:88
+    """)
+
     def runpytestqa(*args, **kwargs):
         return testdir.runpytest(httpserver_base_url, '--driver', 'Firefox',
                                  *args, **kwargs)
