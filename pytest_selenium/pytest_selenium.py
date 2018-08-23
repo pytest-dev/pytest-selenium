@@ -97,25 +97,27 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
         if all([key, options]):
             capabilities[key] = _merge(
                 capabilities.get(key, {}), options.get(key, {}))
-    capabilities_marker = _get_marker(request.node, 'capabilities')
-    LOGGER.debug('Capabilities from marker: {}'.format(capabilities_marker))
-    if capabilities_marker:
-        # add capabilities from the marker
-        capabilities.update(capabilities_marker)
+    capabilities.update(get_capabilities_from_markers(request.node))
     return capabilities
 
 
-def _get_marker(node, name):
-    # get_marker is deprecated
+def get_capabilities_from_markers(node):
+    # get_marker is deprecated since pytest 3.6
     # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
     try:
-        markers = dict()
-        for each in node.iter_markers(name):
-            markers.update(each.kwargs)
-        return markers
-    except AttributeError:  # backwards-compat
-        marker = node.get_marker(name)
-        return marker.kwargs if marker else {}
+        capabilities = dict()
+        for level, mark in node.iter_markers_with_node('capabilities'):
+            LOGGER.debug('{0} marker <{1.name}> '
+                         'contained kwargs <{1.kwargs}>'.
+                         format(level.__class__.__name__, mark))
+            capabilities.update(mark.kwargs)
+        LOGGER.info('Capabilities from markers: {}'.format(capabilities))
+        return capabilities
+    except AttributeError:
+        # backwards-compat
+        # can be removed when minimum req pytest is 3.6
+        capabilities = node.get_marker('capabilities')
+        return capabilities.kwargs if capabilities else {}
 
 
 @pytest.fixture
