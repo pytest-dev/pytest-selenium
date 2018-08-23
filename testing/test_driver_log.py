@@ -13,26 +13,28 @@ LOG_REGEX = '<a class="text" href=".*" target="_blank">Driver Log</a>'
 
 
 def test_driver_log(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
-    testdir.makepyfile("""
+    httpserver.serve_content(content="<h1>Success!</h1>")
+    testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_driver_log(webtext):
             assert False
-    """)
-    path = testdir.tmpdir.join('report.html')
-    testdir.runpytestqa('--html', path)
+    """
+    )
+    path = testdir.tmpdir.join("report.html")
+    testdir.runpytestqa("--html", path)
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is not None
-    log_path = testdir.tmpdir.dirpath(
-        'basetemp', 'test_driver_log0', 'driver.log')
+    log_path = testdir.tmpdir.dirpath("basetemp", "test_driver_log0", "driver.log")
     assert os.path.exists(str(log_path))
 
 
 def test_driver_log_fixture(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
-    file_test = testdir.makepyfile("""
+    httpserver.serve_content(content="<h1>Success!</h1>")
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.fixture
         def driver_log():
@@ -41,14 +43,16 @@ def test_driver_log_fixture(testdir, httpserver):
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """)
+    """
+    )
     testdir.quick_qa(file_test, passed=1)
-    assert os.path.exists(str(testdir.tmpdir.join('foo.log')))
+    assert os.path.exists(str(testdir.tmpdir.join("foo.log")))
 
 
 def test_no_driver_log(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
-    testdir.makepyfile("""
+    httpserver.serve_content(content="<h1>Success!</h1>")
+    testdir.makepyfile(
+        """
         import pytest
         @pytest.fixture
         def driver_log():
@@ -57,12 +61,12 @@ def test_no_driver_log(testdir, httpserver):
         @pytest.mark.nondestructive
         def test_no_driver_log(webtext):
             assert False
-    """)
-    path = testdir.tmpdir.join('report.html')
-    testdir.runpytestqa('--html', path)
+    """
+    )
+    path = testdir.tmpdir.join("report.html")
+    testdir.runpytestqa("--html", path)
     with open(str(path)) as f:
         html = f.read()
     assert re.search(LOG_REGEX, html) is None
-    log_path = testdir.tmpdir.dirpath(
-        'basetemp', 'test_no_driver_log0', 'driver.log')
+    log_path = testdir.tmpdir.dirpath("basetemp", "test_no_driver_log0", "driver.log")
     assert not os.path.exists(str(log_path))

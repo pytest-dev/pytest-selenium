@@ -15,24 +15,21 @@ else:
 
 
 class Provider(object):
-
     @property
     def name(self):
         return type(self).__name__
 
     @property
     def config(self):
-        name = '.{0}'.format(self.name.lower())
+        name = ".{0}".format(self.name.lower())
         config = configparser.ConfigParser()
-        config.read([name, os.path.join(os.path.expanduser('~'), name)])
+        config.read([name, os.path.join(os.path.expanduser("~"), name)])
         return config
 
     def get_credential(self, key, envs):
         try:
-            return self.config.get('credentials', key)
-        except (configparser.NoSectionError,
-                configparser.NoOptionError,
-                KeyError):
+            return self.config.get("credentials", key)
+        except (configparser.NoSectionError, configparser.NoOptionError, KeyError):
             for env in envs:
                 value = os.getenv(env)
                 if value:

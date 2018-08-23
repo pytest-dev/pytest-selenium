@@ -9,11 +9,13 @@ pytestmark = pytest.mark.nondestructive
 
 @pytest.mark.safari
 def test_launch(testdir, httpserver):
-    httpserver.serve_content(content='<body><h1>Success!</h1></body>')
-    file_test = testdir.makepyfile("""
+    httpserver.serve_content(content="<body><h1>Success!</h1></body>")
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """)
-    testdir.quick_qa('--driver', 'Safari', file_test, passed=1)
+    """
+    )
+    testdir.quick_qa("--driver", "Safari", file_test, passed=1)

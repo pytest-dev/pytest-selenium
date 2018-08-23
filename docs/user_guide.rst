@@ -136,6 +136,16 @@ preferences, and a command line argument:
 See the `Firefox options API documentation`_ for full details of what can be
 configured.
 
+You can also use the ``firefox_preferences`` and ``firefox_arguments`` markers:
+
+.. code-block:: python
+
+  import pytest
+  @pytest.mark.firefox_arguments('-foreground')
+  @pytest.mark.firefox_preferences({'browser.anchor_color': '#FF0000'})
+  def test_firefox(selenium):
+      selenium.get('http://www.example.com')
+
 Chrome
 ------
 
@@ -172,14 +182,14 @@ configured.
 
 The ChromeDriver supports various command line arguments. These can be passed
 by implementing a ``driver_args`` fixture and returning a list of the desired
-arguments. The following example specifies the log file path:
+arguments. The following example specifies the log level:
 
 .. code-block:: python
 
   import pytest
   @pytest.fixture
   def driver_args():
-      return ['--log-path=chromedriver.log']
+      return ['--log-level=LEVEL']
 
 For a full list of supported command line arguments, run
 ``chromedriver --help`` in your terminal.

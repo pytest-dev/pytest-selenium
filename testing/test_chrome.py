@@ -11,19 +11,22 @@ pytestmark = pytest.mark.nondestructive
 
 @pytest.mark.chrome
 def test_launch(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
-    file_test = testdir.makepyfile("""
+    httpserver.serve_content(content="<h1>Success!</h1>")
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """)
-    testdir.quick_qa('--driver', 'Chrome', file_test, passed=1)
+    """
+    )
+    testdir.quick_qa("--driver", "Chrome", file_test, passed=1)
 
 
 @pytest.mark.chrome
 def test_options(testdir):
-    testdir.makepyfile("""
+    testdir.makepyfile(
+        """
         import pytest
         @pytest.fixture
         def chrome_options(chrome_options):
@@ -32,17 +35,19 @@ def test_options(testdir):
 
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """)
-    reprec = testdir.inline_run('--driver', 'Chrome')
+    """
+    )
+    reprec = testdir.inline_run("--driver", "Chrome")
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
-    assert 'no chrome binary at /foo/bar' in out
+    assert "no chrome binary at /foo/bar" in out
 
 
 @pytest.mark.chrome
 def test_args(testdir):
-    file_test = testdir.makepyfile("""
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.fixture
         def driver_log():
@@ -54,6 +59,7 @@ def test_args(testdir):
 
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """)
-    testdir.quick_qa('--driver', 'Chrome', file_test, passed=1)
-    assert os.path.exists(str(testdir.tmpdir.join('foo.log')))
+    """
+    )
+    testdir.quick_qa("--driver", "Chrome", file_test, passed=1)
+    assert os.path.exists(str(testdir.tmpdir.join("foo.log")))
