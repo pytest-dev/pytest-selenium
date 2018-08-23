@@ -7,6 +7,7 @@ import copy
 from datetime import datetime
 import os
 import io
+import logging
 
 import pytest
 from requests.structures import CaseInsensitiveDict
@@ -16,6 +17,9 @@ from selenium.webdriver.support.event_firing_webdriver import \
     EventFiringWebDriver
 
 from . import drivers
+
+LOGGER = logging.getLogger(__name__)
+
 
 SUPPORTED_DRIVERS = CaseInsensitiveDict({
     'BrowserStack': webdriver.Remote,
@@ -93,11 +97,27 @@ def capabilities(request, driver_class, chrome_options, firefox_options,
         if all([key, options]):
             capabilities[key] = _merge(
                 capabilities.get(key, {}), options.get(key, {}))
-    capabilities_marker = request.node.get_marker('capabilities')
-    if capabilities_marker is not None:
-        # add capabilities from the marker
-        capabilities.update(capabilities_marker.kwargs)
+    capabilities.update(get_capabilities_from_markers(request.node))
     return capabilities
+
+
+def get_capabilities_from_markers(node):
+    # get_marker is deprecated since pytest 3.6
+    # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
+    try:
+        capabilities = dict()
+        for level, mark in node.iter_markers_with_node('capabilities'):
+            LOGGER.debug('{0} marker <{1.name}> '
+                         'contained kwargs <{1.kwargs}>'.
+                         format(level.__class__.__name__, mark))
+            capabilities.update(mark.kwargs)
+        LOGGER.info('Capabilities from markers: {}'.format(capabilities))
+        return capabilities
+    except AttributeError:
+        # backwards-compat
+        # can be removed when minimum req pytest is 3.6
+        capabilities = node.get_marker('capabilities')
+        return capabilities.kwargs if capabilities else {}
 
 
 @pytest.fixture
