@@ -2,7 +2,7 @@ Release Notes
 =============
 
 
-1.14.0 (unreleased)
+1.14.0 (2018-08-23)
 -------------------
 
 * Move Sauce Labs credentials to capabilities instead of URL.

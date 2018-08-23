@@ -179,7 +179,7 @@ arguments. The following example specifies the log file path:
   import pytest
   @pytest.fixture
   def driver_args():
-      return ['--log-path=chromedriver.log']
+      return ['--log-level=LEVEL']
 
 For a full list of supported command line arguments, run
 ``chromedriver --help`` in your terminal.
