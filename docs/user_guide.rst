@@ -172,7 +172,7 @@ configured.
 
 The ChromeDriver supports various command line arguments. These can be passed
 by implementing a ``driver_args`` fixture and returning a list of the desired
-arguments. The following example specifies the log file path:
+arguments. The following example specifies the log level:
 
 .. code-block:: python
 
