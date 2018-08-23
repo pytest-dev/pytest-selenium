@@ -172,14 +172,14 @@ configured.
 
 The ChromeDriver supports various command line arguments. These can be passed
 by implementing a ``driver_args`` fixture and returning a list of the desired
-arguments. The following example specifies the log file path:
+arguments. The following example specifies the log level:
 
 .. code-block:: python
 
   import pytest
   @pytest.fixture
   def driver_args():
-      return ['--log-path=chromedriver.log']
+      return ['--log-level=LEVEL']
 
 For a full list of supported command line arguments, run
 ``chromedriver --help`` in your terminal.

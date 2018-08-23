@@ -2,8 +2,16 @@ Release Notes
 =============
 
 
-1.14.0 (unreleased)
+1.14.0 (2018-08-23)
 -------------------
+
+* Handle Sauce Labs W3C compliance using :code:`sauce_options`.
+
+* Fix bug with test reporting when using cloud providers.
+
+* Fixed a deprecation warning (``log_path``) on Selenium 3.14 and later.
+
+* Fixed a deprecation warning (``get_markers``) on pytest 3.6 and later.
 
 * Move Sauce Labs credentials to capabilities instead of URL.
 
