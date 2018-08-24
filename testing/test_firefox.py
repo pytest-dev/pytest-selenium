@@ -8,25 +8,29 @@ pytestmark = pytest.mark.nondestructive
 
 
 def test_launch(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
-    file_test = testdir.makepyfile("""
+    httpserver.serve_content(content="<h1>Success!</h1>")
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """)
+    """
+    )
     testdir.quick_qa(file_test, passed=1)
 
 
 def test_launch_case_insensitive(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
-    file_test = testdir.makepyfile("""
+    httpserver.serve_content(content="<h1>Success!</h1>")
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """)
-    testdir.quick_qa('--driver', 'firefox', file_test, passed=1)
+    """
+    )
+    testdir.quick_qa("--driver", "firefox", file_test, passed=1)
 
 
 def test_profile(testdir, httpserver):
@@ -36,12 +40,14 @@ def test_profile(testdir, httpserver):
     when calling value_of_css_property.
     """
     httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
-    profile = testdir.tmpdir.mkdir('profile')
-    profile.join('prefs.js').write(
+    profile = testdir.tmpdir.mkdir("profile")
+    profile.join("prefs.js").write(
         'user_pref("browser.anchor_color", "#FF69B4");'
         'user_pref("browser.display.foreground_color", "#FF0000");'
-        'user_pref("browser.display.use_document_colors", false);')
-    file_test = testdir.makepyfile("""
+        'user_pref("browser.display.use_document_colors", false);'
+    )
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_profile(base_url, selenium):
@@ -52,8 +58,9 @@ def test_profile(testdir, httpserver):
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
             assert anchor_color == 'rgb(255, 105, 180)'
-    """)
-    testdir.quick_qa('--firefox-profile', profile, file_test, passed=1)
+    """
+    )
+    testdir.quick_qa("--firefox-profile", profile, file_test, passed=1)
 
 
 def test_profile_with_preferences(testdir, httpserver):
@@ -65,12 +72,14 @@ def test_profile_with_preferences(testdir, httpserver):
     overridden by the preference.
     """
     httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
-    profile = testdir.tmpdir.mkdir('profile')
-    profile.join('prefs.js').write(
+    profile = testdir.tmpdir.mkdir("profile")
+    profile.join("prefs.js").write(
         'user_pref("browser.anchor_color", "#FF69B4");'
         'user_pref("browser.display.foreground_color", "#FF0000");'
-        'user_pref("browser.display.use_document_colors", false);')
-    file_test = testdir.makepyfile("""
+        'user_pref("browser.display.use_document_colors", false);'
+    )
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_preferences(base_url, selenium):
@@ -81,17 +90,27 @@ def test_profile_with_preferences(testdir, httpserver):
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
             assert anchor_color == 'rgb(255, 0, 0)'
-    """)
-    testdir.quick_qa('--firefox-preference', 'browser.anchor_color', '#FF0000',
-                     '--firefox-profile', profile, file_test, passed=1)
+    """
+    )
+    testdir.quick_qa(
+        "--firefox-preference",
+        "browser.anchor_color",
+        "#FF0000",
+        "--firefox-profile",
+        profile,
+        file_test,
+        passed=1,
+    )
 
 
 def test_extension(testdir):
     """Test that a firefox extension can be added when starting Firefox."""
     import os
-    path = os.path.join(os.path.split(os.path.dirname(__file__))[0], 'testing')
-    extension = os.path.join(path, 'empty.xpi')
-    file_test = testdir.makepyfile("""
+
+    path = os.path.join(os.path.split(os.path.dirname(__file__))[0], "testing")
+    extension = os.path.join(path, "empty.xpi")
+    file_test = testdir.makepyfile(
+        """
         import time
         import pytest
         from selenium.common.exceptions import StaleElementReferenceException
@@ -105,14 +124,16 @@ def test_extension(testdir):
                     lambda s: s.find_element_by_id(
                         'extensions-tbody').text)
             assert 'Test Extension (empty)' in extensions
-    """)
-    testdir.quick_qa('--firefox-extension', extension, file_test, passed=1)
+    """
+    )
+    testdir.quick_qa("--firefox-extension", extension, file_test, passed=1)
 
 
 def test_preferences_marker(testdir, httpserver):
     """Test that preferences can be specified using the marker."""
     httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
-    file_test = testdir.makepyfile("""
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         @pytest.mark.firefox_preferences({
@@ -127,5 +148,6 @@ def test_preferences_marker(testdir, httpserver):
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
             assert anchor_color == 'rgb(255, 105, 180)'
-    """)
+    """
+    )
     testdir.quick_qa(file_test, passed=1)

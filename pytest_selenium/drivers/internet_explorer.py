@@ -8,13 +8,13 @@ from selenium import __version__ as SELENIUM_VERSION
 def driver_kwargs(capabilities, driver_log, driver_path, **kwargs):
 
     # Selenium 3.14.0 deprecated log_file in favour of service_log_path
-    if LooseVersion(SELENIUM_VERSION) < LooseVersion('3.14.0'):
-        kwargs = {'log_file': driver_log}
+    if LooseVersion(SELENIUM_VERSION) < LooseVersion("3.14.0"):
+        kwargs = {"log_file": driver_log}
     else:
-        kwargs = {'service_log_path': driver_log}
+        kwargs = {"service_log_path": driver_log}
 
     if capabilities:
-        kwargs['capabilities'] = capabilities
+        kwargs["capabilities"] = capabilities
     if driver_path is not None:
-        kwargs['executable_path'] = driver_path
+        kwargs["executable_path"] = driver_path
     return kwargs
