@@ -3,12 +3,15 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from distutils.version import LooseVersion
 import warnings
+import logging
 
 import pytest
 from selenium import __version__ as SELENIUM_VERSION
 from selenium.webdriver import FirefoxProfile
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.firefox.options import Options
+
+LOGGER = logging.getLogger(__name__)
 
 
 def pytest_addoption(parser):
@@ -85,17 +88,53 @@ def firefox_options(request, firefox_path, firefox_profile):
     if firefox_path is not None:
         options.binary = FirefoxBinary(firefox_path)
 
-    args = request.node.get_marker("firefox_arguments")
-    if args is not None:
-        for arg in args.args:
-            options.add_argument(arg)
+    for arg in get_arguments_from_markers(request.node):
+        options.add_argument(arg)
 
-    prefs = request.node.get_marker("firefox_preferences")
-    if prefs is not None:
-        for name, value in prefs.args[0].items():
-            options.set_preference(name, value)
+    for name, value in get_preferences_from_markers(request.node).items():
+        options.set_preference(name, value)
 
     return options
+
+
+def get_arguments_from_markers(node):
+    # get_marker is deprecated since pytest 3.6
+    # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
+    try:
+        arguments = list()
+        for level, mark in node.iter_markers_with_node("firefox_arguments"):
+            LOGGER.debug(
+                "{0} marker <{1.name}> "
+                "contained args <{1.args}>".format(level.__class__.__name__, mark)
+            )
+            arguments += mark.args
+        LOGGER.info("Firefox arguments from markers: {}".format(arguments))
+        return arguments
+    except AttributeError:
+        arguments = node.get_marker("firefox_arguments")
+        # backwards-compat
+        # can be removed when minimum req pytest is 3.6
+        return arguments.args if arguments else []
+
+
+def get_preferences_from_markers(node):
+    # get_marker is deprecated since pytest 3.6
+    # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
+    try:
+        preferences = dict()
+        for level, mark in node.iter_markers_with_node("firefox_preferences"):
+            LOGGER.debug(
+                "{0} marker <{1.name}> "
+                "contained args <{1.args}>".format(level.__class__.__name__, mark)
+            )
+            preferences.update(mark.args[0])
+        LOGGER.info("Firefox preferences from markers: {}".format(preferences))
+        return preferences
+    except AttributeError:
+        # backwards-compat
+        # can be removed when minimum req pytest is 3.6
+        preferences = node.get_marker("firefox_preferences")
+        return preferences.args[0] if preferences else {}
 
 
 @pytest.fixture(scope="session")

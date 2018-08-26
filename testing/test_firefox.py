@@ -151,3 +151,19 @@ def test_preferences_marker(testdir, httpserver):
     """
     )
     testdir.quick_qa(file_test, passed=1)
+
+
+def test_arguments_marker(testdir):
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+        pytestmark = pytest.mark.firefox_arguments('baz')
+        @pytest.mark.nondestructive
+        @pytest.mark.firefox_arguments('foo', 'bar')
+        def test_arguments(firefox_options):
+            actual = sorted(firefox_options.arguments)
+            expected = sorted(['baz', 'foo', 'bar'])
+            assert actual == expected
+    """
+    )
+    testdir.quick_qa(file_test, passed=1)
