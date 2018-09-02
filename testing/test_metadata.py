@@ -9,7 +9,7 @@ pytestmark = pytest.mark.nondestructive
 
 def test_metadata_default_host_port(testdir):
     host = "localhost"
-    port = 4444
+    port = "4444"
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -25,7 +25,7 @@ def test_metadata_default_host_port(testdir):
 
 def test_metadata_host_port(testdir):
     host = "notlocalhost"
-    port = 4441
+    port = "4441"
     file_test = testdir.makepyfile(
         """
         import pytest

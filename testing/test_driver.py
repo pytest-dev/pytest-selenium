@@ -89,7 +89,7 @@ def test_driver_quit(testdir):
 
 def test_default_host_port(testdir):
     host = "localhost"
-    port = 4444
+    port = "4444"
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -105,7 +105,7 @@ def test_default_host_port(testdir):
 
 def test_arguments_order(testdir):
     host = "notlocalhost"
-    port = 4441
+    port = "4441"
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -123,7 +123,7 @@ def test_arguments_order(testdir):
 
 def test_arguments_order_random(testdir):
     host = "notlocalhost"
-    port = 4441
+    port = "4441"
     file_test = testdir.makepyfile(
         """
         import pytest
