@@ -101,14 +101,8 @@ def get_arguments_from_markers(node):
     # get_marker is deprecated since pytest 3.6
     # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
     try:
-        arguments = list()
-        for level, mark in node.iter_markers_with_node("firefox_arguments"):
-            LOGGER.debug(
-                "{0} marker <{1.name}> "
-                "contained args <{1.args}>".format(level.__class__.__name__, mark)
-            )
-            arguments += mark.args
-        LOGGER.info("Firefox arguments from markers: {}".format(arguments))
+        arguments = []
+        [arguments.extend(m.args) for m in node.iter_markers("firefox_arguments")]
         return arguments
     except AttributeError:
         arguments = node.get_marker("firefox_arguments")
@@ -122,13 +116,8 @@ def get_preferences_from_markers(node):
     # https://docs.pytest.org/en/latest/mark.html#marker-revamp-and-iteration
     try:
         preferences = dict()
-        for level, mark in node.iter_markers_with_node("firefox_preferences"):
-            LOGGER.debug(
-                "{0} marker <{1.name}> "
-                "contained args <{1.args}>".format(level.__class__.__name__, mark)
-            )
+        for mark in node.iter_markers("firefox_preferences"):
             preferences.update(mark.args[0])
-        LOGGER.info("Firefox preferences from markers: {}".format(preferences))
         return preferences
     except AttributeError:
         # backwards-compat
