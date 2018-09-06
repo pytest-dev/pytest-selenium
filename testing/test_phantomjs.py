@@ -11,19 +11,22 @@ pytestmark = pytest.mark.nondestructive
 
 @pytest.mark.phantomjs
 def test_launch(testdir, httpserver):
-    httpserver.serve_content(content='<h1>Success!</h1>')
-    file_test = testdir.makepyfile("""
+    httpserver.serve_content(content="<h1>Success!</h1>")
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """)
-    testdir.quick_qa('--driver', 'PhantomJS', file_test, passed=1)
+    """
+    )
+    testdir.quick_qa("--driver", "PhantomJS", file_test, passed=1)
 
 
 @pytest.mark.phantomjs
 def test_args(testdir):
-    file_test = testdir.makepyfile("""
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.fixture
         def driver_args():
@@ -31,6 +34,7 @@ def test_args(testdir):
 
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """)
-    testdir.quick_qa('--driver', 'PhantomJS', file_test, passed=1)
-    assert os.path.exists(str(testdir.tmpdir.join('foo.log')))
+    """
+    )
+    testdir.quick_qa("--driver", "PhantomJS", file_test, passed=1)
+    assert os.path.exists(str(testdir.tmpdir.join("foo.log")))

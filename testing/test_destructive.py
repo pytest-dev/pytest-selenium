@@ -8,70 +8,74 @@ pytestmark = pytest.mark.nondestructive
 
 
 def test_skip_destructive_by_default(testdir):
-    file_test = testdir.makepyfile('def test_pass(): pass')
+    file_test = testdir.makepyfile("def test_pass(): pass")
     testdir.quick_qa(file_test, passed=0, failed=0, skipped=1)
 
 
 def test_warn_when_url_is_sensitive(testdir, httpserver, monkeypatch, capsys):
-    monkeypatch.setenv('SENSITIVE_URL', r'127\.0\.0\.1')
-    file_test = testdir.makepyfile('def test_pass(): pass')
-    testdir.quick_qa(file_test, '--verbose', passed=0, failed=0, skipped=1)
+    monkeypatch.setenv("SENSITIVE_URL", r"127\.0\.0\.1")
+    file_test = testdir.makepyfile("def test_pass(): pass")
+    testdir.quick_qa(file_test, "--verbose", passed=0, failed=0, skipped=1)
     out, err = capsys.readouterr()
-    msg = '*** WARNING: sensitive url matches {} ***'.format(httpserver.url)
+    msg = "*** WARNING: sensitive url matches {} ***".format(httpserver.url)
     assert msg in out
 
 
 def test_skip_destructive_when_sensitive_command_line(testdir, httpserver):
-    file_test = testdir.makepyfile('def test_pass(): pass')
+    file_test = testdir.makepyfile("def test_pass(): pass")
     print(httpserver.url)
-    testdir.quick_qa('--sensitive-url', r'127\.0\.0\.1', file_test, passed=0,
-                     failed=0, skipped=1)
+    testdir.quick_qa(
+        "--sensitive-url", r"127\.0\.0\.1", file_test, passed=0, failed=0, skipped=1
+    )
 
 
 def test_skip_destructive_when_sensitive_config_file(testdir, httpserver):
-    testdir.makefile('.ini', pytest='[pytest]\nsensitive_url=127\\.0\\.0\\.1')
-    file_test = testdir.makepyfile('def test_pass(): pass')
+    testdir.makefile(".ini", pytest="[pytest]\nsensitive_url=127\\.0\\.0\\.1")
+    file_test = testdir.makepyfile("def test_pass(): pass")
     testdir.quick_qa(file_test, passed=0, failed=0, skipped=1)
 
 
 def test_skip_destructive_when_sensitive_env(testdir, httpserver, monkeypatch):
-    monkeypatch.setenv('SENSITIVE_URL', r'127\.0\.0\.1')
-    file_test = testdir.makepyfile('def test_pass(): pass')
+    monkeypatch.setenv("SENSITIVE_URL", r"127\.0\.0\.1")
+    file_test = testdir.makepyfile("def test_pass(): pass")
     testdir.quick_qa(file_test, passed=0, failed=0, skipped=1)
 
 
 def test_run_non_destructive_by_default(testdir):
-    file_test = testdir.makepyfile("""
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_pass(): pass
-    """)
+    """
+    )
     testdir.quick_qa(file_test, passed=1)
 
 
 def test_run_destructive_when_not_sensitive_command_line(testdir, httpserver):
-    file_test = testdir.makepyfile('def test_pass(): pass')
-    testdir.quick_qa('--sensitive-url', 'foo', file_test, passed=1)
+    file_test = testdir.makepyfile("def test_pass(): pass")
+    testdir.quick_qa("--sensitive-url", "foo", file_test, passed=1)
 
 
 def test_run_destructive_when_not_sensitive_config_file(testdir, httpserver):
-    testdir.makefile('.ini', pytest='[pytest]\nsensitive_url=foo')
-    file_test = testdir.makepyfile('def test_pass(): pass')
+    testdir.makefile(".ini", pytest="[pytest]\nsensitive_url=foo")
+    file_test = testdir.makepyfile("def test_pass(): pass")
     testdir.quick_qa(file_test, passed=1, failed=0, skipped=0)
 
 
-def test_run_destructive_when_not_sensitive_env(testdir, httpserver,
-                                                monkeypatch):
-    monkeypatch.setenv('SENSITIVE_URL', 'foo')
-    file_test = testdir.makepyfile('def test_pass(): pass')
+def test_run_destructive_when_not_sensitive_env(testdir, httpserver, monkeypatch):
+    monkeypatch.setenv("SENSITIVE_URL", "foo")
+    file_test = testdir.makepyfile("def test_pass(): pass")
     testdir.quick_qa(file_test, passed=1, failed=0, skipped=0)
 
 
 def test_run_destructive_and_non_destructive_when_not_sensitive(testdir):
-    file_test = testdir.makepyfile("""
+    file_test = testdir.makepyfile(
+        """
         import pytest
         @pytest.mark.nondestructive
         def test_pass1(): pass
         def test_pass2(): pass
-    """)
-    testdir.quick_qa('--sensitive-url', 'foo', file_test, passed=2)
+    """
+    )
+    testdir.quick_qa("--sensitive-url", "foo", file_test, passed=2)

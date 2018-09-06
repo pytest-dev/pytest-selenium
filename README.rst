@@ -16,6 +16,8 @@ support for running `Selenium <http://seleniumhq.org/>`_ based tests.
 .. image:: https://img.shields.io/badge/docs-latest-brightgreen.svg
    :target: http://pytest-selenium.readthedocs.io/en/latest/
    :alt: Read the Docs
+.. image:: https://img.shields.io/badge/code%20style-black-000000.svg
+    :target: https://github.com/ambv/black
 .. image:: https://img.shields.io/github/issues-raw/pytest-dev/pytest-selenium.svg
    :target: https://github.com/pytest-dev/pytest-selenium/issues
    :alt: Issues

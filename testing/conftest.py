@@ -6,7 +6,7 @@
 
 import pytest
 
-pytest_plugins = 'pytester'
+pytest_plugins = "pytester"
 
 
 def base_url(httpserver):
@@ -15,49 +15,55 @@ def base_url(httpserver):
 
 @pytest.fixture
 def httpserver_base_url(httpserver):
-    return '--base-url={0}'.format(base_url(httpserver))
+    return "--base-url={0}".format(base_url(httpserver))
 
 
 @pytest.fixture(autouse=True)
 def testdir(request, httpserver_base_url):
     item = request.node
-    if 'testdir' not in item.funcargnames:
+    if "testdir" not in item.funcargnames:
         return
 
-    testdir = request.getfixturevalue('testdir')
+    testdir = request.getfixturevalue("testdir")
 
-    testdir.makepyfile(conftest="""
+    testdir.makepyfile(
+        conftest="""
         import pytest
         @pytest.fixture
         def webtext(base_url, selenium):
             selenium.get(base_url)
             return selenium.find_element_by_tag_name('h1').text
-        """)
+        """
+    )
 
-    testdir.makefile('.cfg', setup="""
+    testdir.makefile(
+        ".cfg",
+        setup="""
         [tool:pytest]
         filterwarnings =
             error::DeprecationWarning
             ignore:--firefox-\w+ has been deprecated:DeprecationWarning
-            ignore:MarkInfo:DeprecationWarning:pytest_selenium.drivers.firefox:88
-    """)
+    """,
+    )
 
     def runpytestqa(*args, **kwargs):
-        return testdir.runpytest(httpserver_base_url, '--driver', 'Firefox',
-                                 *args, **kwargs)
+        return testdir.runpytest(
+            httpserver_base_url, "--driver", "Firefox", *args, **kwargs
+        )
 
     testdir.runpytestqa = runpytestqa
 
     def inline_runqa(*args, **kwargs):
-        return testdir.inline_run(httpserver_base_url, '--driver', 'Firefox',
-                                  *args, **kwargs)
+        return testdir.inline_run(
+            httpserver_base_url, "--driver", "Firefox", *args, **kwargs
+        )
 
     testdir.inline_runqa = inline_runqa
 
     def quick_qa(*args, **kwargs):
         reprec = inline_runqa(*args)
         outcomes = reprec.listoutcomes()
-        names = ('passed', 'skipped', 'failed')
+        names = ("passed", "skipped", "failed")
         for name, val in zip(names, outcomes):
             wantlen = kwargs.get(name)
             if wantlen is not None:
