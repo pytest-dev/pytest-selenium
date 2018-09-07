@@ -19,7 +19,7 @@ class CrossBrowserTesting(Provider):
 
     @property
     def executor(self):
-        return "http://{0}:{1}@hub.crossbrowsertesting.com:80/wd/hub".format(
+        return "https://hub.crossbrowsertesting.com/wd/hub".format(
             self.username, self.key
         )
 
@@ -100,6 +100,8 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 def driver_kwargs(request, test, capabilities, **kwargs):
     provider = CrossBrowserTesting()
     capabilities.setdefault("name", test)
+    capabilities.setdefault("username", provider.username)
+    capabilities.setdefault("password", provider.key)
     kwargs = {
         "command_executor": provider.executor,
         "desired_capabilities": capabilities,
