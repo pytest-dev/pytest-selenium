@@ -18,9 +18,7 @@ class BrowserStack(Provider):
 
     @property
     def executor(self):
-        return "http://{0}:{1}@hub.browserstack.com:80/wd/hub".format(
-            self.username, self.key
-        )
+        return "https://hub.browserstack.com/wd/hub".format(self.username, self.key)
 
     @property
     def username(self):
@@ -80,6 +78,8 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 def driver_kwargs(request, test, capabilities, **kwargs):
     provider = BrowserStack()
     capabilities.setdefault("name", test)
+    capabilities.setdefault("browserstack.user", provider.username)
+    capabilities.setdefault("browserstack.key", provider.key)
     kwargs = {
         "command_executor": provider.executor,
         "desired_capabilities": capabilities,
