@@ -103,6 +103,7 @@ def test_profile_with_preferences(testdir, httpserver):
     )
 
 
+@pytest.mark.xfail(reason="https://github.com/SeleniumHQ/selenium/pull/5069")
 def test_extension(testdir):
     """Test that a firefox extension can be added when starting Firefox."""
     import os
