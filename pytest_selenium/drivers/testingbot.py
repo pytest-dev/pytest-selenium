@@ -10,7 +10,7 @@ import requests
 from pytest_selenium.drivers.cloud import Provider
 
 HOST = "hub.testingbot.com"
-PORT = 80
+PORT = 443
 
 
 class TestingBot(Provider):
@@ -29,7 +29,7 @@ class TestingBot(Provider):
 
     @property
     def executor(self):
-        return "http://{0.key}:{0.secret}@{0.host}:{0.port}/wd/hub".format(self)
+        return "https://{0.host}:{0.port}/wd/hub".format(self)
 
     @property
     def key(self):
@@ -84,6 +84,8 @@ def driver_kwargs(request, test, capabilities, host, port, **kwargs):
     provider = TestingBot(host, port)
     keywords = request.node.keywords
     capabilities.setdefault("name", test)
+    capabilities.setdefault("client_key", provider.key)
+    capabilities.setdefault("client_secret", provider.secret)
     markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
     groups = capabilities.get("groups", []) + markers
     if groups:
