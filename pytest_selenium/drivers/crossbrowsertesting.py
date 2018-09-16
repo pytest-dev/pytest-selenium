@@ -19,9 +19,7 @@ class CrossBrowserTesting(Provider):
 
     @property
     def executor(self):
-        return "https://hub.crossbrowsertesting.com/wd/hub".format(
-            self.username, self.key
-        )
+        return "https://hub.crossbrowsertesting.com/wd/hub"
 
     @property
     def username(self):
