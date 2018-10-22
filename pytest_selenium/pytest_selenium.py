@@ -184,7 +184,7 @@ def driver_path(request):
     return request.config.getoption("driver_path")
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def driver(request, driver_class, driver_kwargs):
     """Returns a WebDriver instance based on options and capabilities"""
     driver = driver_class(**driver_kwargs)
@@ -203,7 +203,7 @@ def driver(request, driver_class, driver_kwargs):
     driver.quit()
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def selenium(driver):
     yield driver
 
