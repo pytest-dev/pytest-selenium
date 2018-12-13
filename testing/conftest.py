@@ -43,7 +43,7 @@ def testdir(request, httpserver_base_url):
         filterwarnings =
             error::DeprecationWarning
             ignore:--firefox-\w+ has been deprecated:DeprecationWarning
-    """,
+    """,  # noqa: W605
     )
 
     def runpytestqa(*args, **kwargs):
