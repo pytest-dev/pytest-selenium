@@ -2,6 +2,19 @@ Release Notes
 =============
 
 
+1.15.0 (2019-01-03)
+-------------------
+
+* Fixed html report embedded video from Testingbot.
+
+* Fixed a deprecation warning (``yield_fixture``) on pytest 3.0 and later.
+
+* Move Testingbot credentials to capabilities instead of URL.
+
+* Move BrowserStack credentials to capabilities instead of URL.
+
+* Move CrossBrowserTesting credentials to capabilities instead of URL.
+
 1.14.0 (2018-08-23)
 -------------------
 
