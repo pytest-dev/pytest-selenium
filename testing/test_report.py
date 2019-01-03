@@ -132,7 +132,7 @@ def test_exclude_debug_env(testdir, httpserver, monkeypatch, exclude):
 
 
 @pytest.mark.parametrize("exclude", ["url", "screenshot", "html", "logs"])
-def test_exclude_debug_config(testdir, httpserver, monkeypatch, exclude):
+def test_exclude_debug_config(testdir, httpserver, exclude):
     httpserver.serve_content(content="<h1>Success!</h1><p>Ё</p>")
     testdir.makefile(
         ".ini",

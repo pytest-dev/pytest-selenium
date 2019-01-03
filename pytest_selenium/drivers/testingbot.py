@@ -46,8 +46,12 @@ def pytest_selenium_capture_debug(item, report, extra):
     if not provider.uses_driver(item.config.getoption("driver")):
         return
 
+    session_id = item._driver.session_id
+    auth_url = get_auth_url(
+        "https://testingbot.com/tests/{}.mp4".format(session_id), provider, session_id
+    )
     pytest_html = item.config.pluginmanager.getplugin("html")
-    extra.append(pytest_html.extras.html(_video_html(item._driver.session_id)))
+    extra.append(pytest_html.extras.html(_video_html(auth_url, session_id)))
 
 
 @pytest.mark.optionalhook
@@ -97,47 +101,25 @@ def driver_kwargs(request, test, capabilities, host, port, **kwargs):
     return kwargs
 
 
-def _video_html(session):
-    flash_vars = 'config={{\
-        "clip":{{\
-            "url":"{session}",\
-            "provider":"rtmp"}},\
-        "plugins":{{\
-            "controls":{{\
-                "url":"http://testingbot.com/assets/\
-                    flowplayer.controls-3.2.14.swf",\
-                "mute":null,\
-                "volume":null}},\
-            "rtmp":{{\
-                "url":"http://testingbot.com/assets/\
-                    flowplayer.rtmp-3.2.11.swf",\
-                "netConnectionUrl":"rtmp://s2tuay45tyrz3f.cloudfront.net/\
-                    cfx/st"}}}},\
-        "playerId":"mediaplayer{session}",\
-        "playlist":[{{\
-            "url":"{session}",\
-            "provider":"rtmp"}}]}}'.format(
-        session=session
-    )
-
+def _video_html(video_url, session):
     return str(
         html.div(
-            html.object(
-                html.param(value="true", name="allowfullscreen"),
-                html.param(value="always", name="allowscriptaccess"),
-                html.param(value="high", name="quality"),
-                html.param(value="#000000", name="bgcolor"),
-                html.param(value="opaque", name="wmode"),
-                html.param(value=flash_vars.replace(" ", ""), name="flashvars"),
+            html.video(
+                html.source(src=video_url, type="video/mp4"),
                 width="100%",
                 height="100%",
-                type="application/x-shockwave-flash",
-                data="http://testingbot.com/assets/flowplayer-3.2.14.swf",
-                name="mediaplayer_api",
-                id="mediaplayer_api",
+                controls="controls",
             ),
             id="mediaplayer{session}".format(session=session),
             style="border:1px solid #e6e6e6; float:right; height:240px;"
             "margin-left:5px; overflow:hidden; width:320px",
         )
     )
+
+
+def get_auth_url(url, provider, session_id):
+    from hashlib import md5
+
+    key = "{0.key}:{0.secret}:{1}".format(provider, session_id)
+    token = md5(key.encode("utf-8")).hexdigest()
+    return "{}?auth={}".format(url, token)
