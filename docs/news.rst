@@ -5,7 +5,11 @@ Release Notes
 1.15.0 (2019-01-03)
 -------------------
 
+* Project now uses `pre-commit <https://pre-commit.com/>`_ and `black <https://github.com/ambv/black>`_ for development.
+
 * Fixed html report embedded video from Testingbot.
+
+* Fixed more (``get_markers``) deprecations on pytest 3.6 and later.
 
 * Fixed a deprecation warning (``yield_fixture``) on pytest 3.0 and later.
 
