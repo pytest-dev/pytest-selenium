@@ -38,3 +38,18 @@ class Provider(object):
 
     def uses_driver(self, driver):
         return driver.lower() == self.name.lower()
+
+
+def get_markers(node):
+    # `MarkInfo` is removed in pytest 4.1.0
+    # see https://github.com/pytest-dev/pytest/pull/4564
+    try:
+        from _pytest.mark import MarkInfo
+
+        keywords = node.keywords
+        markers = [m for m in keywords.keys() if isinstance(keywords[m], MarkInfo)]
+    except ImportError:
+        # `iter_markers` was introduced in pytest 3.6
+        markers = [m.name for m in node.iter_markers()]
+
+    return markers
