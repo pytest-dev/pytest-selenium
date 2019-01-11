@@ -9,7 +9,7 @@ from py.xml import html
 import pytest
 import requests
 
-from pytest_selenium.drivers.cloud import Provider, get_markers
+from pytest_selenium.drivers.cloud import Provider
 
 
 class SauceLabs(Provider):
@@ -92,7 +92,8 @@ def driver_kwargs(request, test, capabilities, **kwargs):
     _capabilities.setdefault("username", provider.username)
     _capabilities.setdefault("accessKey", provider.key)
     _capabilities.setdefault("name", test)
-    tags = _capabilities.get("tags", []) + get_markers(request.node)
+    markers = [x.name for x in request.node.iter_markers()]
+    tags = _capabilities.get("tags", []) + markers
     if tags:
         _capabilities["tags"] = tags
 
