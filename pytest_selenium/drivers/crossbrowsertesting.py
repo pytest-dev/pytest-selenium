@@ -78,7 +78,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 
     try:
         # Update the test result
-        if report.when == "setup" or info.get("test_score") is not "fail":
+        if report.when == "setup" or info.get("test_score") != "fail":
             # Only update the result if it's not already marked as failed
             score = "pass" if passed else "fail"
             data = {"action": "set_score", "score": score}
