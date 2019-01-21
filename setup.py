@@ -10,7 +10,7 @@ setup(
     url="https://github.com/pytest-dev/pytest-selenium",
     packages=["pytest_selenium", "pytest_selenium.drivers"],
     install_requires=[
-        "pytest>=3.0",
+        "pytest>=3.6",
         "pytest-base-url",
         "pytest-html>=1.14.0",
         "pytest-variables>=1.5.0",
