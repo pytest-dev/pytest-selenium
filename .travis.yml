@@ -6,32 +6,45 @@ jobs:
       dist: xenial
       sudo: required
       env: TOXENV=flake8
+
     - stage:
       python: 3.7
       dist: xenial
       sudo: required
       env: TOXENV=docs
+
     - stage:
       python: 2.7
       env: TOXENV=py27
+      services:
+        - xvfb
+
     - stage:
       python: 3.6
       env: TOXENV=py36
+      services:
+        - xvfb
+
     - stage:
       python: 3.7
       dist: xenial
       sudo: required
       env: TOXENV=py37
+      services:
+        - xvfb
+
     - stage:
       python: pypy-5.6.0
       env: TOXENV=pypy
+      services:
+        - xvfb
+
     - stage: deploy
       python: 3.7
       dist: xenial
       sudo: required
       before_install: skip
       install: skip
-      before_script: skip
       script: skip
       deploy:
         provider: pypi
@@ -42,20 +55,26 @@ jobs:
         on:
           tags: true
           repo: pytest-dev/pytest-selenium
+
 sudo: required
+
 env:
   global:
   - DISPLAY=:99.0
   - GECKODRIVER_VERSION=0.21.0
   - PYTEST_ADDOPTS="-m 'not (chrome or edge or safari or phantomjs)'"
+
 cache: pip
+
 before_install:
   - curl -L -o /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v$GECKODRIVER_VERSION/geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz
   - mkdir $HOME/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C $HOME/geckodriver
   - export PATH=$HOME/geckodriver:$PATH
   - geckodriver --version
+
 install: pip install tox
-before_script: sh -e /etc/init.d/xvfb start
+
 script: tox
+
 addons:
   firefox: latest
