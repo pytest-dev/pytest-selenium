@@ -38,12 +38,12 @@ def testdir(request, httpserver_base_url):
 
     testdir.makefile(
         ".cfg",
-        setup="""
+        setup=r"""
         [tool:pytest]
         filterwarnings =
             error::DeprecationWarning
             ignore:--firefox-\w+ has been deprecated:DeprecationWarning
-    """,  # noqa: W605
+    """,
     )
 
     def runpytestqa(*args, **kwargs):
