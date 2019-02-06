@@ -3,10 +3,12 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
+import sys
 
 pytestmark = pytest.mark.nondestructive
 
 
+@pytest.mark.skipif(sys.platform != "win32", reason="Edge only runs on Windows")
 @pytest.mark.edge
 def test_launch(testdir, httpserver):
     httpserver.serve_content(content="<h1>Success!</h1>")

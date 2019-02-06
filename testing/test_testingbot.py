@@ -2,10 +2,11 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from functools import partial
 import os
-
 import pytest
+
+from functools import partial
+from pytest_selenium.drivers.testingbot import TestingBot, HOST, PORT
 
 pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
@@ -88,3 +89,11 @@ def test_invalid_host(failure, monkeypatch, tmpdir):
         "Name or service not known",
     ]
     assert any(message in out for message in messages)
+
+
+@pytest.mark.parametrize(
+    ("protocol", "host", "port"), [("http", "localhost", "4445"), ("https", HOST, PORT)]
+)
+def test_executor_url(protocol, host, port):
+    tb = TestingBot(host, port)
+    assert tb.executor == "{}://{}:{}/wd/hub".format(protocol, host, port)

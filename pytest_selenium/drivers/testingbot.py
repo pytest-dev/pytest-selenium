@@ -3,10 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-
-from py.xml import html
 import requests
 
+from hashlib import md5
+from py.xml import html
 from pytest_selenium.drivers.cloud import Provider
 
 HOST = "hub.testingbot.com"
@@ -29,7 +29,9 @@ class TestingBot(Provider):
 
     @property
     def executor(self):
-        return "https://{0.host}:{0.port}/wd/hub".format(self)
+        return "{1}://{0.host}:{0.port}/wd/hub".format(
+            self, "http" if self.host == "localhost" else "https"
+        )
 
     @property
     def key(self):
@@ -118,8 +120,6 @@ def _video_html(video_url, session):
 
 
 def get_auth_url(url, provider, session_id):
-    from hashlib import md5
-
     key = "{0.key}:{0.secret}:{1}".format(provider, session_id)
     token = md5(key.encode("utf-8")).hexdigest()
     return "{}?auth={}".format(url, token)
