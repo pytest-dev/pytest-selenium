@@ -5,6 +5,7 @@ Release Notes
 -------------------
 
 * ``pytest-selenium`` now requires pytest 3.6 or later.
+* Fixed `issue <https://github.com/pytest-dev/pytest-selenium/issues/216>`_ with TestingBot local tunnel.
 
 1.15.1 (2019-01-07)
 -------------------
