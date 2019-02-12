@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-1.16.0 (unreleased)
+1.16.0 (2019-02-12)
 -------------------
 
 * ``pytest-selenium`` now requires pytest 3.6 or later.
