@@ -36,6 +36,13 @@ SUPPORTED_DRIVERS = CaseInsensitiveDict(
     }
 )
 
+try:
+    from appium import webdriver as appiumdriver
+
+    SUPPORTED_DRIVERS["Appium"] = appiumdriver.Remote
+except ImportError:
+    pass  # Appium is optional.
+
 
 def _merge(a, b):
     """ merges b and a configurations.
@@ -363,6 +370,7 @@ def split_class_and_test_names(nodeid):
 class DriverAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         setattr(namespace, self.dest, values)
+
         driver = getattr(drivers, values.lower())
         # set the default host and port if specified in the driver module
         namespace.host = namespace.host or getattr(driver, "HOST", None)

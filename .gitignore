@@ -5,8 +5,9 @@ __pycache__
 .idea
 .pytest_cache
 .tox
+.vscode/
 *.egg-info/
 *.pyc
 build
 dist
-Pipfile*
+Pipfile.lock
