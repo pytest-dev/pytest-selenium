@@ -58,7 +58,8 @@ cache: pip
 
 before_install:
   - sudo apt-get update
-  - sudo apt-get install -y libglib2.0-0 libnss3 libx11-6 curl jq
+  - sudo apt-get install -y curl jq
+  - uname
   - installation/geckodriver.sh latest
   - installation/chromedriver.sh latest
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
