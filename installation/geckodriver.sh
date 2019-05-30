@@ -19,11 +19,6 @@ fi
 
 filename="geckodriver-${version}-${os}.tar.gz"
 curl -sL -o /tmp/"${filename}" "${base_url}/${version}/${filename}"
-echo "try taring to HOME"
-tar -zvxf /tmp/"${filename}" -C "${HOME}"
-echo "try moving geckodriver to /usr/local/bin"
-mv "${HOME}/geckodriver" "${install_dir}"
-echo "try taring straight to /usr/bin/local"
-tar -zvxf /tmp/"${filename}" -C "${install_dir}"
+tar -vxf /tmp/"${filename}" -C "${install_dir}"
 rm /tmp/"${filename}"
 echo "geckodriver ${version} is now available in '${install_dir}'"
