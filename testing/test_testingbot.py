@@ -6,7 +6,7 @@ import os
 import pytest
 
 from functools import partial
-from pytest_selenium.drivers.testingbot import TestingBot, HOST, PORT
+from pytest_selenium.drivers.testingbot import HOST, PORT
 
 pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
@@ -95,5 +95,9 @@ def test_invalid_host(failure, monkeypatch, tmpdir):
     ("protocol", "host", "port"), [("http", "localhost", "4445"), ("https", HOST, PORT)]
 )
 def test_executor_url(protocol, host, port):
+    # Import needs to be here, see here:
+    # https://github.com/pytest-dev/pytest/issues/5330#issuecomment-497146362
+    from pytest_selenium.drivers.testingbot import TestingBot
+
     tb = TestingBot(host, port)
     assert tb.executor == "{}://{}:{}/wd/hub".format(protocol, host, port)
