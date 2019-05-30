@@ -14,9 +14,10 @@ else
     version="v${version}"
 fi
 
-
 [[ $(uname) == "Darwin" ]] && os="macos" || os="linux64"
 
-curl -sL "${base_url}/${version}/geckodriver-${version}-${os}.tar.gz" | tar -xz
-mv geckodriver "${install_dir}"
+filename="geckodriver-${version}-${os}.tar.gz"
+curl -sL -o /tmp/"${filename}" "${base_url}/${version}/${filename}"
+tar -zxf /tmp/"${filename}" -C "${install_dir}"
+rm /tmp/"${filename}"
 echo "geckodriver ${version} is now available in '${install_dir}'"
