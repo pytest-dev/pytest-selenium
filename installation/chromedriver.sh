@@ -16,7 +16,7 @@ filename="${drivername}_${os}64.zip"
 curl -sL -o /tmp/"${filename}" "${base_url}/${version}/${filename}"
 unzip -q /tmp/"${filename}"
 mv ${drivername} "${install_dir}"
-ls -la "${install_dir}"
+
 [[ $(uname) == "Linux" ]] && chmod +x "${install_dir}/${drivername}"
-ls -la "${install_dir}"
+
 echo "${drivername} ${version} is now available in '${install_dir}'"

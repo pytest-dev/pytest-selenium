@@ -19,6 +19,6 @@ fi
 
 filename="geckodriver-${version}-${os}.tar.gz"
 curl -sL -o /tmp/"${filename}" "${base_url}/${version}/${filename}"
-tar -vxf /tmp/"${filename}" -C "${install_dir}"
+tar -xf /tmp/"${filename}" -C "${install_dir}"
 rm /tmp/"${filename}"
 echo "geckodriver ${version} is now available in '${install_dir}'"
