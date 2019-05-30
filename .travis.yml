@@ -60,12 +60,13 @@ cache: pip
 before_install:
   - sudo apt-get update
   - sudo apt-get install -y curl jq
+  - cat /etc/group
   - echo $PATH
   - ls -la /usr/local/bin
   - ls -la /usr/local
   - ls -la /usr
-  - installation/geckodriver.sh latest
-  - installation/chromedriver.sh latest
+  - sudo installation/geckodriver.sh latest
+  - sudo installation/chromedriver.sh latest
   - google-chrome-stable --headless --disable-gpu --remote-debugging-port=9222 http://localhost &
 
 install: pip install tox
