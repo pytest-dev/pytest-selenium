@@ -5,17 +5,18 @@ set -e
 version=${1:-latest}
 
 install_dir="/usr/local/bin"
-base_url="https://chromedriver.storage.googleapis.com"
+drivername="chromedriver"
+base_url="https://${drivername}.storage.googleapis.com"
 
 [[ ${version} == "latest" ]] && version=$(curl -s "${base_url}/LATEST_RELEASE")
 
 [[ $(uname) == "Darwin" ]] && os="mac" || os="linux"
 
-filename="chromedriver_${os}64.zip"
+filename="${drivername}_${os}64.zip"
 curl -sL -o /tmp/"${filename}" "${base_url}/${version}/${filename}"
 unzip -q /tmp/"${filename}"
-mv chromedriver "${install_dir}"
+mv ${drivername} "${install_dir}"
 ls -la "${install_dir}"
-chmod +x "${install_dir}"
+[[ $(uname) == "Linux" ]] && chmod +x "${install_dir}/${drivername}"
 ls -la "${install_dir}"
-echo "chromedriver ${version} is now available in '${install_dir}'"
+echo "${drivername} ${version} is now available in '${install_dir}'"
