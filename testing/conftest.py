@@ -30,6 +30,11 @@ def testdir(request, httpserver_base_url):
         conftest="""
         import pytest
         @pytest.fixture
+        def chrome_options(chrome_options):
+            chrome_options.add_argument("headless")
+            return chrome_options
+
+        @pytest.fixture
         def webtext(base_url, selenium):
             selenium.get(base_url)
             return selenium.find_element_by_tag_name('h1').text
