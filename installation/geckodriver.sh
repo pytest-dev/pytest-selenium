@@ -7,14 +7,10 @@ version=${1:-latest}
 install_dir="/usr/local/bin"
 base_url="https://github.com/mozilla/geckodriver/releases/download"
 
-echo ${version}
-echo "before if"
 if [[ ${version} == "latest" ]]; then
-    echo "inside if"
     json=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest)
-    echo ${json}
     version=$(echo "${json}" | jq -r '.tag_name')
-    echo ${version}
+    [[ ${version} == "null" ]] && version=${GECKO_FALLBACK_VERSION}
 else
     echo "inside else"
     version="v${version}"
