@@ -34,7 +34,7 @@ def testdir(request, httpserver_base_url):
             return selenium.find_element_by_tag_name('h1').text
         """
 
-    if request.node.get_closest_marker("chrome"):
+    if item.get_closest_marker("chrome"):
         conftest += """
         @pytest.fixture
         def chrome_options(chrome_options):

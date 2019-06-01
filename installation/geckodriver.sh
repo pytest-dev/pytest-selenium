@@ -10,7 +10,9 @@ base_url="https://github.com/mozilla/geckodriver/releases/download"
 if [[ ${version} == "latest" ]]; then
     json=$(curl -s https://api.github.com/repos/mozilla/geckodriver/releases/latest)
     version=$(echo "${json}" | jq -r '.tag_name')
-    [[ ${version} == "null" ]] && version=${GECKO_FALLBACK_VERSION}
+    # In case of "API rate limit exceeded"
+    # See https://developer.github.com/v3/#rate-limiting
+    [[ ${version} == "null" ]] && version=${GECKODRIVER_FALLBACK_VERSION}
 else
     version="v${version}"
 fi

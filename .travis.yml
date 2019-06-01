@@ -1,35 +1,37 @@
 language: python
 jobs:
   include:
-    - stage:
+    - stage: Linting
       python: 3.7
       dist: xenial
       sudo: required
       before_install: skip
+      addons: skip
       env: TOXENV=flake8
 
-    - stage:
+    - stage: Docs
       python: 3.7
       dist: xenial
       sudo: required
       before_install: skip
+      addons: skip
       env: TOXENV=docs
 
-    - stage:
+    - stage: python 2.7
       python: 2.7
       env: TOXENV=py27
 
-    - stage:
+    - stage: python 3.6
       python: 3.6
       env: TOXENV=py36
 
-    - stage:
+    - stage: python 3.7
       python: 3.7
       dist: xenial
       sudo: required
       env: TOXENV=py37
 
-    - stage:
+    - stage: pypy 5.6.0
       python: pypy-5.6.0
       env: TOXENV=pypy
 
@@ -40,6 +42,7 @@ jobs:
       before_install: skip
       install: skip
       script: skip
+      addons: skip
       deploy:
         provider: pypi
         user: davehunt
@@ -55,7 +58,7 @@ sudo: required
 env:
   global:
   - PYTEST_ADDOPTS="-m 'not (edge or safari or phantomjs)'"
-  - GECKO_FALLBACK_VERSION="v0.24.0"
+  - GECKODRIVER_FALLBACK_VERSION="v0.24.0"
 
 cache: pip
 
