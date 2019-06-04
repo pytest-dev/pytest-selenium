@@ -1,0 +1,14 @@
+image: Visual Studio 2017
+
+environment:
+  PYTEST_ADDOPTS: "-m 'not (edge or safari or phantomjs or chrome or firefox)'"
+  matrix:
+  - TOXENV: py37
+
+build: off
+
+install:
+- pip install tox
+
+test_script:
+- tox
