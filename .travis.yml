@@ -1,43 +1,39 @@
 language: python
 jobs:
   include:
-    - stage:
+    - stage: Linting
       python: 3.7
       dist: xenial
       sudo: required
+      before_install: skip
+      addons: skip
       env: TOXENV=flake8
 
-    - stage:
+    - stage: Docs
       python: 3.7
       dist: xenial
       sudo: required
+      before_install: skip
+      addons: skip
       env: TOXENV=docs
 
-    - stage:
+    - stage: python 2.7
       python: 2.7
       env: TOXENV=py27
-      services:
-        - xvfb
 
-    - stage:
+    - stage: python 3.6
       python: 3.6
       env: TOXENV=py36
-      services:
-        - xvfb
 
-    - stage:
+    - stage: python 3.7
       python: 3.7
       dist: xenial
       sudo: required
       env: TOXENV=py37
-      services:
-        - xvfb
 
-    - stage:
+    - stage: pypy 5.6.0
       python: pypy-5.6.0
       env: TOXENV=pypy
-      services:
-        - xvfb
 
     - stage: deploy
       python: 3.7
@@ -46,6 +42,7 @@ jobs:
       before_install: skip
       install: skip
       script: skip
+      addons: skip
       deploy:
         provider: pypi
         user: davehunt
@@ -60,17 +57,16 @@ sudo: required
 
 env:
   global:
-  - DISPLAY=:99.0
-  - GECKODRIVER_VERSION=0.21.0
-  - PYTEST_ADDOPTS="-m 'not (chrome or edge or safari or phantomjs)'"
+  - PYTEST_ADDOPTS="-m 'not (edge or safari or phantomjs)'"
+  - GECKODRIVER_FALLBACK_VERSION="v0.24.0"
 
 cache: pip
 
 before_install:
-  - curl -L -o /tmp/geckodriver.tar.gz https://github.com/mozilla/geckodriver/releases/download/v$GECKODRIVER_VERSION/geckodriver-v$GECKODRIVER_VERSION-linux64.tar.gz
-  - mkdir $HOME/geckodriver && tar xvf /tmp/geckodriver.tar.gz -C $HOME/geckodriver
-  - export PATH=$HOME/geckodriver:$PATH
-  - geckodriver --version
+  - sudo apt-get update
+  - sudo apt-get install -y curl jq
+  - sudo installation/geckodriver.sh latest
+  - sudo installation/chromedriver.sh latest
 
 install: pip install tox
 
@@ -78,3 +74,4 @@ script: tox
 
 addons:
   firefox: latest
+  chrome: stable

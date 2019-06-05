@@ -26,15 +26,23 @@ def testdir(request, httpserver_base_url):
 
     testdir = request.getfixturevalue("testdir")
 
-    testdir.makepyfile(
-        conftest="""
+    conftest = """
         import pytest
         @pytest.fixture
         def webtext(base_url, selenium):
             selenium.get(base_url)
             return selenium.find_element_by_tag_name('h1').text
         """
-    )
+
+    if item.get_closest_marker("chrome"):
+        conftest += """
+        @pytest.fixture
+        def chrome_options(chrome_options):
+            chrome_options.add_argument("headless")
+            return chrome_options
+        """
+
+    testdir.makepyfile(conftest=conftest)
 
     testdir.makefile(
         ".cfg",
