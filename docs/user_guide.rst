@@ -269,7 +269,7 @@ the default when running tests against a remote driver.
 
 To run your automated tests, simply specify ``Remote`` as your driver. Browser
 selection is determined using capabilities. Check the
-`desired capabilities documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`_
+`desired capabilities documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`__
 for details of accepted values. There are also a number of
 `browser specific capabilities <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#browser-specific-capabilities>`_
 that can be set. Be sure to also check the documentation for your chosen
@@ -519,7 +519,7 @@ By default Appium will listen on host 127.0.0.1 and port 4723.
 
 To run your automated tests, simply specify ``Appium`` as your driver. Device
 selection is determined using capabilities. Check the
-`desired capabilities documentation <https://appium.io/docs/en/writing-running-appium/caps/>`_
+`desired capabilities documentation <https://appium.io/docs/en/writing-running-appium/caps/>`__
 for details of accepted values.
 
 Note that if your Appium server is not running locally or is running on an
