@@ -36,6 +36,13 @@ SUPPORTED_DRIVERS = CaseInsensitiveDict(
     }
 )
 
+try:
+    from appium import webdriver as appiumdriver
+
+    SUPPORTED_DRIVERS["Appium"] = appiumdriver.Remote
+except ImportError:
+    pass  # Appium is optional.
+
 
 def _merge(a, b):
     """ merges b and a configurations.

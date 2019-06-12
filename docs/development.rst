@@ -27,7 +27,7 @@ against the supported Python versions.
 
 Drivers
 -------
-To run the tests you'll going to need some browser drivers.
+To run the tests you're going to need some browser drivers.
 
 Chromedriver
 ~~~~~~~~~~~~
