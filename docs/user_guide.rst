@@ -6,7 +6,7 @@ User Guide
 Quick Start
 ***********
 
-The pytest-selenium plugin provides a method scoped selenium
+The pytest-selenium plugin provides a function scoped selenium
 `fixture <http://pytest.org/latest/fixture.html>`_ for your tests. This means
 that any test with selenium as an argument will cause a browser instance to be
 invoked. The browser may run locally or remotely depending on your
@@ -269,7 +269,7 @@ the default when running tests against a remote driver.
 
 To run your automated tests, simply specify ``Remote`` as your driver. Browser
 selection is determined using capabilities. Check the
-`desired capabilities documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`_
+`desired capabilities documentation <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#used-by-the-selenium-server-for-browser-selection>`__
 for details of accepted values. There are also a number of
 `browser specific capabilities <https://github.com/SeleniumHQ/selenium/wiki/DesiredCapabilities#browser-specific-capabilities>`_
 that can be set. Be sure to also check the documentation for your chosen
@@ -279,7 +279,8 @@ driver, as the accepted capabilities may differ::
 
 Note that if your server is not running locally or is running on an alternate
 port you will need to specify the ``--host`` and ``--port`` command line
-options::
+options, or by setting the ``SELENIUM_HOST`` and ``SELENIUM_PORT`` environment
+variables::
 
   pytest --driver Remote --host selenium.hostname --port 5555 --capability browserName firefox
 
@@ -506,11 +507,33 @@ for full details of what can be configured.
 
 .. _capabilities:
 
+Appium
+------
+
+**Note:** Appium support is not installed by default, see: `Installation <https://pytest-selenium.readthedocs.io/en/latest/installing.html>`_
+
+To run tests against mobile devices, you can use `Appium <https://appium.io>`_.
+This requires that you have the Appium server running.
+
+By default Appium will listen on host 127.0.0.1 and port 4723.
+
+To run your automated tests, simply specify ``Appium`` as your driver. Device
+selection is determined using capabilities. Check the
+`desired capabilities documentation <https://appium.io/docs/en/writing-running-appium/caps/>`__
+for details of accepted values.
+
+Note that if your Appium server is not running locally or is running on an
+alternate port you will need to specify the ``--host`` and ``--port``
+command line options, or by setting the ``APPIUM_HOST`` and ``APPIUM_PORT``
+environment variables::
+
+  pytest --driver Appium --host appium.hostname --port 5555
+
 Specifying Capabilities
 ***********************
 
 Configuration options are specified using a capabilities dictionary. This is
-required when using a Selenium server to specify the target environment, but
+required when using an Selenium server to specify the target environment, but
 can also be used to configure local drivers.
 
 Command Line Capabilities

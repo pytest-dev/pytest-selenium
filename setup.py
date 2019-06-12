@@ -33,11 +33,13 @@ setup(
             "safari_driver = pytest_selenium.drivers.safari",
             "saucelabs_driver = pytest_selenium.drivers.saucelabs",
             "testingbot_driver = pytest_selenium.drivers.testingbot",
+            "appium_driver = pytest_selenium.drivers.appium",
         ]
     },
     setup_requires=["setuptools_scm"],
+    extras_require={"appium": ["appium-python-client>=0.44"]},
     license="Mozilla Public License 2.0 (MPL 2.0)",
-    keywords="py.test pytest selenium saucelabs browserstack webqa qa " "mozilla",
+    keywords="py.test pytest selenium saucelabs browserstack webqa qa",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Pytest",

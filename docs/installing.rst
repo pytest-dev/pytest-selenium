@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-pytest-selenium will work with Python 3.6 and 2.7.
+pytest-selenium will work with Python >=3.6 and 2.7.
 
 Install pytest-selenium
 -----------------------
@@ -20,3 +20,14 @@ To install from source:
 .. code-block:: bash
 
   $ python setup.py develop
+
+Optional packages
+-----------------
+
+Appium
+~~~~~~
+To install pytest-selenium with `appium <https://appium.io/>`_ support:
+
+.. code-block:: bash
+
+  $ pip install pytest-selenium[appium]
