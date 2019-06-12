@@ -218,6 +218,9 @@ option to indicate where it can be found::
 
 PhantomJS
 ---------
+**NOTE:** Support for PhantomJS has been deprecated and will be removed in a
+future release. If running headless is a requirement, please consider using
+Firefox or Chrome instead.
 
 To use PhantomJS, you will need `download it <http://phantomjs.org/download.html>`_
 and specify ``PhantomJS`` for the ``--driver`` command line option. If
