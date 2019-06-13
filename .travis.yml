@@ -1,7 +1,8 @@
 language: python
 jobs:
   include:
-    - stage: Linting
+    - stage: Tests
+      name: Linting
       python: 3.7
       dist: xenial
       sudo: required
@@ -9,7 +10,8 @@ jobs:
       addons: skip
       env: TOXENV=flake8
 
-    - stage: Docs
+    -
+      name: Docs
       python: 3.7
       dist: xenial
       sudo: required
@@ -17,21 +19,25 @@ jobs:
       addons: skip
       env: TOXENV=docs
 
-    - stage: python 2.7
+    -
+      name: python 2.7
       python: 2.7
       env: TOXENV=py27
 
-    - stage: python 3.6
+    -
+      name: python 3.6
       python: 3.6
       env: TOXENV=py36
 
-    - stage: python 3.7
+    -
+      name: python 3.7
       python: 3.7
       dist: xenial
       sudo: required
       env: TOXENV=py37
 
-    - stage: pypy 5.6.0
+    -
+      name: pypy 5.6.0
       python: pypy-5.6.0
       env: TOXENV=pypy
 
