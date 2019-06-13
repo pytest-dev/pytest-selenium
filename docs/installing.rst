@@ -26,7 +26,7 @@ Optional packages
 
 Appium
 ~~~~~~
-To install pytest-selenium with `appium <https://appium.io/>`_ support:
+To install pytest-selenium with `Appium <https://appium.io/>`_ support:
 
 .. code-block:: bash
 
