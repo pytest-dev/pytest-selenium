@@ -47,7 +47,7 @@ master_doc = "index"
 
 # General information about the project.
 project = u"pytest-selenium"
-copyright = u"2015, Dave Hunt"
+copyright = u"2019, Dave Hunt"
 author = u"Dave Hunt"
 
 # The version info for the project you're documenting, acts as replacement for
