@@ -21,7 +21,7 @@ def httpserver_base_url(httpserver):
 @pytest.fixture(autouse=True)
 def testdir(request, httpserver_base_url):
     item = request.node
-    if "testdir" not in item.funcargnames:
+    if "testdir" not in item.fixturenames:
         return
 
     testdir = request.getfixturevalue("testdir")
