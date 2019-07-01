@@ -670,7 +670,7 @@ Save screenshot to file
 -----------------------
 
 To save a screenshot to the file system, especially when not using ``--html``,
-you can place the `pytest_selenium_capture_debug` hook in ``conftest.py``.
+you can place the ``pytest_selenium_capture_debug`` hook in ``conftest.py``.
 
 The example will create a png-file using the test name.
 
