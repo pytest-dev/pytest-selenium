@@ -660,6 +660,33 @@ or set the ``SELENIUM_EXCLUDE_DEBUG`` environment variable to a list of the
 For example, to exclude HTML, logs, and screenshots from the report, you could
 set ``SELENIUM_EXCLUDE_DEBUG`` to ``html:logs:screenshot``.
 
+Tips & Tricks
+*************
+
+Example solutions to common scenarios that sometimes gets reported as issues
+to the project.
+
+Save screenshot to file
+-----------------------
+
+To save a screenshot to the file system, especially when not using ``--html``,
+you can place the ``pytest_selenium_capture_debug`` hook in ``conftest.py``.
+
+The example will create a png-file using the test name.
+
+.. code-block:: python
+
+  import base64
+
+
+  def pytest_selenium_capture_debug(item, report, extra):
+      for log_type in extra:
+          if log_type["name"] == "Screenshot":
+              content = base64.b64decode(log_type["content"].encode("utf-8"))
+              with open(item.name + ".png", "wb") as f:
+                  f.write(content)
+
+
 .. _Jenkins CI: https://jenkins.io/
 .. _using environment variables in Jenkins pipelines: https://jenkins.io/doc/pipeline/tour/environment/
 .. _Firefox options API documentation: https://seleniumhq.github.io/selenium/docs/api/py/webdriver_firefox/selenium.webdriver.firefox.options.html
