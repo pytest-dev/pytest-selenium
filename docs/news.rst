@@ -1,7 +1,7 @@
 Release Notes
 =============
 
-1.17.9 (2019-07-13)
+1.17.0 (2019-07-13)
 -------------------
 
 * Added support for `Appium <https://appium.io/>`_
