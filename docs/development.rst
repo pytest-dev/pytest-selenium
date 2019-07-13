@@ -73,4 +73,4 @@ Follow these steps to release a new version of the project:
 5. Once merged, update your local master again (``git pull --rebase upstream master``)
 6. Tag the release with the new release version (``git tag v<new tag>``)
 7. Push the tag (``git push upstream --tags``)
-8. Done. You can monitor the progress on `Travis <https://travis-ci.org/pytest-dev/pytest-html/>`_
+8. Done. You can monitor the progress on `Travis <https://travis-ci.org/pytest-dev/pytest-selenium/>`_
