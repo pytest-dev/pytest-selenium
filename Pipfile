@@ -11,4 +11,4 @@ black = "*"
 pre-commit = "*"
 
 [packages]
-pytest-selenium = {editable = true,path = "."}
+pytest-selenium = {editable = true,extras = ["appium"],path = "."}
