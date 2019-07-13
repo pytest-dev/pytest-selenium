@@ -8,7 +8,6 @@ pytest = "*"
 tox = "*"
 flake8 = "*"
 black = "*"
-pre-commit = "*"
 
 [packages]
 pytest-selenium = {editable = true,extras = ["appium"],path = "."}
