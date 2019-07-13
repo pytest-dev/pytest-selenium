@@ -60,3 +60,17 @@ Instructions for `edgedriver <https://developer.microsoft.com/en-us/microsoft-ed
 IEDriver
 ~~~~~~~~
 Instructions for `iedriver <https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver>`_.
+
+Releasing a new version
+-----------------------
+
+Follow these steps to release a new version of the project:
+
+1. Update your local master with the upstream master (``git pull --rebase upstream master``)
+2. Create a new branch and update ``news.rst`` with the new version, today's date, and all changes/new features
+3. Commit and push the new branch and then create a new pull request
+4. Wait for tests and reviews and then merge the branch
+5. Once merged, update your local master again (``git pull --rebase upstream master``)
+6. Tag the release with the new release version (``git tag v<new tag>``)
+7. Push the tag (``git push upstream --tags``)
+8. Done. You can monitor the progress on `Travis <https://travis-ci.org/pytest-dev/pytest-html/>`_
