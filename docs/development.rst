@@ -2,7 +2,7 @@ Development
 ===========
 
 To contribute to `pytest-selenium` you can use `Pipenv`_ to manage
-a python virutal environment and `pre-commit <https://pre-commit.com/>`_ to help you with
+a python virtual environment and `pre-commit <https://pre-commit.com/>`_ to help you with
 styling and formatting.
 
 To setup the virtual environment and pre-commit, run:
