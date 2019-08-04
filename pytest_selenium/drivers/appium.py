@@ -8,7 +8,6 @@ HOST = os.environ.get("APPIUM_HOST", "localhost")
 PORT = os.environ.get("APPIUM_PORT", 4723)
 
 
-
 def driver_kwargs(capabilities, host, port, **kwargs):
     executor = "http://{0}:{1}/wd/hub".format(host, port)
     kwargs = {"command_executor": executor, "desired_capabilities": capabilities}
