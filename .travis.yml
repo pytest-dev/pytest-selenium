@@ -9,6 +9,9 @@ jobs:
       before_install: skip
       addons: skip
       env: TOXENV=linting
+      cache:
+        directories:
+          - $HOME/.cache/pre-commit
 
     -
       name: Docs
