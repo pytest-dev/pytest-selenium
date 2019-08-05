@@ -1,10 +1,18 @@
 Release Notes
 =============
 
+1.17.0 (2019-07-13)
+-------------------
+
+* Added support for `Appium <https://appium.io/>`_
+
+* Deprecate support for `PhantomJS`
+
 1.16.0 (2019-02-12)
 -------------------
 
 * ``pytest-selenium`` now requires pytest 3.6 or later.
+
 * Fixed `issue <https://github.com/pytest-dev/pytest-selenium/issues/216>`_ with TestingBot local tunnel.
 
 1.15.1 (2019-01-07)

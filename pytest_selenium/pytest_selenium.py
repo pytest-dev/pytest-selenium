@@ -47,7 +47,7 @@ except ImportError:
 def _merge(a, b):
     """ merges b and a configurations.
         Based on http://bit.ly/2uFUHgb
-     """
+    """
     for key in b:
         if key in a:
             if isinstance(a[key], dict) and isinstance(b[key], dict):
