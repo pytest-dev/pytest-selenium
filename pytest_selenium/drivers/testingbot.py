@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-import requests
 
 from hashlib import md5
 from py.xml import html
@@ -71,6 +70,10 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin("html")
     # Add the job URL to the HTML report
     extra.append(pytest_html.extras.url(job_url, "{0} Job".format(provider.name)))
+
+    # import requests lazily here to avoid importing
+    # requests for unit tests that don't need it
+    import requests
 
     try:
         # Update the job result

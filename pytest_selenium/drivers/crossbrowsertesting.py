@@ -4,7 +4,6 @@
 
 from py.xml import html
 import pytest
-import requests
 
 from pytest_selenium.drivers.cloud import Provider
 
@@ -40,6 +39,10 @@ def pytest_selenium_capture_debug(item, report, extra):
     if not provider.uses_driver(item.config.getoption("driver")):
         return
 
+    # import requests lazily here to avoid importing
+    # requests for unit tests that don't need it
+    import requests
+
     videos = (
         requests.get(
             provider.API.format(session=item._driver.session_id),
@@ -62,6 +65,10 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
         return
 
     passed = report.passed or (report.failed and hasattr(report, "wasxfail"))
+
+    # import requests lazily here to avoid importing
+    # requests for unit tests that don't need it
+    import requests
 
     # Add the test URL to the summary
     info = requests.get(

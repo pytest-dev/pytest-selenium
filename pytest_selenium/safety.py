@@ -7,7 +7,6 @@ import os
 import re
 
 import pytest
-import requests
 
 
 def pytest_addoption(parser):
@@ -53,6 +52,11 @@ def sensitive_url(request, base_url):
     """Return the first sensitive URL from response history of the base URL"""
     if not base_url:
         return False
+
+    # import requests lazily here to avoid importing
+    # requests for unit tests that don't need it
+    import requests
+
     # consider this environment sensitive if the base url or any redirection
     # history matches the regular expression
     urls = [base_url]
