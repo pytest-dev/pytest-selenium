@@ -3,8 +3,10 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
+from distutils.version import LooseVersion
 
 import pytest
+from selenium import __version__ as SELENIUM_VERSION
 
 pytestmark = pytest.mark.nondestructive
 
@@ -20,7 +22,11 @@ def test_launch(testdir, httpserver):
             assert webtext == u'Success!'
     """
     )
-    testdir.quick_qa("--driver", "PhantomJS", file_test, passed=1)
+    if LooseVersion(SELENIUM_VERSION) < LooseVersion("4.0.0"):
+        testdir.quick_qa("--driver", "PhantomJS", file_test, passed=1)
+    else:
+        reprec = testdir.inline_run("--driver", "PhantomJS")
+        assert reprec.ret == pytest.ExitCode.USAGE_ERROR
 
 
 @pytest.mark.phantomjs
@@ -36,5 +42,8 @@ def test_args(testdir):
         def test_pass(selenium): pass
     """
     )
-    testdir.quick_qa("--driver", "PhantomJS", file_test, passed=1)
-    assert os.path.exists(str(testdir.tmpdir.join("foo.log")))
+    if LooseVersion(SELENIUM_VERSION) < LooseVersion("4.0.0"):
+        testdir.quick_qa("--driver", "PhantomJS", file_test, passed=1)
+        assert os.path.exists(str(testdir.tmpdir.join("foo.log")))
+    else:
+        pass
