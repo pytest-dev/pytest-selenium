@@ -5,12 +5,14 @@
 import argparse
 import copy
 from datetime import datetime
+from distutils.version import LooseVersion
 import os
 import io
 import logging
 
 import pytest
 from requests.structures import CaseInsensitiveDict
+from selenium import __version__ as SELENIUM_VERSION
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
@@ -28,13 +30,17 @@ SUPPORTED_DRIVERS = CaseInsensitiveDict(
         "Edge": webdriver.Edge,
         "Firefox": webdriver.Firefox,
         "IE": webdriver.Ie,
-        "PhantomJS": webdriver.PhantomJS,
         "Remote": webdriver.Remote,
         "Safari": webdriver.Safari,
         "SauceLabs": webdriver.Remote,
         "TestingBot": webdriver.Remote,
     }
 )
+
+
+# Selenium 4.0.0 deprecated phantom js.
+if LooseVersion(SELENIUM_VERSION) < LooseVersion("4.0.0"):
+    SUPPORTED_DRIVERS["PhantomJS"] = webdriver.PhantomJS
 
 try:
     from appium import webdriver as appiumdriver
