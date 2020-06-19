@@ -334,7 +334,11 @@ def _gather_logs(item, report, driver, summary, extra):
 
 def _gather_driver_log(item, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin("html")
-    if hasattr(item.config, "_driver_log") and os.path.exists(item.config._driver_log):
+    if (
+        hasattr(item.config, "_driver_log")
+        and item.config._driver_log is not None
+        and os.path.exists(item.config._driver_log)
+    ):
         if pytest_html is not None:
             with io.open(item.config._driver_log, "r", encoding="utf8") as f:
                 extra.append(pytest_html.extras.text(f.read(), "Driver Log"))
@@ -344,7 +348,7 @@ def _gather_driver_log(item, summary, extra):
 def format_log(log):
     timestamp_format = "%Y-%m-%d %H:%M:%S.%f"
     entries = [
-        u"{0} {1[level]} - {1[message]}".format(
+        "{0} {1[level]} - {1[message]}".format(
             datetime.utcfromtimestamp(entry["timestamp"] / 1000.0).strftime(
                 timestamp_format
             ),
