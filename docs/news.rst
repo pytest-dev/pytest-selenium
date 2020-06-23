@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+1.18.0 (2020-06-23)
+-------------------
+
+* Handle PhantomJS error when using Selenium 4 (`#241 <https://github.com/pytest-dev/pytest-selenium/pull/241>`_)
+
+  * Thanks to (`@Zac-HD <https://github.com/Zac-HD>`_) for the PR
+
+* Ensure compatibility with next pytest-xdist release (`#239 <https://github.com/pytest-dev/pytest-selenium/pull/239>`_)
+
+  * Thanks to (`@PhilippSelenium <https://github.com/PhilippSelenium>`_) for the PR
+
 1.17.0 (2019-07-13)
 -------------------
 
