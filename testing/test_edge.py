@@ -36,7 +36,7 @@ def test_launch_legacy(testdir, httpserver):
 def test_launch(use_chromium, testdir, httpserver):
     httpserver.serve_content(content="<h1>Success!</h1>")
     file_test = testdir.makepyfile(
-        f"""
+        """
         import pytest
 
         @pytest.mark.nondestructive
@@ -45,8 +45,10 @@ def test_launch(use_chromium, testdir, httpserver):
 
         @pytest.fixture
         def edge_options(edge_options):
-            edge_options.use_chromium = {use_chromium}
+            edge_options.use_chromium = {}
             return edge_options
-    """
+    """.format(
+            use_chromium
+        )
     )
     testdir.quick_qa("--driver", "Edge", file_test, passed=1)
