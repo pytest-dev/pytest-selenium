@@ -2,10 +2,13 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 from distutils.version import LooseVersion
+
+import pytest
 from selenium import __version__ as SELENIUM_VERSION
+from selenium.webdriver.edge.options import Options
 
 
-def driver_kwargs(capabilities, driver_log, driver_path, **kwargs):
+def driver_kwargs(capabilities, driver_log, driver_path, edge_options, **kwargs):
 
     # Selenium 3.14.0 deprecated log_path in favour of service_log_path
     if LooseVersion(SELENIUM_VERSION) < LooseVersion("3.14.0"):
@@ -13,8 +16,17 @@ def driver_kwargs(capabilities, driver_log, driver_path, **kwargs):
     else:
         kwargs = {"service_log_path": driver_log}
 
+    if LooseVersion(SELENIUM_VERSION) >= LooseVersion("4.0.0"):
+        kwargs["options"] = edge_options
+
     if capabilities:
         kwargs["capabilities"] = capabilities
     if driver_path is not None:
         kwargs["executable_path"] = driver_path
+
     return kwargs
+
+
+@pytest.fixture
+def edge_options():
+    return Options()
