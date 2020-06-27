@@ -10,15 +10,14 @@ import io
 import logging
 
 import pytest
-from requests.structures import CaseInsensitiveDict
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
 
+from .utils import CaseInsensitiveDict
 from . import drivers
 
 LOGGER = logging.getLogger(__name__)
-
 
 SUPPORTED_DRIVERS = CaseInsensitiveDict(
     {
