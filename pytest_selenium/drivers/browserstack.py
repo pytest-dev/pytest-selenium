@@ -3,7 +3,6 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-import requests
 
 from pytest_selenium.drivers.cloud import Provider
 
@@ -42,6 +41,9 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
     passed = report.passed or (report.failed and hasattr(report, "wasxfail"))
     session_id = item._driver.session_id
     api_url = provider.API.format(session=session_id)
+
+    # lazy import requests for projects that don't need requests
+    import requests
 
     try:
         job_info = requests.get(api_url, auth=provider.auth, timeout=10).json()
