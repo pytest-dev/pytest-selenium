@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+2.0.0 (unreleased)
+------------------
+
+* Drop python 2.7 support (incl. PyPy)
+
+* Add python 3.8 support
+
+* Drop `PhantomJS` support
+
+
 1.17.0 (2019-07-13)
 -------------------
 

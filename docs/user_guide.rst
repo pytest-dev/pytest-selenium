@@ -216,39 +216,6 @@ option to indicate where it can be found::
 
   pytest --driver IE --driver-path \path\to\IEDriverServer.exe
 
-PhantomJS
----------
-**NOTE:** Support for PhantomJS has been deprecated and will be removed in a
-future release. If running headless is a requirement, please consider using
-Firefox or Chrome instead.
-
-To use PhantomJS, you will need `download it <http://phantomjs.org/download.html>`_
-and specify ``PhantomJS`` for the ``--driver`` command line option. If
-the driver executable is not available on your path, you can use the
-``--driver-path`` option to indicate where it can be found::
-
-  pytest --driver PhantomJS --driver-path /path/to/phantomjs
-
-See the `PhantomJS documentation <http://phantomjs.org/quick-start.html>`_ for
-more information.
-
-Configuration
-~~~~~~~~~~~~~
-
-PhantomJS supports various command line arguments. These can be passed by
-implementing a ``driver_args`` fixture and returning a list of the desired
-arguments. The following example specifies the log file path:
-
-.. code-block:: python
-
-  import pytest
-  @pytest.fixture
-  def driver_args():
-      return ['--webdriver-logfile=phantomjs.log']
-
-For a full list of supported command line arguments, run ``phantomjs --help``
-in your terminal.
-
 Safari
 ------
 

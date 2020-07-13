@@ -10,7 +10,7 @@ setup(
     url="https://github.com/pytest-dev/pytest-selenium",
     packages=["pytest_selenium", "pytest_selenium.drivers"],
     install_requires=[
-        "pytest>=3.6",
+        "pytest>=5.0.0",
         "pytest-base-url",
         "pytest-html>=1.14.0",
         "pytest-variables>=1.5.0",
@@ -29,7 +29,6 @@ setup(
             "firefox_driver = pytest_selenium.drivers.firefox",
             "ie_driver = pytest_selenium.drivers.internet_explorer",
             "remote_driver = pytest_selenium.drivers.remote",
-            "phantomjs_driver = pytest_selenium.drivers.phantomjs",
             "safari_driver = pytest_selenium.drivers.safari",
             "saucelabs_driver = pytest_selenium.drivers.saucelabs",
             "testingbot_driver = pytest_selenium.drivers.testingbot",
@@ -40,6 +39,7 @@ setup(
     extras_require={"appium": ["appium-python-client>=0.44"]},
     license="Mozilla Public License 2.0 (MPL 2.0)",
     keywords="py.test pytest selenium saucelabs browserstack webqa qa",
+    python_requires=">=3.6",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Pytest",
@@ -52,8 +52,8 @@ setup(
         "Topic :: Software Development :: Testing",
         "Topic :: Utilities",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 2.7",
         "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
     ],
 )
