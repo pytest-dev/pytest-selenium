@@ -3,9 +3,7 @@ jobs:
   include:
     - stage: Tests
       name: Linting
-      python: 3.7
-      dist: xenial
-      sudo: required
+      python: 3.8
       before_install: skip
       addons: skip
       env: TOXENV=linting
@@ -15,17 +13,10 @@ jobs:
 
     -
       name: Docs
-      python: 3.7
-      dist: xenial
-      sudo: required
+      python: 3.8
       before_install: skip
       addons: skip
       env: TOXENV=docs
-
-    -
-      name: python 2.7
-      python: 2.7
-      env: TOXENV=py27
 
     -
       name: python 3.6
@@ -35,14 +26,12 @@ jobs:
     -
       name: python 3.7
       python: 3.7
-      dist: xenial
-      sudo: required
       env: TOXENV=py37
 
     -
-      name: pypy
-      python: pypy
-      env: TOXENV=pypy
+      name: python 3.8
+      python: 3.8
+      env: TOXENV=py38
 
     -
       name: pypy3
@@ -50,9 +39,7 @@ jobs:
       env: TOXENV=pypy3
 
     - stage: deploy
-      python: 3.7
-      dist: xenial
-      sudo: required
+      python: 3.8
       before_install: skip
       install: skip
       script: skip
@@ -66,8 +53,6 @@ jobs:
         on:
           tags: true
           repo: pytest-dev/pytest-selenium
-
-sudo: required
 
 env:
   global:

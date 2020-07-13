@@ -4,7 +4,7 @@ Installation
 Requirements
 ------------
 
-pytest-selenium will work with Python >=3.6 and 2.7.
+pytest-selenium will work with Python >=3.6.
 
 Install pytest-selenium
 -----------------------

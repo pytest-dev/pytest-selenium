@@ -3,15 +3,9 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import os
-import sys
+import configparser
 
 from pytest_selenium.exceptions import MissingCloudCredentialError
-
-
-if sys.version_info[0] == 2:
-    import ConfigParser as configparser
-else:
-    import configparser
 
 
 class Provider(object):
