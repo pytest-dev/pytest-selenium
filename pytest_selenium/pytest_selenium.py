@@ -96,7 +96,12 @@ def session_capabilities(pytestconfig):
 
 @pytest.fixture
 def capabilities(
-    request, driver_class, chrome_options, firefox_options, session_capabilities
+    request,
+    driver_class,
+    chrome_options,
+    firefox_options,
+    edge_options,
+    session_capabilities,
 ):
     """Returns combined capabilities"""
     capabilities = copy.deepcopy(session_capabilities)  # make a copy
@@ -111,6 +116,9 @@ def capabilities(
         elif browser == "FIREFOX":
             key = firefox_options.KEY
             options = firefox_options.to_capabilities()
+        elif browser == "EDGE":
+            key = edge_options.KEY
+            options = edge_options.to_capabilities()
         if all([key, options]):
             capabilities[key] = _merge(capabilities.get(key, {}), options.get(key, {}))
     capabilities.update(get_capabilities_from_markers(request.node))
@@ -146,6 +154,7 @@ def driver_kwargs(
     driver_path,
     firefox_options,
     firefox_profile,
+    edge_options,
     pytestconfig,
 ):
     kwargs = {}
@@ -159,6 +168,7 @@ def driver_kwargs(
             driver_path=driver_path,
             firefox_options=firefox_options,
             firefox_profile=firefox_profile,
+            edge_options=edge_options,
             host=pytestconfig.getoption("host"),
             port=pytestconfig.getoption("port"),
             service_log_path=None,
@@ -166,6 +176,7 @@ def driver_kwargs(
             test=".".join(split_class_and_test_names(request.node.nodeid)),
         )
     )
+
     pytestconfig._driver_log = driver_log
     return kwargs
 
