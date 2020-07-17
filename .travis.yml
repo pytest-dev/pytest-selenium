@@ -56,7 +56,7 @@ jobs:
 
 env:
   global:
-  - PYTEST_ADDOPTS="-m 'not (edge or safari or phantomjs)'"
+  - PYTEST_ADDOPTS="-m 'not (edge or safari)'"
   - GECKODRIVER_FALLBACK_VERSION="v0.24.0"
 
 cache: pip
