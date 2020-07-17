@@ -7,7 +7,6 @@ import json
 
 from py.xml import html
 import pytest
-import requests
 
 from pytest_selenium.drivers.cloud import Provider
 
@@ -67,6 +66,9 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin("html")
     # Add the job URL to the HTML report
     extra.append(pytest_html.extras.url(job_url, "{0} Job".format(provider.name)))
+
+    # lazy import requests for projects that don't need requests
+    import requests
 
     try:
         # Update the job result

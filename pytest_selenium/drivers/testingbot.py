@@ -2,11 +2,11 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-import pytest
-import requests
-
 from hashlib import md5
+
+import pytest
 from py.xml import html
+
 from pytest_selenium.drivers.cloud import Provider
 
 HOST = "hub.testingbot.com"
@@ -71,6 +71,9 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin("html")
     # Add the job URL to the HTML report
     extra.append(pytest_html.extras.url(job_url, "{0} Job".format(provider.name)))
+
+    # lazy import requests for projects that don't need requests
+    import requests
 
     try:
         # Update the job result
