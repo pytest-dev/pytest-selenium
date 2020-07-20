@@ -51,7 +51,6 @@ def testdir(request, httpserver_base_url):
         filterwarnings =
             error::DeprecationWarning
             ignore:--firefox-\w+ has been deprecated:DeprecationWarning
-            ignore:Support for PhantomJS:DeprecationWarning
             ignore:desired_capabilities has been deprecated
             ignore:service_log_path has been deprecated
     """,
