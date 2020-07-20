@@ -10,6 +10,8 @@ Release Notes
 
 * Drop `PhantomJS` support
 
+* Add driver initialization retry
+
 
 1.17.0 (2019-07-13)
 -------------------

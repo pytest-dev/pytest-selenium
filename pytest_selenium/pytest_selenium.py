@@ -13,6 +13,7 @@ import pytest
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.support.event_firing_webdriver import EventFiringWebDriver
+from tenacity import Retrying, stop_after_attempt, wait_exponential
 
 from .utils import CaseInsensitiveDict
 from . import drivers
@@ -195,7 +196,16 @@ def driver_path(request):
 @pytest.fixture
 def driver(request, driver_class, driver_kwargs):
     """Returns a WebDriver instance based on options and capabilities"""
-    driver = driver_class(**driver_kwargs)
+
+    retries = int(request.config.getini("max_driver_init_attempts"))
+    for retry in Retrying(
+        stop=stop_after_attempt(retries), wait=wait_exponential(), reraise=True
+    ):
+        with retry:
+            LOGGER.info(
+                f"Driver init, attempt {retry.retry_state.attempt_number}/{retries}"
+            )
+            driver = driver_class(**driver_kwargs)
 
     event_listener = request.config.getoption("event_listener")
     if event_listener is not None:
@@ -409,6 +419,11 @@ def pytest_addoption(parser):
         default=os.getenv("SAUCELABS_JOB_AUTH", "none"),
     )
 
+    parser.addini(
+        "max_driver_init_attempts",
+        help="Maximum number of driver initialization attempts",
+        default=3,
+    )
     group = parser.getgroup("selenium", "selenium")
     group._addoption(
         "--driver",

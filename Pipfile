@@ -9,6 +9,9 @@ tox = "*"
 flake8 = "*"
 black = "*"
 pre-commit = "*"
+pytest-localserver = "*"
+pytest-xdist = "*"
+pytest-mock = "*"
 
 [packages]
 pytest-selenium = {editable = true,extras = ["appium"],path = "."}

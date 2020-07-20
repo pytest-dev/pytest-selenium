@@ -4,7 +4,10 @@
 
 from functools import partial
 
+import pytest_selenium
 import pytest
+
+from pytest_selenium.utils import CaseInsensitiveDict
 
 pytestmark = pytest.mark.nondestructive
 
@@ -180,3 +183,58 @@ def test_no_service_log_path(testdir):
     """
     )
     testdir.quick_qa("--driver", "Firefox", file_test, passed=1)
+
+
+def test_driver_retry_pass(testdir, mocker):
+    mocker.patch.dict(
+        pytest_selenium.SUPPORTED_DRIVERS,
+        CaseInsensitiveDict({"Firefox": mocker.MagicMock()}),
+    )
+    mock_retrying = mocker.spy(pytest_selenium.pytest_selenium, "Retrying")
+
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.nondestructive
+        def test_pass(driver):
+            assert driver
+    """
+    )
+
+    testdir.quick_qa("--driver", "Firefox", file_test, passed=1)
+    assert mock_retrying.spy_return.statistics["attempt_number"] == 1
+
+
+@pytest.mark.parametrize("max_num_attempts", [None, 2])
+def test_driver_retry_fail(testdir, mocker, max_num_attempts):
+    mocker.patch(
+        "pytest_selenium.webdriver.firefox.webdriver.FirefoxRemoteConnection",
+        side_effect=Exception("Connection Error"),
+    )
+    mocker.patch("pytest_selenium.webdriver.firefox.webdriver.Service")
+    mocker.patch("pytest_selenium.pytest_selenium.wait_exponential", return_value=0)
+    mock_retrying = mocker.spy(pytest_selenium.pytest_selenium, "Retrying")
+
+    default_attempts = 3
+    if max_num_attempts is not None:
+        testdir.makeini(
+            f"""
+            [pytest]
+            max_driver_init_attempts = {max_num_attempts}
+            """
+        )
+
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.nondestructive
+        def test_pass(driver):
+            assert True  # catch if this starts to pass
+        """
+    )
+
+    testdir.quick_qa("--driver", "Firefox", file_test, failed=1)
+    expected_attempts = max_num_attempts or default_attempts
+    assert mock_retrying.spy_return.statistics["attempt_number"] == expected_attempts
