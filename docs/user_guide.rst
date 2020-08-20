@@ -248,11 +248,11 @@ driver, as the accepted capabilities may differ::
   pytest --driver Remote --capability browserName firefox
 
 Note that if your server is not running locally or is running on an alternate
-port you will need to specify the ``--host`` and ``--port`` command line
+port you will need to specify the ``--selenium-host`` and ``--selenium-port`` command line
 options, or by setting the ``SELENIUM_HOST`` and ``SELENIUM_PORT`` environment
 variables::
 
-  pytest --driver Remote --host selenium.hostname --port 5555 --capability browserName firefox
+  pytest --driver Remote --selenium-host selenium.hostname --selenium-port 5555 --capability browserName firefox
 
 Sauce Labs
 ----------
@@ -428,7 +428,7 @@ Local tunnel
 ~~~~~~~~~~~~
 
 To run the tests using `TestingBot's local tunnel <https://testingbot.com/support/other/tunnel>`_
-you'll also need to set the ``--host`` and ``--port`` command line arguments.
+you'll also need to set the ``--selenium-host`` and ``--selenium-port`` command line arguments.
 
 CrossBrowserTesting
 -------------------
@@ -493,11 +493,11 @@ selection is determined using capabilities. Check the
 for details of accepted values.
 
 Note that if your Appium server is not running locally or is running on an
-alternate port you will need to specify the ``--host`` and ``--port``
+alternate port you will need to specify the ``--selenium-host`` and ``--selenium-port``
 command line options, or by setting the ``APPIUM_HOST`` and ``APPIUM_PORT``
 environment variables::
 
-  pytest --driver Appium --host appium.hostname --port 5555
+  pytest --driver Appium --selenium-host appium.hostname --selenium-port 5555
 
 Specifying Capabilities
 ***********************

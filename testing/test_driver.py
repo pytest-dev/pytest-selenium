@@ -106,7 +106,11 @@ def test_default_host_port(testdir):
     testdir.quick_qa("--driver", "Remote", file_test, passed=1)
 
 
-def test_arguments_order(testdir):
+@pytest.mark.parametrize(
+    ("host_arg_name", "port_arg_name"),
+    [("--selenium-host", "--selenium-port"), ("--host", "--port")],
+)
+def test_arguments_order(testdir, host_arg_name, port_arg_name):
     host = "notlocalhost"
     port = "4441"
     file_test = testdir.makepyfile(
@@ -120,7 +124,14 @@ def test_arguments_order(testdir):
         )
     )
     testdir.quick_qa(
-        "--driver", "Remote", "--host", host, "--port", port, file_test, passed=1
+        "--driver",
+        "Remote",
+        host_arg_name,
+        host,
+        port_arg_name,
+        port,
+        file_test,
+        passed=1,
     )
 
 
@@ -138,7 +149,14 @@ def test_arguments_order_random(testdir):
         )
     )
     testdir.quick_qa(
-        "--host", host, "--driver", "Remote", "--port", port, file_test, passed=1
+        "--selenium-host",
+        host,
+        "--driver",
+        "Remote",
+        "--selenium-port",
+        port,
+        file_test,
+        passed=1,
     )
 
 
