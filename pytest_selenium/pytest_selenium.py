@@ -18,6 +18,8 @@ from tenacity import Retrying, stop_after_attempt, wait_exponential
 from .utils import CaseInsensitiveDict
 from . import drivers
 
+import warnings
+
 LOGGER = logging.getLogger(__name__)
 
 SUPPORTED_DRIVERS = CaseInsensitiveDict(
@@ -162,8 +164,8 @@ def driver_kwargs(
             firefox_options=firefox_options,
             firefox_profile=firefox_profile,
             edge_options=edge_options,
-            host=pytestconfig.getoption("host"),
-            port=pytestconfig.getoption("port"),
+            host=pytestconfig.getoption("selenium_host"),
+            port=pytestconfig.getoption("selenium_port"),
             service_log_path=None,
             request=request,
             test=".".join(split_class_and_test_names(request.node.nodeid)),
@@ -228,6 +230,22 @@ def selenium(driver):
 
 @pytest.hookimpl(trylast=True)
 def pytest_configure(config):
+    if config.getoption("host"):
+        warnings.warn(
+            "--host has been deprecated and will be removed in a "
+            "future release. Please use --selenium-host instead.",
+            DeprecationWarning,
+        )
+        config.option.selenium_host = config.getoption("host")
+
+    if config.getoption("port"):
+        warnings.warn(
+            "--port has been deprecated and will be removed in a "
+            "future release. Please use --selenium-port instead.",
+            DeprecationWarning,
+        )
+        config.option.selenium_port = config.getoption("port")
+
     capabilities = config._variables.get("capabilities", {})
     capabilities.update({k: v for k, v in config.getoption("capabilities")})
     config.addinivalue_line(
@@ -241,9 +259,9 @@ def pytest_configure(config):
     if hasattr(config, "_metadata"):
         config._metadata["Driver"] = config.getoption("driver")
         config._metadata["Capabilities"] = capabilities
-        if all((config.getoption("host"), config.getoption("port"))):
+        if all((config.option.selenium_host, config.option.selenium_port)):
             config._metadata["Server"] = "{0}:{1}".format(
-                config.getoption("host"), config.getoption("port")
+                config.option.selenium_host, config.option.selenium_port
             )
     config._capabilities = capabilities
 
@@ -395,8 +413,12 @@ class DriverAction(argparse.Action):
         setattr(namespace, self.dest, values)
         driver = getattr(drivers, values.lower())
         # set the default host and port if specified in the driver module
-        namespace.host = namespace.host or getattr(driver, "HOST", None)
-        namespace.port = namespace.port or getattr(driver, "PORT", None)
+        namespace.selenium_host = namespace.selenium_host or getattr(
+            driver, "HOST", None
+        )
+        namespace.selenium_port = namespace.selenium_port or getattr(
+            driver, "PORT", None
+        )
 
 
 def pytest_addoption(parser):
@@ -453,12 +475,27 @@ def pytest_addoption(parser):
     group._addoption(
         "--host",
         metavar="str",
-        help="host that the selenium server is listening on, "
+        help="DEPRECATED host that the selenium server is listening on, "
         "which will default to the cloud provider default "
         "or localhost.",
     )
     group._addoption(
         "--port",
+        type=int,
+        metavar="num",
+        help="DEPRECATED port that the selenium server is listening on, "
+        "which will default to the cloud provider default "
+        "or localhost.",
+    )
+    group._addoption(
+        "--selenium-host",
+        metavar="str",
+        help="host that the selenium server is listening on, "
+        "which will default to the cloud provider default "
+        "or localhost.",
+    )
+    group._addoption(
+        "--selenium-port",
         type=int,
         metavar="num",
         help="port that the selenium server is listening on, "

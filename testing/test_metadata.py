@@ -23,7 +23,11 @@ def test_metadata_default_host_port(testdir):
     testdir.quick_qa("--driver", "Remote", file_test, passed=1)
 
 
-def test_metadata_host_port(testdir):
+@pytest.mark.parametrize(
+    ("host_arg_name", "port_arg_name"),
+    [("--selenium-host", "--selenium-port"), ("--host", "--port")],
+)
+def test_metadata_host_port(testdir, host_arg_name, port_arg_name):
     host = "notlocalhost"
     port = "4441"
     file_test = testdir.makepyfile(
@@ -37,5 +41,12 @@ def test_metadata_host_port(testdir):
         )
     )
     testdir.quick_qa(
-        "--driver", "Remote", "--host", host, "--port", port, file_test, passed=1
+        "--driver",
+        "Remote",
+        host_arg_name,
+        host,
+        port_arg_name,
+        port,
+        file_test,
+        passed=1,
     )

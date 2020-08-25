@@ -85,7 +85,7 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
 def test_invalid_host(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     tmpdir.join(".testingbot").write("[credentials]\nkey=foo\nsecret=bar")
-    out = failure("--host", "foo.bar.com")
+    out = failure("--selenium-host", "foo.bar.com")
     messages = [
         "nodename nor servname provided, or not known",
         "Name or service not known",
