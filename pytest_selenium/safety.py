@@ -21,8 +21,6 @@ def pytest_addoption(parser):
 
 
 def pytest_configure(config):
-    if hasattr(config, "workerinput"):
-        return  # avoid doing anything if this is an xdist worker node
     config.option.sensitive_url = (
         config.getoption("sensitive_url")
         or config.getini("sensitive_url")
