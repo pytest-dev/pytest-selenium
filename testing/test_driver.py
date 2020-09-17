@@ -256,3 +256,16 @@ def test_driver_retry_fail(testdir, mocker, max_num_attempts):
     testdir.quick_qa("--driver", "Firefox", file_test, failed=1)
     expected_attempts = max_num_attempts or default_attempts
     assert mock_retrying.spy_return.statistics["attempt_number"] == expected_attempts
+
+
+def test_xdist(testdir):
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+
+        @pytest.mark.nondestructive
+        def test_xdist(driver):
+            pass
+    """
+    )
+    testdir.quick_qa("--driver", "firefox", "-n", "2", file_test, passed=1)
