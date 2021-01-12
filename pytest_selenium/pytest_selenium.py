@@ -112,7 +112,7 @@ def capabilities(
             key = firefox_options.KEY
             options = firefox_options.to_capabilities()
         elif browser == "EDGE":
-            key = edge_options.KEY
+            key = getattr(edge_options, "KEY", None)
             options = edge_options.to_capabilities()
         if all([key, options]):
             capabilities[key] = _merge(capabilities.get(key, {}), options.get(key, {}))
