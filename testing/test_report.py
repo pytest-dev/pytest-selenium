@@ -18,10 +18,11 @@ if LooseVersion(PYTEST_HTML_VERSION) < LooseVersion("2.0.0"):
     SCREENSHOT_LINK_REGEX = '<a class="image" href=".*" target="_blank">Screenshot</a>'
     SCREENSHOT_REGEX = '<div class="image"><a href=".*"><img src=".*"/></a></div>'
 else:
-    SCREENSHOT_LINK_REGEX = '<a class="image" href=".*" target="_blank"></a>'
-    SCREENSHOT_REGEX = (
-        '<div class="image"><a class="image" href=".*" target="_blank"></a></div>'
+    SCREENSHOT_LINK_REGEX = (
+        '<a class="image" href=".*" target="_blank"><img src=".*"/></a>'
     )
+    SCREENSHOT_REGEX = '<div class="image"><a class="image" href=".*" target="_blank">'
+    '<img src=".*"/></a></div>'
 
 LOGS_REGEX = '<a class="text" href=".*" target="_blank">.* Log</a>'
 HTML_REGEX = '<a class="text" href=".*" target="_blank">HTML</a>'
