@@ -2,6 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
+from contextlib import ExitStack as does_not_raise
 from functools import partial
 
 import pytest_selenium
@@ -107,10 +108,13 @@ def test_default_host_port(testdir):
 
 
 @pytest.mark.parametrize(
-    ("host_arg_name", "port_arg_name"),
-    [("--selenium-host", "--selenium-port"), ("--host", "--port")],
+    ("host_arg_name", "port_arg_name", "context"),
+    [
+        ("--selenium-host", "--selenium-port", does_not_raise()),
+        ("--host", "--port", pytest.warns(DeprecationWarning)),
+    ],
 )
-def test_arguments_order(testdir, host_arg_name, port_arg_name):
+def test_arguments_order(testdir, host_arg_name, port_arg_name, context):
     host = "notlocalhost"
     port = "4441"
     file_test = testdir.makepyfile(
@@ -123,16 +127,17 @@ def test_arguments_order(testdir, host_arg_name, port_arg_name):
             host, port
         )
     )
-    testdir.quick_qa(
-        "--driver",
-        "Remote",
-        host_arg_name,
-        host,
-        port_arg_name,
-        port,
-        file_test,
-        passed=1,
-    )
+    with context:
+        testdir.quick_qa(
+            "--driver",
+            "Remote",
+            host_arg_name,
+            host,
+            port_arg_name,
+            port,
+            file_test,
+            passed=1,
+        )
 
 
 def test_arguments_order_random(testdir):
