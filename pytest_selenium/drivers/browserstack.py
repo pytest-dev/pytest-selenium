@@ -5,11 +5,12 @@
 import pytest
 
 from pytest_selenium.drivers.cloud import Provider
+from pytest_selenium.exceptions import MissingCloudSettingError
 
 
 class BrowserStack(Provider):
 
-    API = "https://www.browserstack.com/automate/sessions/{session}.json"
+    API = "https://api.browserstack.com/automate/sessions/{session}.json"
 
     @property
     def auth(self):
@@ -31,6 +32,21 @@ class BrowserStack(Provider):
             "key", ["BROWSERSTACK_ACCESS_KEY", "BROWSERSTACK_PSW"]
         )
 
+    @property
+    def job_access(self):
+        """Get job url field, private(required authentication) or public."""
+        try:
+            field = self.get_setting(
+                key="job_access",
+                envs=["BROWSERSTACK_JOB_ACCESS"],
+                section="report",
+                allowed_values=["browser_url", "public_url"],
+            )
+        except MissingCloudSettingError:
+            field = "browser_url"
+
+        return field
+
 
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
@@ -47,7 +63,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 
     try:
         job_info = requests.get(api_url, auth=provider.auth, timeout=10).json()
-        job_url = job_info["automation_session"]["browser_url"]
+        job_url = job_info["automation_session"][provider.job_access]
         # Add the job URL to the summary
         summary.append("{0} Job: {1}".format(provider.name, job_url))
         pytest_html = item.config.pluginmanager.getplugin("html")
@@ -79,6 +95,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 
 def driver_kwargs(request, test, capabilities, **kwargs):
     provider = BrowserStack()
+    assert provider.job_access
     capabilities.setdefault("name", test)
     capabilities.setdefault("browserstack.user", provider.username)
     capabilities.setdefault("browserstack.key", provider.key)

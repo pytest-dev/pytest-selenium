@@ -80,3 +80,9 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     out = failure()
     messages = ["Invalid username or password", "basic auth failed"]
     assert any(message in out for message in messages)
+
+
+def test_invalid_job_access_value(failure, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
+    tmpdir.join(".browserstack").write("[report]\njob_access=foo")
+    assert "BrowserStack job_access invalid value `foo`" in failure()

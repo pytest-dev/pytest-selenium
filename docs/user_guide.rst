@@ -378,6 +378,24 @@ See the
 for additional configuration that can be set using ``--capability`` command line
 arguments.
 
+Test result links
+~~~~~~~~~~~~~~~~~
+
+By default, links to BrowserStack jobs are only visible to users logged in to the account
+that ran the job. You can choose to display a public URL in the pytest summary.
+
+This can be configured by setting the ``BROWSERSTACK_JOB_ACCESS`` environment variable or by
+adding ``report`` section in ``.browserstack`` configuration file.
+Allowed values are ``browser_url`` for private access and ``public_url`` for everyone.
+
+An example using a configuration file:
+
+.. code-block:: ini
+
+  [report]
+  job_access = browser_url
+
+
 TestingBot
 ----------
 
