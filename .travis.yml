@@ -34,6 +34,11 @@ jobs:
       env: TOXENV=py38
 
     -
+      name: python 3.9
+      python: 3.9
+      env: TOXENV=py39
+
+    -
       name: pypy3
       python: pypy3
       env: TOXENV=pypy3
