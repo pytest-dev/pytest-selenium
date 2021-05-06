@@ -14,7 +14,7 @@ setup(
         "pytest-base-url",
         "pytest-html>=1.14.0",
         "pytest-variables>=1.5.0",
-        "selenium>=3.0.0",
+        "selenium>=4.0.0.b3",
         "requests",
         "tenacity>=6,<7",
     ],
