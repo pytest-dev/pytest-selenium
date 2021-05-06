@@ -40,7 +40,7 @@ setup(
     extras_require={"appium": ["appium-python-client>=0.44"]},
     license="Mozilla Public License 2.0 (MPL 2.0)",
     keywords="py.test pytest selenium saucelabs browserstack webqa qa",
-    python_requires=">=3.6",
+    python_requires=">=3.7",
     classifiers=[
         "Development Status :: 5 - Production/Stable",
         "Framework :: Pytest",
@@ -53,8 +53,8 @@ setup(
         "Topic :: Software Development :: Testing",
         "Topic :: Utilities",
         "Programming Language :: Python",
-        "Programming Language :: Python :: 3.6",
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
     ],
 )
