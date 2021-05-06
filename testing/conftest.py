@@ -51,9 +51,13 @@ def testdir(request, httpserver_base_url):
         filterwarnings =
             error::DeprecationWarning
             ignore:--firefox-\w+ has been deprecated:DeprecationWarning
+            ignore:capabilities and desired_capabilities have been deprecated, please pass in a Service object:DeprecationWarning
+            ignore:firefox_profile has been deprecated, please use an Options object:DeprecationWarning
+            ignore:Setting a profile has been deprecated. Please use the set_preference and install_addons methods:DeprecationWarning
+            ignore:Getting a profile has been deprecated.:DeprecationWarning
             ignore:desired_capabilities has been deprecated
             ignore:service_log_path has been deprecated
-    """,
+    """,  # noqa: E501
     )
 
     def runpytestqa(*args, **kwargs):
