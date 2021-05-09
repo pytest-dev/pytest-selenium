@@ -66,7 +66,6 @@ def test_missing_secret_file(failure, monkeypatch, tmpdir):
     [("TESTINGBOT_KEY", "TESTINGBOT_SECRET"), ("TESTINGBOT_PSW", "TESTINGBOT_USR")],
 )
 def test_invalid_credentials_env(failure, monkeypatch, tmpdir, key, secret):
-    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     monkeypatch.setenv(key, "foo")
     monkeypatch.setenv(secret, "bar")
     out = failure()

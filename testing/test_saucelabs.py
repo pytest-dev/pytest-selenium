@@ -68,7 +68,6 @@ def test_missing_api_key_file(failure, monkeypatch, tmpdir):
     ],
 )
 def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
-    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     monkeypatch.setenv(username, "foo")
     monkeypatch.setenv(key, "bar")
     out = failure()
