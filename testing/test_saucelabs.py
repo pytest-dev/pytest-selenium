@@ -8,6 +8,8 @@ import json
 
 import pytest
 
+from pytest_selenium.drivers.cloud import Provider
+
 pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
 
@@ -76,8 +78,9 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
 
 
 def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
-    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
-    tmpdir.join(".saucelabs").write("[credentials]\nusername=foo\nkey=bar")
+    cfg_file = tmpdir.join(".saucelabs")
+    cfg_file.write("[credentials]\nusername=foo\nkey=bar")
+    monkeypatch.setattr(Provider, "config_file_path", str(cfg_file))
     out = failure()
     messages = ["Sauce Labs Authentication Error", "basic auth failed"]
     assert any(message in out for message in messages)
