@@ -16,7 +16,7 @@ setup(
         "pytest-variables>=1.5.0",
         "selenium>=3.0.0",
         "requests",
-        "tenacity>=6,<7",
+        "tenacity>=6,<8.1",
     ],
     entry_points={
         "pytest11": [
