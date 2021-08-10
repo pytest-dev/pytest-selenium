@@ -15,3 +15,6 @@ pytest-mock = "*"
 
 [packages]
 pytest-selenium = {editable = true,extras = ["appium"],path = "."}
+
+[pipenv]
+allow_prereleases = true
