@@ -9,7 +9,7 @@ To setup the virtual environment and pre-commit, run:
 
 .. code-block:: bash
 
-  $ pipenv install --dev
+  $ pipenv install --dev --pre
   $ pipenv run pre-commit install
 
 If you're not using `Pipenv`_, to install `pre-commit`, run:
