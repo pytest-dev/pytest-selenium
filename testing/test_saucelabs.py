@@ -211,12 +211,23 @@ def test_auth_type_expiration(monkeypatch, auth_type):
     assert re.match(expected_pattern, actual)
 
 
+def test_default_data_centre(monkeypatch):
+    from pytest_selenium.drivers.saucelabs import SauceLabs
+
+    provider = SauceLabs()
+
+    expected = "us-west-1"
+    actual = provider.data_centre
+
+    assert expected in actual
+
+
 class Config(object):
     def __init__(self, value):
         self._value = value
 
     def getini(self, key):
-        if key == "saucelabs_job_auth":
+        if key == "saucelabs_job_auth" or "sauce_labs_data_centre":
             return self._value
         else:
             raise KeyError

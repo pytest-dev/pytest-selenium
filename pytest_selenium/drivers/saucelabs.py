@@ -12,9 +12,12 @@ from pytest_selenium.drivers.cloud import Provider
 
 
 class SauceLabs(Provider):
-
-    API = "https://saucelabs.com/rest/v1/{username}/jobs/{session}"
-    JOB = "https://saucelabs.com/jobs/{session}"
+    def __init__(self, data_centre="us-west-1"):
+        self.data_centre = data_centre
+        self.API = "https://{}.saucelabs.com/rest/v1/{username}/jobs/{session}".format(
+            data_centre
+        )
+        self.JOB = "https://{}.saucelabs.com/jobs/{session}".format(data_centre)
 
     @property
     def auth(self):
@@ -22,7 +25,7 @@ class SauceLabs(Provider):
 
     @property
     def executor(self):
-        return "https://ondemand.saucelabs.com/wd/hub"
+        return "https://{}.ondemand.saucelabs.com/wd/hub".format(self.data_centre)
 
     @property
     def username(self):
@@ -52,7 +55,7 @@ def pytest_selenium_capture_debug(item, report, extra):
 
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
-    provider = SauceLabs()
+    provider = SauceLabs(item.config.getoption("data_centre"))
     if not provider.uses_driver(item.config.getoption("driver")):
         return
 
@@ -60,7 +63,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
     session_id = item._driver.session_id
 
     # Add the job URL to the summary
-    provider = SauceLabs()
+    provider = SauceLabs(item.config.getoption("data_centre"))
     job_url = get_job_url(item.config, provider, session_id)
     summary.append("{0} Job: {1}".format(provider.name, job_url))
     pytest_html = item.config.pluginmanager.getplugin("html")
@@ -85,7 +88,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 
 
 def driver_kwargs(request, test, capabilities, **kwargs):
-    provider = SauceLabs()
+    provider = SauceLabs(request.config.option.data_centre)
 
     _capabilities = capabilities
     if os.getenv("SAUCELABS_W3C") == "true":
