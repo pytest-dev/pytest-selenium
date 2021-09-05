@@ -7,6 +7,8 @@ import pytest
 from selenium import __version__ as SELENIUM_VERSION
 from selenium.webdriver.edge.options import Options
 
+from pytest_selenium.pytest_selenium import determine_scope
+
 
 def driver_kwargs(capabilities, driver_log, driver_path, edge_options, **kwargs):
 
@@ -27,6 +29,6 @@ def driver_kwargs(capabilities, driver_log, driver_path, edge_options, **kwargs)
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def edge_options():
     return Options()

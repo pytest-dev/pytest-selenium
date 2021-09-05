@@ -8,6 +8,7 @@ from datetime import datetime
 import os
 import io
 import logging
+import py
 
 import pytest
 from selenium import webdriver
@@ -68,6 +69,12 @@ def _merge(a, b):
     return a
 
 
+def determine_scope(fixture_name, config):
+    if config.getoption("--selenium-session-scope", False):
+        return "session"
+    return "function"
+
+
 def pytest_addhooks(pluginmanager):
     from . import hooks
 
@@ -89,7 +96,7 @@ def session_capabilities(pytestconfig):
     return capabilities
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def capabilities(
     request,
     driver_class,
@@ -132,13 +139,13 @@ def get_capabilities_from_markers(node):
     return capabilities
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def driver_args():
     """Return arguments to pass to the driver service"""
     return None
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def driver_kwargs(
     request,
     capabilities,
@@ -184,18 +191,23 @@ def driver_class(request):
     return SUPPORTED_DRIVERS[driver]
 
 
-@pytest.fixture
-def driver_log(tmpdir):
-    """Return path to driver log"""
-    return str(tmpdir.join("driver.log"))
+@pytest.fixture(scope=determine_scope)
+def driver_log(tmp_path_factory, request):
+    """
+    Return path to driver log using a (session scoped) tmp_path_factory
+    but returning a legacy `py.path.local` object to maintain compatibility.
+    """
+    test_name = getattr(request.node, "name", "unknown")
+    tmp_path = py.path.local(tmp_path_factory.mktemp(test_name))
+    return str(tmp_path.join("driver.log"))
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def driver_path(request):
     return request.config.getoption("driver_path")
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def driver(request, driver_class, driver_kwargs):
     """Returns a WebDriver instance based on options and capabilities"""
 
@@ -223,7 +235,7 @@ def driver(request, driver_class, driver_kwargs):
     driver.quit()
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def selenium(driver):
     yield driver
 
@@ -501,4 +513,9 @@ def pytest_addoption(parser):
         help="port that the selenium server is listening on, "
         "which will default to the cloud provider default "
         "or localhost.",
+    )
+    group._addoption(
+        "--selenium-session-scope",
+        action="store_true",
+        help="Use session scope for all Selenium fixtures.",
     )

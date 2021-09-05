@@ -7,6 +7,8 @@ import pytest
 from selenium import __version__ as SELENIUM_VERSION
 from selenium.webdriver.chrome.options import Options
 
+from pytest_selenium.pytest_selenium import determine_scope
+
 
 def driver_kwargs(
     capabilities, driver_args, driver_log, driver_path, chrome_options, **kwargs
@@ -26,6 +28,6 @@ def driver_kwargs(
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def chrome_options():
     return Options()

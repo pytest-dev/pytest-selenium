@@ -11,6 +11,8 @@ from selenium.webdriver import FirefoxProfile
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 from selenium.webdriver.firefox.options import Options
 
+from pytest_selenium.pytest_selenium import determine_scope
+
 LOGGER = logging.getLogger(__name__)
 
 
@@ -78,7 +80,7 @@ def driver_kwargs(capabilities, driver_log, driver_path, firefox_options, **kwar
     return kwargs
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def firefox_options(request, firefox_path, firefox_profile):
     options = Options()
 
@@ -111,7 +113,7 @@ def get_preferences_from_markers(node):
     return preferences
 
 
-@pytest.fixture(scope="session")
+@pytest.fixture(scope=determine_scope)
 def firefox_path(pytestconfig):
     if pytestconfig.getoption("firefox_path"):
         warnings.warn(
@@ -125,7 +127,7 @@ def firefox_path(pytestconfig):
         return pytestconfig.getoption("firefox_path")
 
 
-@pytest.fixture
+@pytest.fixture(scope=determine_scope)
 def firefox_profile(pytestconfig):
     profile = None
     if pytestconfig.getoption("firefox_profile"):

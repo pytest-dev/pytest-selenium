@@ -25,6 +25,14 @@ support for running `Selenium <http://seleniumhq.org/>`_ based tests.
    :target: https://requires.io/github/pytest-dev/pytest-selenium/requirements/?branch=master
    :alt: Requirements
 
+Development
+------------
+To install the development dependencies locally you'll need to run Pipenv like this:
+
+    ``pipenv lock --dev --pre``
+
+This is because ``black`` is still in a pre-release state.
+
 Resources
 ---------
 
