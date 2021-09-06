@@ -21,6 +21,18 @@ def testfile(testdir):
     )
 
 
+@pytest.fixture
+def testfile_scopes(testdir):
+    return testdir.makepyfile(
+        """
+        import pytest
+        @pytest.mark.nondestructive
+        def test_chrome_options(chrome_options):
+            assert chrome_options
+    """
+    )
+
+
 def test_command_line(testfile, testdir):
     testdir.quick_qa("--capability", "foo", "bar", testfile, passed=1)
 
@@ -62,6 +74,22 @@ def test_fixture(testfile, testdir):
     """
     )
     testdir.quick_qa(testfile, passed=1)
+
+
+def test_session_scoped_fixture(testfile_scopes, testdir):
+    testdir.makeconftest(
+        """
+        import pytest
+        @pytest.fixture(scope='session')
+        def chrome_options(chrome_options):
+            chrome_options.add_argument('--headless')
+            return chrome_options
+    """
+    )
+    testdir.quick_qa(testfile_scopes, failed=1)
+    testdir.quick_qa(
+        "--selenium-session-scope", testfile_scopes, passed=1
+    )
 
 
 def test_mark(testdir):
