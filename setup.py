@@ -15,7 +15,7 @@ setup(
         "pytest-html>=1.14.0",
         "pytest-variables>=1.5.0",
         "selenium>=3.0.0,<4.0.0;python_version=='3.6'",
-        "selenium>=4.0.0.rc1;python_version>'3.6'",
+        "selenium>=4.0.0;python_version>'3.6'",
         "requests",
         "tenacity>=6,<7",
     ],
