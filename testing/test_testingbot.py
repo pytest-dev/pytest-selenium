@@ -89,6 +89,7 @@ def test_invalid_host(failure, monkeypatch, tmpdir):
     messages = [
         "nodename nor servname provided, or not known",
         "Name or service not known",
+        "No address associated with hostname",
     ]
     assert any(message in out for message in messages)
 

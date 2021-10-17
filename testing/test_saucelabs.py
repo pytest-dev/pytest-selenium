@@ -72,7 +72,7 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setenv(username, "foo")
     monkeypatch.setenv(key, "bar")
     out = failure()
-    messages = ["Sauce Labs Authentication Error", "basic auth failed"]
+    messages = ["Sauce Labs Authentication Error", "basic auth failed", "Unauthorized"]
     assert any(message in out for message in messages)
 
 
@@ -80,7 +80,7 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     tmpdir.join(".saucelabs").write("[credentials]\nusername=foo\nkey=bar")
     out = failure()
-    messages = ["Sauce Labs Authentication Error", "basic auth failed"]
+    messages = ["Sauce Labs Authentication Error", "basic auth failed", "Unauthorized"]
     assert any(message in out for message in messages)
 
 
@@ -190,7 +190,7 @@ def test_auth_type_none(monkeypatch):
     monkeypatch.setenv("SAUCELABS_API_KEY", "bar")
 
     session_id = "123456"
-    expected = "https://saucelabs.com/jobs/{}".format(session_id)
+    expected = "https://api.us-west-1.saucelabs.com/v1/jobs/{}".format(session_id)
     actual = get_job_url(Config("none"), SauceLabs(), session_id)
     assert actual == expected
 
@@ -205,10 +205,79 @@ def test_auth_type_expiration(monkeypatch, auth_type):
 
     session_id = "123456"
     expected_pattern = (
-        r"https://saucelabs\.com/jobs/" r"{}\?auth=[a-f0-9]{{32}}$".format(session_id)
+        r"https://api.us-west-1.saucelabs\.com/v1/jobs/"
+        r"{}\?auth=[a-f0-9]{{32}}$".format(session_id)
     )
     actual = get_job_url(Config(auth_type), SauceLabs(), session_id)
     assert re.match(expected_pattern, actual)
+
+
+def test_data_center_option(testdir, monkeypatch):
+    monkeypatch.setenv("SAUCELABS_USERNAME", "foo")
+    monkeypatch.setenv("SAUCELABS_API_KEY", "bar")
+
+    expected_data_center = "us-east-1"
+    testdir.makeini(
+        f"""
+        [pytest]
+        saucelabs_data_center = {expected_data_center}
+    """
+    )
+
+    file_test = testdir.makepyfile(
+        f"""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert "{expected_data_center}" in driver_kwargs['command_executor']
+    """
+    )
+    testdir.quick_qa("--driver", "SauceLabs", file_test, passed=1)
+
+
+def test_data_center_option_file(testdir, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
+    monkeypatch.setenv("SAUCELABS_USERNAME", "foo")
+    monkeypatch.setenv("SAUCELABS_API_KEY", "bar")
+
+    expected_data_center = "us-east-1"
+    tmpdir.join(".saucelabs").write(f"[options]\ndata_center={expected_data_center}")
+
+    file_test = testdir.makepyfile(
+        f"""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert "{expected_data_center}" in driver_kwargs['command_executor']
+    """
+    )
+    testdir.quick_qa("--driver", "SauceLabs", file_test, passed=1)
+
+
+def test_data_center_option_precedence(testdir, monkeypatch, tmpdir):
+    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
+    monkeypatch.setenv("SAUCELABS_USERNAME", "foo")
+    monkeypatch.setenv("SAUCELABS_API_KEY", "bar")
+
+    expected_data_center = "us-east-1"
+    tmpdir.join(".saucelabs").write(f"[options]\ndata_center={expected_data_center}")
+
+    testdir.makeini(
+        f"""
+        [pytest]
+        saucelabs_data_center = "ap-east-1"
+    """
+    )
+
+    file_test = testdir.makepyfile(
+        f"""
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert "{expected_data_center}" in driver_kwargs['command_executor']
+    """
+    )
+    testdir.quick_qa("--driver", "SauceLabs", file_test, passed=1)
 
 
 class Config(object):

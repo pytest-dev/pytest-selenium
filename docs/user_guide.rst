@@ -279,6 +279,15 @@ For more information, see `using environment variables in Jenkins pipelines`_.
 Configuration
 ~~~~~~~~~~~~~
 
+Sauce Labs provides multiple `data center endpoints <https://docs.saucelabs.com/basics/data-center-endpoints/>`_.
+The default is ``us-west-1``.
+
+To override the default you can either set the ``data_center`` option under the ``options`` section in the
+``.saucelabs`` configuration file or by setting ``saucelabs_data_center``
+in :ref:`configuration file <configuration-files>`.
+
+Note that the value set in ``.saucelabs`` takes precedence.
+
 Below is an example ``.saucelabs`` configuration file:
 
 .. code-block:: ini
@@ -286,6 +295,9 @@ Below is an example ``.saucelabs`` configuration file:
   [credentials]
   username = username
   key = secret
+
+  [options]
+  data_center = us-east-1
 
 Running tests
 ~~~~~~~~~~~~~

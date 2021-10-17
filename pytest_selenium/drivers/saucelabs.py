@@ -9,20 +9,32 @@ from py.xml import html
 import pytest
 
 from pytest_selenium.drivers.cloud import Provider
+from pytest_selenium.exceptions import MissingCloudSettingError
 
 
 class SauceLabs(Provider):
 
-    API = "https://saucelabs.com/rest/v1/{username}/jobs/{session}"
-    JOB = "https://saucelabs.com/jobs/{session}"
+    API = "https://api.{data_center}.saucelabs.com/v1/{username}/jobs/{session}"
+    JOB = "https://api.{data_center}.saucelabs.com/v1/jobs/{session}"
+
+    def __init__(self, data_center="us-west-1"):
+        super(SauceLabs, self).__init__()
+        self._data_center = data_center
 
     @property
     def auth(self):
         return self.username, self.key
 
     @property
+    def data_center(self):
+        try:
+            return self.get_setting("data_center", [], "options")
+        except MissingCloudSettingError:
+            return self._data_center
+
+    @property
     def executor(self):
-        return "https://ondemand.saucelabs.com/wd/hub"
+        return f"https://ondemand.{self.data_center}.saucelabs.com/wd/hub"
 
     @property
     def username(self):
@@ -42,7 +54,7 @@ class SauceLabs(Provider):
 
 @pytest.mark.optionalhook
 def pytest_selenium_capture_debug(item, report, extra):
-    provider = SauceLabs()
+    provider = SauceLabs(item.config.getini("saucelabs_data_center"))
     if not provider.uses_driver(item.config.getoption("driver")):
         return
 
@@ -52,7 +64,7 @@ def pytest_selenium_capture_debug(item, report, extra):
 
 @pytest.mark.optionalhook
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
-    provider = SauceLabs()
+    provider = SauceLabs(item.config.getini("saucelabs_data_center"))
     if not provider.uses_driver(item.config.getoption("driver")):
         return
 
@@ -60,7 +72,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
     session_id = item._driver.session_id
 
     # Add the job URL to the summary
-    provider = SauceLabs()
+    provider = SauceLabs(item.config.getini("saucelabs_data_center"))
     job_url = get_job_url(item.config, provider, session_id)
     summary.append("{0} Job: {1}".format(provider.name, job_url))
     pytest_html = item.config.pluginmanager.getplugin("html")
@@ -72,7 +84,11 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 
     try:
         # Update the job result
-        api_url = provider.API.format(session=session_id, username=provider.username)
+        api_url = provider.API.format(
+            session=session_id,
+            username=provider.username,
+            data_center=provider.data_center,
+        )
         job_info = requests.get(api_url, auth=provider.auth, timeout=10).json()
         if report.when == "setup" or job_info.get("passed") is not False:
             # Only update the result if it's not already marked as failed
@@ -85,7 +101,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 
 
 def driver_kwargs(request, test, capabilities, **kwargs):
-    provider = SauceLabs()
+    provider = SauceLabs(request.config.getini("saucelabs_data_center"))
 
     _capabilities = capabilities
     if os.getenv("SAUCELABS_W3C") == "true":
@@ -161,7 +177,7 @@ def _video_html(session):
 def get_job_url(config, provider, session_id):
     from datetime import datetime
 
-    job_url = provider.JOB.format(session=session_id)
+    job_url = provider.JOB.format(session=session_id, data_center=provider.data_center)
     job_auth = config.getini("saucelabs_job_auth").lower()
 
     if job_auth == "none":
