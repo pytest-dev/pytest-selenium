@@ -1,0 +1,25 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - "*.*.*"
+
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.9
+
+      - name: Install Poetry
+        run: curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/5d0faf96176d9f24b310df5d6c245f08690fda5a/get-poetry.py | python -
+
+      - name: Build project
+        run: poetry build
