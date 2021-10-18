@@ -4,8 +4,8 @@
 
 
 def pytest_selenium_capture_debug(item, report, extra):
-    """ Called when gathering debug information for the HTML report. """
+    """Called when gathering debug information for the HTML report."""
 
 
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
-    """ Called when making the HTML report. """
+    """Called when making the HTML report."""

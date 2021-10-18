@@ -1,0 +1,34 @@
+[build-system]
+requires = [
+    # sync with setup.py until we discard non-pep-517/518
+    "setuptools>=45.0",
+    "setuptools-scm[toml]>=6.2.3",
+    "wheel",
+]
+build-backend = "setuptools.build_meta"
+
+[tool.poetry]
+name = "pytest-selenium"
+version = "2.0.1"
+description = "pytest plugin for Selenium"
+authors = ["Dave Hunt <dhunt@mozilla.com>"]
+license = "Mozilla Public License 2.0 (MPL 2.0)"
+
+[tool.poetry.dependencies]
+python = "^3.6.2"
+pytest = ">5.0.0"
+pytest-base-url = "^1.4.2"
+pytest-html = ">=1.14.0"
+pytest-variables = ">=1.5.0"
+requests = "^2.26.0"
+selenium = "3.*"
+tenacity = "6.*"
+
+[tool.poetry.dev-dependencies]
+tox = "^3.24.4"
+flake8 = "^4.0.1"
+black = "^21.9b0"
+pre-commit = "^2.15.0"
+pytest-localserver = "^0.5.0"
+pytest-xdist = "^2.4.0"
+pytest-mock = "^3.6.1"
