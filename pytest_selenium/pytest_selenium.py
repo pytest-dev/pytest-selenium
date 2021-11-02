@@ -441,6 +441,15 @@ def pytest_addoption(parser):
         default=os.getenv("SAUCELABS_JOB_AUTH", "none"),
     )
 
+    _data_center_choices = ("us-west-1", "us-east-1", "eu-central-1")
+    parser.addini(
+        "saucelabs_data_center",
+        help="Data center options for Sauce Labs connections: {0}".format(
+            _data_center_choices
+        ),
+        default="us-west-1",
+    )
+
     parser.addini(
         "max_driver_init_attempts",
         help="Maximum number of driver initialization attempts",

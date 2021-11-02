@@ -38,6 +38,7 @@ class Provider(object):
             raise MissingCloudCredentialError(self.name, key, envs)
 
     def get_setting(self, key, envs, section, allowed_values=None):
+        value = None
         try:
             value = self.config.get(section, key)
         except (configparser.NoSectionError, configparser.NoOptionError, KeyError):
