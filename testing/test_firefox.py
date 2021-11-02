@@ -49,11 +49,12 @@ def test_profile(testdir, httpserver):
     file_test = testdir.makepyfile(
         """
         import pytest
+        from selenium.webdriver.common.by import By
         @pytest.mark.nondestructive
         def test_profile(base_url, selenium):
             selenium.get(base_url)
-            header = selenium.find_element_by_tag_name('h1')
-            anchor = selenium.find_element_by_tag_name('a')
+            header = selenium.find_element(By.TAG_NAME, 'h1')
+            anchor = selenium.find_element(By.TAG_NAME, 'a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
