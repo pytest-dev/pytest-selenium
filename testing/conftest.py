@@ -28,10 +28,11 @@ def testdir(request, httpserver_base_url):
 
     conftest = """
         import pytest
+        from selenium.webdriver.common.by import By
         @pytest.fixture
         def webtext(base_url, selenium):
             selenium.get(base_url)
-            return selenium.find_element_by_tag_name('h1').text
+            return selenium.find_element(By.TAG_NAME, 'h1').text
         """
 
     if item.get_closest_marker("chrome"):
