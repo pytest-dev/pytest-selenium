@@ -7,6 +7,8 @@ import os
 
 import pytest
 
+from pytest_selenium.drivers.cloud import Provider
+
 pytestmark = pytest.mark.nondestructive
 
 
@@ -66,7 +68,6 @@ def test_missing_access_key_file(failure, monkeypatch, tmpdir):
     ],
 )
 def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
-    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     monkeypatch.setenv(username, "foo")
     monkeypatch.setenv(key, "bar")
     out = failure()
@@ -75,8 +76,9 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
 
 
 def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
-    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
-    tmpdir.join(".browserstack").write("[credentials]\nusername=foo\nkey=bar")
+    cfg_file = tmpdir.join(".browserstack")
+    cfg_file.write("[credentials]\nusername=foo\nkey=bar")
+    monkeypatch.setattr(Provider, "config_file_path", str(cfg_file))
     out = failure()
     messages = ["Invalid username or password", "basic auth failed"]
     assert any(message in out for message in messages)

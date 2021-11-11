@@ -7,6 +7,8 @@ import pytest
 
 from functools import partial
 
+from pytest_selenium.drivers.cloud import Provider
+
 "'as TB' to avoid pytest trying to collect the class"
 from pytest_selenium.drivers.testingbot import HOST, PORT, TestingBot as TB
 
@@ -66,7 +68,6 @@ def test_missing_secret_file(failure, monkeypatch, tmpdir):
     [("TESTINGBOT_KEY", "TESTINGBOT_SECRET"), ("TESTINGBOT_PSW", "TESTINGBOT_USR")],
 )
 def test_invalid_credentials_env(failure, monkeypatch, tmpdir, key, secret):
-    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     monkeypatch.setenv(key, "foo")
     monkeypatch.setenv(secret, "bar")
     out = failure()
@@ -75,8 +76,9 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, key, secret):
 
 
 def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
-    monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
-    tmpdir.join(".testingbot").write("[credentials]\nkey=foo\nsecret=bar")
+    cfg_file = tmpdir.join(".testingbot")
+    cfg_file.write("[credentials]\nkey=foo\nsecret=bar")
+    monkeypatch.setattr(Provider, "config_file_path", str(cfg_file))
     out = failure()
     messages = ["incorrect TestingBot credentials", "basic auth failed"]
     assert any(message in out for message in messages)

@@ -18,10 +18,17 @@ class Provider(object):
         return type(self).__name__
 
     @property
+    def config_name(self):
+        return ".{0}".format(self.name.lower())
+
+    @property
+    def config_file_path(self):
+        return os.path.join(os.path.expanduser("~"), self.config_name)
+
+    @property
     def config(self):
-        name = ".{0}".format(self.name.lower())
         config = configparser.ConfigParser()
-        config.read([name, os.path.join(os.path.expanduser("~"), name)])
+        config.read([self.config_name, self.config_file_path])
         return config
 
     def get_credential(self, key, envs):

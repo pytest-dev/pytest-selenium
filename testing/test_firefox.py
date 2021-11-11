@@ -49,11 +49,12 @@ def test_profile(testdir, httpserver):
     file_test = testdir.makepyfile(
         """
         import pytest
+        from selenium.webdriver.common.by import By
         @pytest.mark.nondestructive
         def test_profile(base_url, selenium):
             selenium.get(base_url)
-            header = selenium.find_element_by_tag_name('h1')
-            anchor = selenium.find_element_by_tag_name('a')
+            header = selenium.find_element(By.TAG_NAME, 'h1')
+            anchor = selenium.find_element(By.TAG_NAME, 'a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
@@ -81,11 +82,12 @@ def test_profile_with_preferences(testdir, httpserver):
     file_test = testdir.makepyfile(
         """
         import pytest
+        from selenium.webdriver.common.by import By
         @pytest.mark.nondestructive
         def test_preferences(base_url, selenium):
             selenium.get(base_url)
-            header = selenium.find_element_by_tag_name('h1')
-            anchor = selenium.find_element_by_tag_name('a')
+            header = selenium.find_element(By.TAG_NAME, 'h1')
+            anchor = selenium.find_element(By.TAG_NAME, 'a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
@@ -114,6 +116,7 @@ def test_extension(testdir):
         """
         import time
         import pytest
+        from selenium.webdriver.common.by import By
         from selenium.common.exceptions import StaleElementReferenceException
         from selenium.webdriver.support.ui import WebDriverWait
         @pytest.mark.nondestructive
@@ -122,7 +125,7 @@ def test_extension(testdir):
             extensions = WebDriverWait(
                 selenium, timeout=10,
                 ignored_exceptions=StaleElementReferenceException).until(
-                    lambda s: s.find_element_by_id(
+                    lambda s: s.find_element(By.ID,
                         'extensions-tbody').text)
             assert 'Test Extension (empty)' in extensions
     """
@@ -136,6 +139,7 @@ def test_preferences_marker(testdir, httpserver):
     file_test = testdir.makepyfile(
         """
         import pytest
+        from selenium.webdriver.common.by import By
         @pytest.mark.nondestructive
         @pytest.mark.firefox_preferences({
             'browser.anchor_color': '#FF69B4',
@@ -143,8 +147,8 @@ def test_preferences_marker(testdir, httpserver):
             'browser.display.use_document_colors': False})
         def test_preferences(base_url, selenium):
             selenium.get(base_url)
-            header = selenium.find_element_by_tag_name('h1')
-            anchor = selenium.find_element_by_tag_name('a')
+            header = selenium.find_element(By.TAG_NAME, 'h1')
+            anchor = selenium.find_element(By.TAG_NAME, 'a')
             header_color = header.value_of_css_property('color')
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
