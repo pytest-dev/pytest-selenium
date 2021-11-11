@@ -40,16 +40,20 @@ def test_profile(testdir, httpserver):
     when calling value_of_css_property.
     """
     httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
-    profile = testdir.tmpdir.mkdir("profile")
-    profile.join("prefs.js").write(
-        'user_pref("browser.anchor_color", "#FF69B4");'
-        'user_pref("browser.display.foreground_color", "#FF0000");'
-        'user_pref("browser.display.use_document_colors", false);'
-    )
     file_test = testdir.makepyfile(
         """
         import pytest
         from selenium.webdriver.common.by import By
+
+        @pytest.fixture
+        def firefox_options(firefox_options):
+            firefox_options.set_preference("browser.anchor_color", "#FF69B4")
+            firefox_options.set_preference("browser.display.foreground_color",
+                                           "#FF0000")
+            firefox_options.set_preference("browser.display.use_document_colors",
+                                           False)
+            return firefox_options
+
         @pytest.mark.nondestructive
         def test_profile(base_url, selenium):
             selenium.get(base_url)
@@ -61,48 +65,7 @@ def test_profile(testdir, httpserver):
             assert anchor_color == 'rgb(255, 105, 180)'
     """
     )
-    testdir.quick_qa("--firefox-profile", profile, file_test, passed=1)
-
-
-def test_profile_with_preferences(testdir, httpserver):
-    """Test that preferences override profile when starting Firefox.
-
-    The profile changes the colors in the browser, which are then reflected
-    when calling value_of_css_property. The test checks that the color of the
-    h1 tag is overridden by the profile, while the color of the a tag is
-    overridden by the preference.
-    """
-    httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
-    profile = testdir.tmpdir.mkdir("profile")
-    profile.join("prefs.js").write(
-        'user_pref("browser.anchor_color", "#FF69B4");'
-        'user_pref("browser.display.foreground_color", "#FF0000");'
-        'user_pref("browser.display.use_document_colors", false);'
-    )
-    file_test = testdir.makepyfile(
-        """
-        import pytest
-        from selenium.webdriver.common.by import By
-        @pytest.mark.nondestructive
-        def test_preferences(base_url, selenium):
-            selenium.get(base_url)
-            header = selenium.find_element(By.TAG_NAME, 'h1')
-            anchor = selenium.find_element(By.TAG_NAME, 'a')
-            header_color = header.value_of_css_property('color')
-            anchor_color = anchor.value_of_css_property('color')
-            assert header_color == 'rgb(255, 0, 0)'
-            assert anchor_color == 'rgb(255, 0, 0)'
-    """
-    )
-    testdir.quick_qa(
-        "--firefox-preference",
-        "browser.anchor_color",
-        "#FF0000",
-        "--firefox-profile",
-        profile,
-        file_test,
-        passed=1,
-    )
+    testdir.quick_qa(file_test, passed=1)
 
 
 @pytest.mark.xfail(reason="https://github.com/SeleniumHQ/selenium/pull/5069")

@@ -8,12 +8,11 @@ HOST = os.environ.get("SELENIUM_HOST", "localhost")
 PORT = os.environ.get("SELENIUM_PORT", 4444)
 
 
-def driver_kwargs(capabilities, firefox_profile, host, port, **kwargs):
+def driver_kwargs(capabilities, host, port, **kwargs):
     executor = "http://{0}:{1}/wd/hub".format(host, port)
 
     kwargs = {
         "command_executor": executor,
         "desired_capabilities": capabilities,
-        "browser_profile": firefox_profile,
     }
     return kwargs
