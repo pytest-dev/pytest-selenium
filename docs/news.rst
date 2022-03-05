@@ -252,7 +252,7 @@ Release Notes
 ------------------
 
 * Introduced a ``firefox_options`` fixture.
-* Switched to Firefox options for speciying binary and profile.
+* Switched to Firefox options for specifying binary and profile.
 
 1.6.0 (2016-11-17)
 ------------------
