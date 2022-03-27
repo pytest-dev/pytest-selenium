@@ -102,6 +102,6 @@ def driver_kwargs(request, test, capabilities, **kwargs):
     kwargs = {
         "command_executor": provider.executor,
         "desired_capabilities": capabilities,
-        "keep_alive": True
+        "keep_alive": True,
     }
     return kwargs

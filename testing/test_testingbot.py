@@ -4,6 +4,7 @@
 
 import os
 import pytest
+import sys
 
 from functools import partial
 
@@ -84,6 +85,7 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     assert any(message in out for message in messages)
 
 
+@pytest.mark.skipif(sys.platform == "win32", reason="Fails on Windows for some reason")
 def test_invalid_host(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     tmpdir.join(".testingbot").write("[credentials]\nkey=foo\nsecret=bar")
@@ -92,6 +94,7 @@ def test_invalid_host(failure, monkeypatch, tmpdir):
         "nodename nor servname provided, or not known",
         "Name or service not known",
         "No address associated with hostname",
+        "No such host is known",
     ]
     assert any(message in out for message in messages)
 

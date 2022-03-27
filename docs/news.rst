@@ -4,7 +4,7 @@ Release Notes
 2.0.1 (2020-09-19)
 ------------------
 
-* Allow ``xdist`` worker nodes to configure sensitive url 
+* Allow ``xdist`` worker nodes to configure sensitive url
 
   * Thanks to `@charith-kulathilaka <https://github.com/charith-kulathilaka>`_ for reporting the issue.
 

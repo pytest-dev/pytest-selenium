@@ -265,7 +265,7 @@ def test_data_center_option_precedence(testdir, monkeypatch, tmpdir):
     tmpdir.join(".saucelabs").write(f"[options]\ndata_center={expected_data_center}")
 
     testdir.makeini(
-        f"""
+        """
         [pytest]
         saucelabs_data_center = "ap-east-1"
     """
