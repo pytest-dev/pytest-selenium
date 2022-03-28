@@ -18,11 +18,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        python: ["3.6", "3.7", "3.8", "3.9", "3.10", "pypy-3.8"]
+        python: ["3.7", "3.8", "3.9", "3.10", "pypy-3.8"]
         os: [ubuntu-latest, windows-latest]
         include:
-          - python: "3.6"
-            tox_env: "py36"
           - python: "3.7"
             tox_env: "py37"
           - python: "3.8"
@@ -65,7 +63,6 @@ jobs:
       uses: nanasess/setup-chromedriver@master
 
     - name: Cache tox environments
-      if: matrix.os != 'windows-latest' && matrix.python != '3.6'
       uses: actions/cache@v3
       with:
         path: .tox
