@@ -65,6 +65,7 @@ jobs:
       uses: nanasess/setup-chromedriver@master
 
     - name: Cache tox environments
+      if: matrix.os != 'windows-latest' && matrix.python != '3.6'
       uses: actions/cache@v3
       with:
         path: .tox
