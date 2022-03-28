@@ -1,6 +1,16 @@
 Release Notes
 =============
 
+3.0.0 (2022-03-28)
+------------------
+
+* Switch project fully to pyproject.toml and Poetry
+
+  * Thanks to `@nfk <https://github.com/nfk>`_, `@dosas <https://github.com/dosas>`_,
+    `@lordgordon <https://github.com/lordgordon>`_, `@betterjblock <https://github.com/betterjblock>`_,
+    `@joshmgrant <https://github.com/joshmgrant>`_, `@rohitanand1614 <https://github.com/rohitanand1614>`_, and
+    `@kianmeng <https://github.com/kianmeng>`_ for all of their contributions to this release
+
 2.0.1 (2020-09-19)
 ------------------
 

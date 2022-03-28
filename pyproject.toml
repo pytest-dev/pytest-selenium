@@ -4,7 +4,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pytest-selenium"
-version = "2.0.2rc0"
+version = "3.0.0"
 description = "pytest plugin for Selenium"
 license = "MPL-2.0"
 authors = [
@@ -45,7 +45,7 @@ include = [
 python = "^3.6.2"
 pytest = "^6.0.0"
 pytest-base-url = "^1.4.2"
-pytest-html = "^1.14.0"
+pytest-html = ">=1.14.0"
 pytest-variables = "^1.5.0"
 requests = "^2.26.0"
 selenium = "3.*"
