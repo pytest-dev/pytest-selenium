@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-from distutils.version import LooseVersion
+from packaging.version import Version
 import warnings
 import logging
 
@@ -60,7 +60,7 @@ def pytest_configure(config):
 def driver_kwargs(capabilities, driver_log, driver_path, firefox_options, **kwargs):
 
     # Selenium 3.14.0 deprecated log_path in favour of service_log_path
-    if LooseVersion(SELENIUM_VERSION) < LooseVersion("3.14.0"):
+    if Version(SELENIUM_VERSION) < Version("3.14.0"):
         kwargs = {"log_path": driver_log}
     else:
         kwargs = {"service_log_path": driver_log}
@@ -71,7 +71,7 @@ def driver_kwargs(capabilities, driver_log, driver_path, firefox_options, **kwar
         kwargs["executable_path"] = driver_path
 
     # Selenium 3.8.0 deprecated firefox_options in favour of options
-    if LooseVersion(SELENIUM_VERSION) < LooseVersion("3.8.0"):
+    if Version(SELENIUM_VERSION) < Version("3.8.0"):
         kwargs["firefox_options"] = firefox_options
     else:
         kwargs["options"] = firefox_options

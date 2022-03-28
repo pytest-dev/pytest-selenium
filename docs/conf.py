@@ -46,9 +46,9 @@ source_suffix = ".rst"
 master_doc = "index"
 
 # General information about the project.
-project = u"pytest-selenium"
-copyright = u"2019, Dave Hunt"
-author = u"Dave Hunt, Jim Brännlund"
+project = "pytest-selenium"
+copyright = "2019, Dave Hunt"
+author = "Dave Hunt, Jim Brännlund"
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -222,8 +222,8 @@ latex_documents = [
     (
         master_doc,
         "pytest-selenium.tex",
-        u"pytest-selenium Documentation",
-        u"Dave Hunt",
+        "pytest-selenium Documentation",
+        "Dave Hunt",
         "manual",
     )
 ]
@@ -254,7 +254,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, "pytest-selenium", u"pytest-selenium Documentation", [author], 1)
+    (master_doc, "pytest-selenium", "pytest-selenium Documentation", [author], 1)
 ]
 
 # If true, show URL addresses after external links.
@@ -270,7 +270,7 @@ texinfo_documents = [
     (
         master_doc,
         "pytest-selenium",
-        u"pytest-selenium Documentation",
+        "pytest-selenium Documentation",
         author,
         "pytest-selenium",
         "One line description of project.",
