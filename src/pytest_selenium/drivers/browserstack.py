@@ -18,7 +18,7 @@ class BrowserStack(Provider):
 
     @property
     def executor(self):
-        return "https://hub.browserstack.com/wd/hub"
+        return "https://hub-cloud.browserstack.com/wd/hub"
 
     @property
     def username(self):
@@ -102,5 +102,6 @@ def driver_kwargs(request, test, capabilities, **kwargs):
     kwargs = {
         "command_executor": provider.executor,
         "desired_capabilities": capabilities,
+        "keep_alive": True,
     }
     return kwargs

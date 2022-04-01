@@ -1,34 +1,81 @@
 [build-system]
-requires = [
-    # sync with setup.py until we discard non-pep-517/518
-    "setuptools>=45.0",
-    "setuptools-scm[toml]>=6.2.3",
-    "wheel",
-]
-build-backend = "setuptools.build_meta"
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "pytest-selenium"
-version = "2.0.1"
+version = "2.0.2rc0"
 description = "pytest plugin for Selenium"
-authors = ["Dave Hunt <dhunt@mozilla.com>"]
-license = "Mozilla Public License 2.0 (MPL 2.0)"
+license = "MPL-2.0"
+authors = [
+    "Dave Hunt <dhunt@mozilla.com>",
+    "Jim Brännlund <jimbrannlund@fastmail.com>"
+]
+readme = "README.rst"
+homepage = "https://github.com/pytest-dev/pytest-selenium"
+repository = "https://github.com/pytest-dev/pytest-selenium"
+keywords = [
+    "pytest",
+    "selenium",
+    "saucelabs",
+    "browserstack",
+    "webqa",
+    "qa"
+]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Framework :: Pytest",
+    "Intended Audience :: Developers",
+    "Operating System :: POSIX",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: MacOS :: MacOS X",
+    "Topic :: Software Development :: Quality Assurance",
+    "Topic :: Software Development :: Testing",
+    "Topic :: Utilities",
+]
+packages = [
+    { include = "pytest_selenium", from = "src" },
+]
+include = [
+    { path = "testing", format = "sdist" },
+    { path = "docs", format = "sdist" }
+]
 
 [tool.poetry.dependencies]
 python = "^3.6.2"
-pytest = ">5.0.0"
+pytest = "^6.0.0"
 pytest-base-url = "^1.4.2"
-pytest-html = ">=1.14.0"
-pytest-variables = ">=1.5.0"
+pytest-html = "^1.14.0"
+pytest-variables = "^1.5.0"
 requests = "^2.26.0"
 selenium = "3.*"
 tenacity = "6.*"
 
+appium-python-client = { version = ">=0.44", optional = true }
+
+[tool.poetry.extras]
+appium = ["appium-python-client"]
+
 [tool.poetry.dev-dependencies]
-tox = "^3.24.4"
+black = "^22.1.0"
 flake8 = "^4.0.1"
-black = "^21.9b0"
-pre-commit = "^2.15.0"
+tox = "^3.24.5"
+pre-commit = "^2.17.0"
 pytest-localserver = "^0.5.0"
 pytest-xdist = "^2.4.0"
 pytest-mock = "^3.6.1"
+
+[tool.poetry.plugins.pytest11]
+selenium = "pytest_selenium.pytest_selenium"
+selenium_safety = "pytest_selenium.safety"
+browserstack_driver = "pytest_selenium.drivers.browserstack"
+crossbrowsertesting_driver = "pytest_selenium.drivers.crossbrowsertesting"
+chrome_driver = "pytest_selenium.drivers.chrome"
+edge_driver = "pytest_selenium.drivers.edge"
+firefox_driver = "pytest_selenium.drivers.firefox"
+ie_driver = "pytest_selenium.drivers.internet_explorer"
+remote_driver = "pytest_selenium.drivers.remote"
+safari_driver = "pytest_selenium.drivers.safari"
+saucelabs_driver = "pytest_selenium.drivers.saucelabs"
+testingbot_driver = "pytest_selenium.drivers.testingbot"
+appium_driver = "pytest_selenium.drivers.appium"

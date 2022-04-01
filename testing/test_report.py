@@ -5,7 +5,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import re
-from distutils.version import LooseVersion
+from packaging.version import Version
 
 import pytest
 from pytest_html import __version__ as PYTEST_HTML_VERSION
@@ -14,7 +14,7 @@ pytestmark = pytest.mark.nondestructive
 
 URL_LINK = '<a class="url" href="{0}/" target="_blank">URL</a>'
 
-if LooseVersion(PYTEST_HTML_VERSION) < LooseVersion("2.0.0"):
+if Version(PYTEST_HTML_VERSION) < Version("2.0.0"):
     SCREENSHOT_LINK_REGEX = '<a class="image" href=".*" target="_blank">Screenshot</a>'
     SCREENSHOT_REGEX = '<div class="image"><a href=".*"><img src=".*"/></a></div>'
 else:

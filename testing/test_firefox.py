@@ -4,7 +4,7 @@
 
 import pytest
 
-pytestmark = pytest.mark.nondestructive
+pytestmark = [pytest.mark.nondestructive, pytest.mark.firefox]
 
 
 def test_launch(testdir, httpserver):

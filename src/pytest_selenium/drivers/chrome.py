@@ -1,7 +1,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
-from distutils.version import LooseVersion
+from packaging.version import Version
 
 import pytest
 from selenium import __version__ as SELENIUM_VERSION
@@ -14,7 +14,7 @@ def driver_kwargs(
     kwargs = {"desired_capabilities": capabilities, "service_log_path": driver_log}
 
     # Selenium 3.8.0 deprecated chrome_options in favour of options
-    if LooseVersion(SELENIUM_VERSION) < LooseVersion("3.8.0"):
+    if Version(SELENIUM_VERSION) < Version("3.8.0"):
         kwargs["chrome_options"] = chrome_options
     else:
         kwargs["options"] = chrome_options
