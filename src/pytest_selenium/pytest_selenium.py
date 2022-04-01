@@ -148,7 +148,6 @@ def driver_kwargs(
     driver_log,
     driver_path,
     firefox_options,
-    firefox_profile,
     edge_options,
     pytestconfig,
 ):
@@ -162,7 +161,6 @@ def driver_kwargs(
             driver_log=driver_log,
             driver_path=driver_path,
             firefox_options=firefox_options,
-            firefox_profile=firefox_profile,
             edge_options=edge_options,
             host=pytestconfig.getoption("selenium_host"),
             port=pytestconfig.getoption("selenium_port"),
