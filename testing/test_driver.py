@@ -108,6 +108,37 @@ def test_default_host_port(testdir):
 
 
 @pytest.mark.parametrize(
+    ("host", "expected"),
+    [
+        ("https://some.host.com", "https://some.host.com"),
+        ("http://some.host.com", "http://some.host.com"),
+        ("some.host.com", "http://some.host.com"),
+    ],
+)
+def test_host_protocol(host, expected, testdir):
+    filetest = testdir.makepyfile(
+        """
+        import pytest
+        @pytest.mark.nondestructive
+        def test_pass(driver_kwargs):
+            assert driver_kwargs['command_executor'] == '{}:4444/wd/hub'
+        """.format(
+            expected
+        )
+    )
+    testdir.quick_qa(
+        "--driver",
+        "Remote",
+        "--selenium-host",
+        host,
+        "--selenium-port",
+        "4444",
+        filetest,
+        passed=1,
+    )
+
+
+@pytest.mark.parametrize(
     ("host_arg_name", "port_arg_name", "context"),
     [
         ("--selenium-host", "--selenium-port", does_not_raise()),
