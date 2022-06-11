@@ -74,7 +74,7 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     messages = [
         "Invalid username or password",
         "basic auth failed",
-        "Authoriation required",
+        "Authorization required",
     ]
     assert any(message in out for message in messages)
 
@@ -87,7 +87,7 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     messages = [
         "Invalid username or password",
         "basic auth failed",
-        "Authoriation required",
+        "Authorization required",
     ]
     assert any(message in out for message in messages)
 
