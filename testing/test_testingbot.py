@@ -72,7 +72,11 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, key, secret):
     monkeypatch.setenv(key, "foo")
     monkeypatch.setenv(secret, "bar")
     out = failure()
-    messages = ["incorrect TestingBot credentials", "basic auth failed"]
+    messages = [
+        "incorrect TestingBot credentials",
+        "basic auth failed",
+        "Please include your client_key and client_secret",
+    ]
     assert any(message in out for message in messages)
 
 
@@ -81,7 +85,11 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     cfg_file.write("[credentials]\nkey=foo\nsecret=bar")
     monkeypatch.setattr(Provider, "config_file_path", str(cfg_file))
     out = failure()
-    messages = ["incorrect TestingBot credentials", "basic auth failed"]
+    messages = [
+        "incorrect TestingBot credentials",
+        "basic auth failed",
+        "Please include your client_key and client_secret",
+    ]
     assert any(message in out for message in messages)
 
 

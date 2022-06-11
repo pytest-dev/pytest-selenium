@@ -71,7 +71,11 @@ def test_invalid_credentials_env(failure, monkeypatch, tmpdir, username, key):
     monkeypatch.setenv(username, "foo")
     monkeypatch.setenv(key, "bar")
     out = failure()
-    messages = ["Invalid username or password", "basic auth failed"]
+    messages = [
+        "Invalid username or password",
+        "basic auth failed",
+        "Authorization required",
+    ]
     assert any(message in out for message in messages)
 
 
@@ -80,7 +84,11 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
     cfg_file.write("[credentials]\nusername=foo\nkey=bar")
     monkeypatch.setattr(Provider, "config_file_path", str(cfg_file))
     out = failure()
-    messages = ["Invalid username or password", "basic auth failed"]
+    messages = [
+        "Invalid username or password",
+        "basic auth failed",
+        "Authorization required",
+    ]
     assert any(message in out for message in messages)
 
 
