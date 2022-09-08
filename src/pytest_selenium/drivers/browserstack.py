@@ -18,7 +18,7 @@ class BrowserStack(Provider):
 
     @property
     def executor(self):
-        return "https://hub-cloud.browserstack.com/wd/hub"
+        return "https://hub.browserstack.com/wd/hub"
 
     @property
     def username(self):
