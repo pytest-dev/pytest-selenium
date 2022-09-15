@@ -18,7 +18,7 @@ class BrowserStack(Provider):
 
     @property
     def executor(self):
-        return "https://hub-cloud.browserstack.com/wd/hub"
+        return "https://hub.browserstack.com/wd/hub"
 
     @property
     def username(self):
@@ -96,9 +96,17 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 def driver_kwargs(request, test, capabilities, **kwargs):
     provider = BrowserStack()
     assert provider.job_access
-    capabilities.setdefault("name", test)
-    capabilities.setdefault("browserstack.user", provider.username)
-    capabilities.setdefault("browserstack.key", provider.key)
+    if (
+        "bstack:options" in capabilities
+        and type(capabilities["bstack:options"]) is dict
+    ):
+        capabilities["bstack:options"].setdefault("sessionName", test)
+        capabilities["bstack:options"].setdefault("userName", provider.username)
+        capabilities["bstack:options"].setdefault("accessKey", provider.key)
+    else:
+        capabilities.setdefault("name", test)
+        capabilities.setdefault("browserstack.user", provider.username)
+        capabilities.setdefault("browserstack.key", provider.key)
     kwargs = {
         "command_executor": provider.executor,
         "desired_capabilities": capabilities,

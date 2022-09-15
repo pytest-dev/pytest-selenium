@@ -4,6 +4,7 @@
 
 from functools import partial
 import os
+import json
 
 import pytest
 
@@ -96,3 +97,101 @@ def test_invalid_job_access_value(failure, monkeypatch, tmpdir):
     monkeypatch.setattr(os.path, "expanduser", lambda p: str(tmpdir))
     tmpdir.join(".browserstack").write("[report]\njob_access=foo")
     assert "BrowserStack job_access invalid value `foo`" in failure()
+
+
+def test_default_caps_in_jsonwp(monkeypatch, testdir):
+    capabilities = {"browserName": "chrome"}
+    test_name = "test_default_caps_in_jsonwp.test_bstack_capabilities"
+    monkeypatch.setenv("BROWSERSTACK_USERNAME", "foo")
+    monkeypatch.setenv("BROWSERSTACK_ACCESS_KEY", "bar")
+    variables = testdir.makefile(
+        ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
+    )
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+        @pytest.mark.nondestructive
+        def test_bstack_capabilities(driver_kwargs):
+            assert driver_kwargs['desired_capabilities']['browserstack.user'] == 'foo'
+            assert driver_kwargs['desired_capabilities']['browserstack.key'] == 'bar'
+            assert driver_kwargs['desired_capabilities']['name'] == '{0}'
+    """.format(
+            test_name
+        )
+    )
+    testdir.quick_qa(
+        "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
+    )
+
+
+def test_default_caps_in_jsonwp_with_conflict(monkeypatch, testdir):
+    capabilities = {"browserName": "chrome", "name": "conflicting_name"}
+    monkeypatch.setenv("BROWSERSTACK_USERNAME", "foo")
+    monkeypatch.setenv("BROWSERSTACK_ACCESS_KEY", "bar")
+    variables = testdir.makefile(
+        ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
+    )
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+        @pytest.mark.nondestructive
+        def test_bstack_capabilities(driver_kwargs):
+            assert driver_kwargs['desired_capabilities']['browserstack.user'] == 'foo'
+            assert driver_kwargs['desired_capabilities']['browserstack.key'] == 'bar'
+            assert driver_kwargs['desired_capabilities']['name'] == 'conflicting_name'
+    """
+    )
+    testdir.quick_qa(
+        "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
+    )
+
+
+def test_default_caps_in_W3C(monkeypatch, testdir):
+    capabilities = {"browserName": "chrome", "bstack:options": {}}
+    monkeypatch.setenv("BROWSERSTACK_USERNAME", "foo")
+    monkeypatch.setenv("BROWSERSTACK_ACCESS_KEY", "bar")
+    variables = testdir.makefile(
+        ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
+    )
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+        @pytest.mark.nondestructive
+        def test_bstack_capabilities(driver_kwargs):
+            assert driver_kwargs['desired_capabilities']['bstack:options'] == {
+                'userName': 'foo',
+                'accessKey': 'bar',
+                'sessionName': 'test_default_caps_in_W3C.test_bstack_capabilities'
+            }
+    """
+    )
+    testdir.quick_qa(
+        "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
+    )
+
+
+def test_default_caps_in_W3C_with_conflict(monkeypatch, testdir):
+    capabilities = {
+        "browserName": "chrome",
+        "bstack:options": {"sessionName": "conflicting_name"},
+    }
+    monkeypatch.setenv("BROWSERSTACK_USERNAME", "foo")
+    monkeypatch.setenv("BROWSERSTACK_ACCESS_KEY", "bar")
+    variables = testdir.makefile(
+        ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
+    )
+    file_test = testdir.makepyfile(
+        """
+        import pytest
+        @pytest.mark.nondestructive
+        def test_bstack_capabilities(driver_kwargs):
+            assert driver_kwargs['desired_capabilities']['bstack:options'] == {
+                'userName': 'foo',
+                'accessKey': 'bar',
+                'sessionName': 'conflicting_name'
+            }
+    """
+    )
+    testdir.quick_qa(
+        "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
+    )
