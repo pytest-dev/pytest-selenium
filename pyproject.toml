@@ -9,7 +9,7 @@ description = "pytest plugin for Selenium"
 license = "MPL-2.0"
 authors = [
     "Dave Hunt <dhunt@mozilla.com>",
-    "Jim Brännlund <jimbrannlund@fastmail.com>"
+    "Jim Brannlund <jimbrannlund@fastmail.com>"
 ]
 readme = "README.rst"
 homepage = "https://github.com/pytest-dev/pytest-selenium"
@@ -45,7 +45,7 @@ include = [
 python = "^3.7"
 pytest = "^6.0.0"
 pytest-base-url = "^2.0.0"
-pytest-html = "^3.1.1"
+pytest-html = ">=2.0.0"
 pytest-variables = "^2.0.0"
 requests = "^2.26.0"
 selenium = "^4.0.0"
