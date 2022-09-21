@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+4.0.0 (2022-09-15)
+------------------
+
+* Selenium 4 support
+
+* Drop support for python 3.6
+
+* Add support for python 3.9 and 3.10
+
+* Relax dependency constraint for pytest-html pending new release
+
+* Handle non W3C caps for browserstack
+
+  * Thanks to `@Ankit098 <https://github.com/Ankit098>`_ for the PR.
+
 2.0.1 (2020-09-19)
 ------------------
 
