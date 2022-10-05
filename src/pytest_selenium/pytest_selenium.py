@@ -18,7 +18,6 @@ from tenacity import Retrying, stop_after_attempt, wait_exponential
 from .utils import CaseInsensitiveDict
 from . import drivers
 
-import warnings
 
 LOGGER = logging.getLogger(__name__)
 
@@ -228,22 +227,6 @@ def selenium(driver):
 
 @pytest.hookimpl(trylast=True)
 def pytest_configure(config):
-    if config.getoption("host"):
-        warnings.warn(
-            "--host has been deprecated and will be removed in a "
-            "future release. Please use --selenium-host instead.",
-            DeprecationWarning,
-        )
-        config.option.selenium_host = config.getoption("host")
-
-    if config.getoption("port"):
-        warnings.warn(
-            "--port has been deprecated and will be removed in a "
-            "future release. Please use --selenium-port instead.",
-            DeprecationWarning,
-        )
-        config.option.selenium_port = config.getoption("port")
-
     capabilities = config._variables.get("capabilities", {})
     capabilities.update({k: v for k, v in config.getoption("capabilities")})
     config.addinivalue_line(
@@ -478,21 +461,6 @@ def pytest_addoption(parser):
         metavar="str",
         help="selenium eventlistener class, e.g. "
         "package.module.EventListenerClassName.",
-    )
-    group._addoption(
-        "--host",
-        metavar="str",
-        help="DEPRECATED host that the selenium server is listening on, "
-        "which will default to the cloud provider default "
-        "or localhost.",
-    )
-    group._addoption(
-        "--port",
-        type=int,
-        metavar="num",
-        help="DEPRECATED port that the selenium server is listening on, "
-        "which will default to the cloud provider default "
-        "or localhost.",
     )
     group._addoption(
         "--selenium-host",
