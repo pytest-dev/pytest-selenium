@@ -253,7 +253,7 @@ def pytest_report_header(config, startdir):
         return "driver: {0}".format(driver)
 
 
-@pytest.mark.hookwrapper
+@pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()

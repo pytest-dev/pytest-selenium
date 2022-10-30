@@ -48,7 +48,7 @@ class BrowserStack(Provider):
         return field
 
 
-@pytest.mark.optionalhook
+@pytest.hookimpl(optionalhook=True)
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     provider = BrowserStack()
     if not provider.uses_driver(item.config.getoption("driver")):
