@@ -10,8 +10,7 @@ pytestmark = pytest.mark.nondestructive
 
 
 @pytest.mark.chrome
-def test_launch(testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+def test_launch(testdir):
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -20,7 +19,15 @@ def test_launch(testdir, httpserver):
             assert webtext == u'Success!'
     """
     )
-    testdir.quick_qa("--driver", "Chrome", file_test, passed=1)
+    testdir.quick_qa(
+        "--driver",
+        "Remote",
+        "--capability",
+        "browserName",
+        "chrome",
+        file_test,
+        passed=1,
+    )
 
 
 @pytest.mark.chrome
@@ -37,13 +44,16 @@ def test_options(testdir):
         def test_pass(selenium): pass
     """
     )
-    reprec = testdir.inline_run("--driver", "Chrome")
+    reprec = testdir.inline_run(
+        "--driver", "Remote", "--capability", "browserName", "chrome"
+    )
     passed, skipped, failed = reprec.listoutcomes()
     assert len(failed) == 1
     out = failed[0].longrepr.reprcrash.message
     assert "no chrome binary at /foo/bar" in out
 
 
+@pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 @pytest.mark.chrome
 def test_args(testdir):
     file_test = testdir.makepyfile(
@@ -61,5 +71,13 @@ def test_args(testdir):
         def test_pass(selenium): pass
     """
     )
-    testdir.quick_qa("--driver", "Chrome", file_test, passed=1)
+    testdir.quick_qa(
+        "--driver",
+        "Remote",
+        "--capability",
+        "browserName",
+        "chrome",
+        file_test,
+        passed=1,
+    )
     assert os.path.exists(str(testdir.tmpdir.join("foo.log")))

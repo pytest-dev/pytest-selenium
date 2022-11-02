@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $(uname -m) == "arm64" ]]; then
+  arch="arm"
+else
+  arch="intel"
+fi
+
+docker-compose -f "docker-compose.${arch}.yml" down

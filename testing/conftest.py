@@ -9,13 +9,13 @@ import pytest
 pytest_plugins = "pytester"
 
 
-def base_url(httpserver):
-    return httpserver.url
+def base_url():
+    return "http://webserver"
 
 
 @pytest.fixture
-def httpserver_base_url(httpserver):
-    return "--base-url={0}".format(base_url(httpserver))
+def httpserver_base_url():
+    return "--base-url={0}".format(base_url())
 
 
 @pytest.fixture(autouse=True)
@@ -59,14 +59,28 @@ def testdir(request, httpserver_base_url):
 
     def runpytestqa(*args, **kwargs):
         return testdir.runpytest(
-            httpserver_base_url, "--driver", "Firefox", *args, **kwargs
+            httpserver_base_url,
+            "--driver",
+            "remote",
+            "--capability",
+            "browserName",
+            "firefox",
+            *args,
+            **kwargs,
         )
 
     testdir.runpytestqa = runpytestqa
 
     def inline_runqa(*args, **kwargs):
         return testdir.inline_run(
-            httpserver_base_url, "--driver", "Firefox", *args, **kwargs
+            httpserver_base_url,
+            "--driver",
+            "remote",
+            "--capability",
+            "browserName",
+            "firefox",
+            *args,
+            **kwargs,
         )
 
     testdir.inline_runqa = inline_runqa
@@ -74,6 +88,7 @@ def testdir(request, httpserver_base_url):
     def quick_qa(*args, **kwargs):
         reprec = inline_runqa(*args)
         outcomes = reprec.listoutcomes()
+        print(f"outcomes: {outcomes}")
         names = ("passed", "skipped", "failed")
         for name, val in zip(names, outcomes):
             wantlen = kwargs.get(name)

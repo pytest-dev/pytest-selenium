@@ -3,16 +3,16 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
-import sys
+
+# import sys
 
 
 pytestmark = pytest.mark.nondestructive
 
 
-@pytest.mark.skipif(sys.platform != "win32", reason="Edge only runs on Windows")
+# @pytest.mark.skipif(sys.platform != "win32", reason="Edge only runs on Windows")
 @pytest.mark.edge
-def test_launch_legacy(testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+def test_launch_legacy(testdir):
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -21,14 +21,15 @@ def test_launch_legacy(testdir, httpserver):
             assert webtext == u'Success!'
     """
     )
-    testdir.quick_qa("--driver", "Edge", file_test, passed=1)
+    testdir.quick_qa(
+        "--driver", "remote", "--capability", "browserName", "edge", file_test, passed=1
+    )
 
 
-@pytest.mark.skipif(sys.platform != "win32", reason="Edge only runs on Windows")
+# @pytest.mark.skipif(sys.platform != "win32", reason="Edge only runs on Windows")
 @pytest.mark.edge
 @pytest.mark.parametrize("use_chromium", [True, False], ids=["chromium", "legacy"])
-def test_launch(use_chromium, testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+def test_launch(use_chromium, testdir):
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -45,4 +46,6 @@ def test_launch(use_chromium, testdir, httpserver):
             use_chromium
         )
     )
-    testdir.quick_qa("--driver", "Edge", file_test, passed=1)
+    testdir.quick_qa(
+        "--driver", "remote", "--capability", "browserName", "edge", file_test, passed=1
+    )

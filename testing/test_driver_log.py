@@ -12,8 +12,8 @@ pytestmark = pytest.mark.nondestructive
 LOG_REGEX = '<a class="text" href=".*" target="_blank">Driver Log</a>'
 
 
-def test_driver_log(testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+@pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
+def test_driver_log(testdir):
     testdir.makepyfile(
         """
         import pytest
@@ -26,13 +26,14 @@ def test_driver_log(testdir, httpserver):
     testdir.runpytestqa("--html", path)
     with open(str(path)) as f:
         html = f.read()
+
     assert re.search(LOG_REGEX, html) is not None
     log_path = testdir.tmpdir.dirpath("basetemp", "test_driver_log0", "driver.log")
     assert os.path.exists(str(log_path))
 
 
-def test_driver_log_fixture(testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+@pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
+def test_driver_log_fixture(testdir):
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -49,8 +50,7 @@ def test_driver_log_fixture(testdir, httpserver):
     assert os.path.exists(str(testdir.tmpdir.join("foo.log")))
 
 
-def test_no_driver_log(testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+def test_no_driver_log(testdir):
     testdir.makepyfile(
         """
         import pytest
