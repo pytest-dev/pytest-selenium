@@ -22,15 +22,35 @@ class BrowserStack(Provider):
 
     @property
     def username(self):
-        return self.get_credential(
+        user = self.get_credential(
             "username", ["BROWSERSTACK_USERNAME", "BROWSERSTACK_USR"]
         )
+        if user in [
+            "BROWSERSTACK_USERNAME",
+            "YOUR_USERNAME",
+            "BROWSERSTACK_USR",
+        ]:
+            return self.get_credential(
+                "", ["BROWSERSTACK_USERNAME", "BROWSERSTACK_USR"]
+            )
+        else:
+            return user
 
     @property
     def key(self):
-        return self.get_credential(
+        access_key = self.get_credential(
             "key", ["BROWSERSTACK_ACCESS_KEY", "BROWSERSTACK_PSW"]
         )
+        if access_key in [
+            "BROWSERSTACK_ACCESS_KEY",
+            "YOUR_ACCESS_KEY",
+            "BROWSERSTACK_PSW",
+        ]:
+            return self.get_credential(
+                "", ["BROWSERSTACK_ACCESS_KEY", "BROWSERSTACK_PSW"]
+            )
+        else:
+            return access_key
 
     @property
     def job_access(self):
