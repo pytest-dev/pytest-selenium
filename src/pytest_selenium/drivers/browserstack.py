@@ -81,7 +81,7 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
     fail_reason = ""
     if not passed:
         try:
-            fail_reason = report.longrepr.reprcrash.message
+            fail_reason = report.longrepr.reprcrash
         except Exception as e:
             summary.append(
                 "WARNING: Failed to determine {0} job URL: {1}".format(provider.name, e)
@@ -118,17 +118,30 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
                     }'
                 )
             else:
+                import json
+
                 if fail_reason:
                     item._driver.execute_script(
-                        'browserstack_executor: {{ \
+                        'browserstack_executor: {\
+                            "action": "annotate", \
+                            "arguments": {\
+                                "level": "error", \
+                                "data": '
+                        + json.dumps(str(fail_reason))
+                        + "\
+                            }\
+                        }"
+                    )
+                    item._driver.execute_script(
+                        'browserstack_executor: {\
                             "action": "setSessionStatus", \
-                            "arguments": {{ \
-                                "status":"failed", \
-                                "reason": "{}" \
-                            }} \
-                        }}'.format(
-                            fail_reason
-                        )
+                            "arguments": {\
+                                "status": "failed", \
+                                "reason": '
+                        + json.dumps(str(fail_reason))
+                        + "\
+                            }\
+                        }"
                     )
                 else:
                     item._driver.execute_script(
