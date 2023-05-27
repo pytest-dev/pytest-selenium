@@ -1,97 +1,146 @@
-name: test
+name: Tests
 
 on:
   push:
     branches:
       - master
-    tags-ignore:
-      - v*
+
+  schedule:
+    - cron: '0 18 * * *'  # Run daily at 14:00 UTC
+
   pull_request:
-  workflow_call:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ ! contains(github.ref, github.event.repository.default_branch) }}
 
 env:
   PYTEST_ADDOPTS: "-m 'not (edge or safari)'"
 
 jobs:
+  linting:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
+
+      - name: Run tests
+        run: tox -e linting
+
   test:
+    name: ${{ matrix.os }} - ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
     strategy:
-      fail-fast: false
+      fail-fast: true
       matrix:
-        python: ["3.7", "3.8", "3.9", "3.10", "pypy-3.8"]
         os: [ubuntu-latest, windows-latest]
+        python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         include:
-          - python: "3.7"
-            tox_env: "py37"
-          - python: "3.8"
-            tox_env: "py38"
-          - python: "3.9"
-            tox_env: "py39"
-          - python: "3.10"
-            tox_env: "py310"
-          - python: "pypy-3.8"
-            tox_env: "pypy3"
+          - os: ubuntu-latest
+            python-version: pypy3.9
+            tox-env: py3.9
+          - os: windows-latest
+            python-version: pypy3.9
+            tox-env: py3.9
+
+# TODO(jim) Deactivate devel tests pending troubleshooting
+#          - os: ubuntu-latest
+#            python-version: 3.12-dev
+#            tox-env: devel
+#          - os: windows-latest
+#            python-version: 3.12-dev
+#            tox-env: devel
+
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: ${{ matrix.python }}
+      - name: Set up python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
 
-    - name: Install tox
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox
+      - name: Install tox
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
 
-    - name: Setup Firefox
-      if: matrix.os == 'ubuntu-latest'
-      uses: browser-actions/setup-firefox@latest
-      with:
-        firefox-version: latest
+      - name: Setup Firefox
+        if: matrix.os == 'ubuntu-latest'
+        uses: browser-actions/setup-firefox@latest
+        with:
+          firefox-version: latest
 
-    - name: Setup Geckodriver
-      if: matrix.os == 'ubuntu-latest'
-      uses: browser-actions/setup-geckodriver@latest
+      - name: Setup Geckodriver
+        if: matrix.os == 'ubuntu-latest'
+        uses: browser-actions/setup-geckodriver@latest
 
-    - name: Setup Chrome
-      uses: browser-actions/setup-chrome@latest
-      with:
-        chrome-version: stable
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@latest
+        with:
+          chrome-version: stable
 
-    - name: Setup Chromedriver
-      uses: nanasess/setup-chromedriver@master
+      - name: Setup Chromedriver
+        uses: nanasess/setup-chromedriver@master
 
-    - name: Cache tox environments
-      uses: actions/cache@v3
-      with:
-        path: .tox
-        key: tox-${{ matrix.os }}-${{ matrix.python }}-${{ hashFiles('pyproject.toml', 'poetry.lock') }}
+      - name: Cache tox environments
+        uses: actions/cache@v3
+        with:
+          path: .tox
+          key: tox-ubuntu-latest-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+          restore-keys: |
+            tox-ubuntu-latest-${{ matrix.python-version }}-
 
-    - name: Test
-      if: matrix.os == 'ubuntu-latest'
-      run: tox -e ${{ matrix.tox_env }}
+      - name: Set tox variable
+        shell: bash
+        run: |
+          echo "python-version: ${{ matrix.python-version }}"
+          echo "tox-env: ${{ matrix.tox-env }}"
+          if [[ -n "${{ matrix.tox-env }}" ]]; then
+            echo "tox=${{ matrix.tox-env }}" >> "$GITHUB_ENV"
+          else
+            echo "tox=py${{ matrix.python-version }}" >> "$GITHUB_ENV"
+          fi
 
-    - name: Test (skip firefox on windows)
-      if: matrix.os == 'windows-latest'
-      env:
-        PYTEST_ADDOPTS: "-m 'not (edge or safari or firefox)'"
-      run: tox -e ${{ matrix.tox_env }}
+      - name: Test
+        if: matrix.os == 'ubuntu-latest'
+        run: tox -e "${{ env.tox }}"
+
+      - name: Test (skip firefox on windows)
+        if: matrix.os == 'windows-latest'
+        env:
+          PYTEST_ADDOPTS: "-m 'not (edge or safari or firefox)'"
+        run: tox -e "${{ env.tox }}"
+
+      - name: Archive report.html
+        if: failure()
+        uses: actions/upload-artifact@v1
+        with:
+          name: report.html.${{ matrix.os }}-${{ env.tox }}.zip
+          path: .tox/${{ env.tox }}/log/report.html
 
   docs:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v3
-      with:
-        python-version: 3.9
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install tox
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install tox
 
-    - name: Run tests
-      run: "tox -e docs"
+      - name: Run tests
+        run: tox -e docs

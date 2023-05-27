@@ -33,7 +33,7 @@ class CrossBrowserTesting(Provider):
         )
 
 
-@pytest.mark.optionalhook
+@pytest.hookimpl(optionalhook=True)
 def pytest_selenium_capture_debug(item, report, extra):
     provider = CrossBrowserTesting()
     if not provider.uses_driver(item.config.getoption("driver")):
@@ -57,7 +57,7 @@ def pytest_selenium_capture_debug(item, report, extra):
         extra.append(pytest_html.extras.html(_video_html(videos[0])))
 
 
-@pytest.mark.optionalhook
+@pytest.hookimpl(optionalhook=True)
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     provider = CrossBrowserTesting()
     if not provider.uses_driver(item.config.getoption("driver")):

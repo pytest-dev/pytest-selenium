@@ -52,7 +52,7 @@ class SauceLabs(Provider):
         return driver.lower() == self.name.lower()
 
 
-@pytest.mark.optionalhook
+@pytest.hookimpl(optionalhook=True)
 def pytest_selenium_capture_debug(item, report, extra):
     provider = SauceLabs(item.config.getini("saucelabs_data_center"))
     if not provider.uses_driver(item.config.getoption("driver")):
@@ -62,7 +62,7 @@ def pytest_selenium_capture_debug(item, report, extra):
     extra.append(pytest_html.extras.html(_video_html(item._driver.session_id)))
 
 
-@pytest.mark.optionalhook
+@pytest.hookimpl(optionalhook=True)
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
     provider = SauceLabs(item.config.getini("saucelabs_data_center"))
     if not provider.uses_driver(item.config.getoption("driver")):

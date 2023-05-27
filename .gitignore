@@ -1,4 +1,5 @@
 __pycache__
+__version.py
 .cache
 .DS_Store
 .eggs
