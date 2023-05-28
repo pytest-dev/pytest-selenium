@@ -127,7 +127,12 @@ def run_sauce_test(monkeypatch, testdir, file_test):
     )
 
     testdir.quick_qa(
-        "--driver", "saucelabs", "--variables", variables, file_test, passed=1
+        "--driver",
+        "saucelabs",
+        "--variables",
+        variables,
+        file_test,
+        passed=1,
     )
 
 

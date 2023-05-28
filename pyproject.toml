@@ -1,71 +1,79 @@
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
-
-[tool.poetry]
-name = "pytest-selenium"
-version = "4.0.0"
-description = "pytest plugin for Selenium"
-license = "MPL-2.0"
-authors = [
-    "Dave Hunt <dhunt@mozilla.com>",
-    "Jim Brannlund <jimbrannlund@fastmail.com>"
+build-backend = "hatchling.build"
+requires = [
+  "hatch-vcs>=0.3",
+  "hatchling>=1.13",
 ]
+
+[project]
+name = "pytest-selenium"
+description = "pytest plugin for Selenium"
 readme = "README.rst"
-homepage = "https://github.com/pytest-dev/pytest-selenium"
-repository = "https://github.com/pytest-dev/pytest-selenium"
+license = "MPL-2.0"
+requires-python = ">=3.7"
 keywords = [
-    "pytest",
-    "selenium",
-    "saucelabs",
-    "browserstack",
-    "webqa",
-    "qa"
+  "pytest",
+  "selenium",
+  "saucelabs",
+  "browserstack",
+  "webqa",
+  "qa"
+]
+authors = [
+  { name = "Dave Hunt", email =  "dhunt@mozilla.com" },
+  { name = "Jim Brannlund", email = "jimbrannlund@fastmail.com" },
 ]
 classifiers = [
-    "Development Status :: 5 - Production/Stable",
-    "Framework :: Pytest",
-    "Intended Audience :: Developers",
-    "Operating System :: POSIX",
-    "Operating System :: Microsoft :: Windows",
-    "Operating System :: MacOS :: MacOS X",
-    "Topic :: Software Development :: Quality Assurance",
-    "Topic :: Software Development :: Testing",
-    "Topic :: Utilities",
+  "Development Status :: 5 - Production/Stable",
+  "Framework :: Pytest",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Natural Language :: English",
+  "Operating System :: POSIX",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: MacOS :: MacOS X",
+  "Programming Language :: Python :: 3.7",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: Implementation :: CPython",
+  "Programming Language :: Python :: Implementation :: PyPy",
+  "Topic :: Software Development :: Quality Assurance",
+  "Topic :: Software Development :: Testing",
+  "Topic :: Utilities",
 ]
-packages = [
-    { include = "pytest_selenium", from = "src" },
+dependencies = [
+  "pytest>=6.0.0",
+  "pytest-base-url>=2.0.0",
+  "pytest-html>=2.0.0",
+  "pytest-variables>=2.0.0",
+  "requests>=2.26.0",
+  "selenium>=4.0.0",
+  "tenacity>=6.0.0",
 ]
-include = [
-    { path = "testing", format = "sdist" },
-    { path = "docs", format = "sdist" }
+dynamic = [
+  "version",
 ]
 
-[tool.poetry.dependencies]
-python = ">=3.7"
-pytest = ">=6.0.0"
-pytest-base-url = ">=2.0.0"
-pytest-html = ">=2.0.0"
-pytest-variables = ">=2.0.0"
-requests = ">=2.26.0"
-selenium = ">=4.0.0"
-tenacity = ">=6.0.0"
+[project.optional-dependencies]
+appium = [ "appium-python-client>=1.0.0" ]
+test = [
+  "pytest-localserver>=0.5.0",
+  "pytest-xdist>=2.4.0",
+  "pytest-mock>=3.6.1",
+  "black>=22.1.0",
+  "flake8>=4.0.1",
+  "pre-commit>=2.17.0",
+  "tox>=3.24.5",
+]
 
-appium-python-client = { version = ">=1.0.0", optional = true }
+[project.urls]
+Homepage = "https://github.com/pytest-dev/pytest-selenium"
+Tracker = "https://github.com/pytest-dev/pytest-selenium/issues"
+Source = "https://github.com/pytest-dev/pytest-selenium"
 
-[tool.poetry.extras]
-appium = ["appium-python-client"]
-
-[tool.poetry.dev-dependencies]
-black = ">=22.1.0"
-flake8 = ">=4.0.1"
-tox = ">=3.24.5"
-pre-commit = ">=2.17.0"
-pytest-localserver = ">=0.5.0"
-pytest-xdist = ">=2.4.0"
-pytest-mock = ">=3.6.1"
-
-[tool.poetry.plugins.pytest11]
+[project.entry-points.pytest11]
 selenium = "pytest_selenium.pytest_selenium"
 selenium_safety = "pytest_selenium.safety"
 browserstack_driver = "pytest_selenium.drivers.browserstack"
@@ -79,3 +87,19 @@ safari_driver = "pytest_selenium.drivers.safari"
 saucelabs_driver = "pytest_selenium.drivers.saucelabs"
 testingbot_driver = "pytest_selenium.drivers.testingbot"
 appium_driver = "pytest_selenium.drivers.appium"
+
+[tool.hatch.envs.test]
+features = [
+  "test",
+]
+
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+  "/.github",
+]
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/pytest_selenium/__version.py"

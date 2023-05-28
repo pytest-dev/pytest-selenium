@@ -227,7 +227,12 @@ def selenium(driver):
 
 @pytest.hookimpl(trylast=True)
 def pytest_configure(config):
-    capabilities = config._variables.get("capabilities", {})
+    try:
+        capabilities = config._variables.get("capabilities", {})
+    except AttributeError:
+        from pytest_variables.plugin import variables_key
+
+        capabilities = config.stash[variables_key].get("capabilities", {})
     capabilities.update({k: v for k, v in config.getoption("capabilities")})
     config.addinivalue_line(
         "markers",
@@ -237,11 +242,18 @@ def pytest_configure(config):
         "bar"
         ")",
     )
-    if hasattr(config, "_metadata"):
-        config._metadata["Driver"] = config.getoption("driver")
-        config._metadata["Capabilities"] = capabilities
+    metadata = config.pluginmanager.getplugin("metadata")
+    if metadata:
+        try:
+            metadata = config._metadata
+        except AttributeError:
+            from pytest_metadata.plugin import metadata_key
+
+            metadata = config.stash[metadata_key]
+        metadata["Driver"] = config.getoption("driver")
+        metadata["Capabilities"] = capabilities
         if all((config.option.selenium_host, config.option.selenium_port)):
-            config._metadata["Server"] = "{0}:{1}".format(
+            metadata["Server"] = "{0}:{1}".format(
                 config.option.selenium_host, config.option.selenium_port
             )
     config._capabilities = capabilities
@@ -253,7 +265,7 @@ def pytest_report_header(config, startdir):
         return "driver: {0}".format(driver)
 
 
-@pytest.mark.hookwrapper
+@pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
     outcome = yield
     report = outcome.get_result()
