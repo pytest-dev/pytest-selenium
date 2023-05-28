@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+4.0.1 (2023-05-28)
+------------------
+
+* Switch to Hatch
+
+* Relax dependency constraints
+
 4.0.0 (2022-09-15)
 ------------------
 
