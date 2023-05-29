@@ -14,9 +14,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: ${{ ! contains(github.ref, github.event.repository.default_branch) }}
 
-env:
-  PYTEST_ADDOPTS: "-m 'not (edge or safari)'"
-
 jobs:
   linting:
     runs-on: ubuntu-latest
@@ -37,28 +34,20 @@ jobs:
         run: tox -e linting
 
   test:
-    name: ${{ matrix.os }} - ${{ matrix.python-version }}
-    runs-on: ${{ matrix.os }}
+    name: ubuntu-latest - ${{ matrix.tox-env || matrix.python-version }}
+    runs-on: ubuntu-latest
     strategy:
-      fail-fast: true
+      fail-fast: false
       matrix:
-        os: [ubuntu-latest, windows-latest]
         python-version: ["3.7", "3.8", "3.9", "3.10", "3.11"]
         include:
           - os: ubuntu-latest
             python-version: pypy3.9
             tox-env: py3.9
-          - os: windows-latest
-            python-version: pypy3.9
-            tox-env: py3.9
 
-# TODO(jim) Deactivate devel tests pending troubleshooting
-#          - os: ubuntu-latest
-#            python-version: 3.12-dev
-#            tox-env: devel
-#          - os: windows-latest
-#            python-version: 3.12-dev
-#            tox-env: devel
+          - os: ubuntu-latest
+            python-version: 3.11
+            tox-env: devel
 
     steps:
       - uses: actions/checkout@v3
@@ -73,23 +62,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install tox
 
-      - name: Setup Firefox
-        if: matrix.os == 'ubuntu-latest'
-        uses: browser-actions/setup-firefox@latest
-        with:
-          firefox-version: latest
-
-      - name: Setup Geckodriver
-        if: matrix.os == 'ubuntu-latest'
-        uses: browser-actions/setup-geckodriver@latest
-
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@latest
-        with:
-          chrome-version: stable
-
-      - name: Setup Chromedriver
-        uses: nanasess/setup-chromedriver@master
+      - name: Start browsers
+        run: docker/start
 
       - name: Cache tox environments
         uses: actions/cache@v3
@@ -111,13 +85,6 @@ jobs:
           fi
 
       - name: Test
-        if: matrix.os == 'ubuntu-latest'
-        run: tox -e "${{ env.tox }}"
-
-      - name: Test (skip firefox on windows)
-        if: matrix.os == 'windows-latest'
-        env:
-          PYTEST_ADDOPTS: "-m 'not (edge or safari or firefox)'"
         run: tox -e "${{ env.tox }}"
 
       - name: Archive report.html

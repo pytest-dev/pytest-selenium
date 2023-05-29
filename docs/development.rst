@@ -47,39 +47,28 @@ Otherwise, to install and run, do:
 
 Drivers
 -------
-To run the tests you're going to need some browser drivers.
 
-Chromedriver
-~~~~~~~~~~~~
-To install the latest `chromedriver <https://sites.google.com/a/chromium.org/chromedriver/>`_
-on your Mac or Linux (64-bit), run:
+The tests requires that Docker is available and uses the Selenium/Seleniarm containerized browsers and drivers.
 
-.. code-block:: bash
+Read more here: `Docker-Seleniarm <https://github.com/seleniumhq-community/docker-seleniarm>`_
 
-  $ ./installation/chromedriver.sh
-
-For Windows users, please see `here <https://sites.google.com/a/chromium.org/chromedriver/getting-started>`_.
-
-Geckodriver
-~~~~~~~~~~~
-To install the latest `geckodriver <https://firefox-source-docs.mozilla.org/testing/geckodriver/>`_
-on your Mac or Linux (64-bit), run:
+To start the browsers (and drivers):
 
 .. code-block:: bash
 
-  $ ./installation/geckodriver.sh
+  $ docker/start
 
-Safaridriver
-~~~~~~~~~~~~
-Instructions for `safaridriver <https://developer.apple.com/documentation/webkit/testing_with_webdriver_in_safari?language=objc>`_.
+You can check status by running:
 
-Edgedriver
-~~~~~~~~~~
-Instructions for `edgedriver <https://developer.microsoft.com/en-us/microsoft-edge/tools/webdriver/#downloads>`_.
+.. code-block:: bash
 
-IEDriver
-~~~~~~~~
-Instructions for `iedriver <https://github.com/SeleniumHQ/selenium/wiki/InternetExplorerDriver>`_.
+  $ docker ps
+
+To stop the containers, run:
+
+.. code-block:: bash
+
+  $ docker/start down
 
 Releasing a new version
 -----------------------

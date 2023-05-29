@@ -203,6 +203,7 @@ def test_provider_naming(name):
     assert provider.name == name
 
 
+@pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 def test_service_log_path(testdir):
     file_test = testdir.makepyfile(
         """
@@ -212,9 +213,10 @@ def test_service_log_path(testdir):
             assert driver_kwargs['service_log_path'] is not None
     """
     )
-    testdir.quick_qa("--driver", "Firefox", file_test, passed=1)
+    testdir.quick_qa(file_test, passed=1)
 
 
+@pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 def test_no_service_log_path(testdir):
     file_test = testdir.makepyfile(
         """
@@ -228,7 +230,7 @@ def test_no_service_log_path(testdir):
             assert driver_kwargs['service_log_path'] is None
     """
     )
-    testdir.quick_qa("--driver", "Firefox", file_test, passed=1)
+    testdir.quick_qa(file_test, passed=1)
 
 
 def test_driver_retry_pass(testdir, mocker):
@@ -248,7 +250,7 @@ def test_driver_retry_pass(testdir, mocker):
     """
     )
 
-    testdir.quick_qa("--driver", "Firefox", file_test, passed=1)
+    testdir.quick_qa(file_test, passed=1)
     assert mock_retrying.spy_return.statistics["attempt_number"] == 1
 
 
@@ -296,4 +298,4 @@ def test_xdist(testdir):
             pass
     """
     )
-    testdir.quick_qa("--driver", "firefox", "-n", "2", file_test, passed=1)
+    testdir.quick_qa("-n", "2", file_test, passed=1)

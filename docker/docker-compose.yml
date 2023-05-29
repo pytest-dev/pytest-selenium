@@ -1,0 +1,80 @@
+# To execute this docker-compose yml file use `docker-compose -f docker-compose.intel.yml up`
+# Add the `-d` flag at the end for detached execution
+# To stop the execution, hit Ctrl+C, and then `docker-compose -f docker-compose-v3.yml down`
+version: "3"
+
+services:
+
+  chromium:
+    image: seleniarm/node-chromium:113.0
+    container_name: selenium-chromium
+    shm_size: 2gb
+    ports:
+      - "5901:5900"
+      - "7901:7900"
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - grid
+
+  firefox:
+    image: seleniarm/node-firefox:112.0
+    container_name: selenium-firefox
+    shm_size: 2gb
+    ports:
+      - "5902:5900"
+      - "7902:7900"
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - grid
+
+  edge:
+    image: selenium/node-edge:113.0
+    container_name: selenium-edge
+    shm_size: 2gb
+    ports:
+      - "5903:5900"
+    depends_on:
+      - selenium-hub
+    environment:
+      - SE_EVENT_BUS_HOST=selenium-hub
+      - SE_EVENT_BUS_PUBLISH_PORT=4442
+      - SE_EVENT_BUS_SUBSCRIBE_PORT=4443
+    networks:
+      - grid
+    profiles:
+      - intel
+
+  selenium-hub:
+    image: seleniarm/hub:4.9.1
+    container_name: selenium-hub
+    ports:
+      - "4442:4442"
+      - "4443:4443"
+      - "4444:4444"
+    networks:
+      - grid
+
+  webserver:
+    container_name: webserver
+    build:
+      context: docker
+    environment:
+      - PYTHONDONTWRITEBYTECODE=1
+    networks:
+      - grid
+    depends_on:
+      - firefox
+      - chromium
+
+networks:
+  grid:

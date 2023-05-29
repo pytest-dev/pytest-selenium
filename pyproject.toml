@@ -59,7 +59,6 @@ dynamic = [
 [project.optional-dependencies]
 appium = [ "appium-python-client>=1.0.0" ]
 test = [
-  "pytest-localserver>=0.5.0",
   "pytest-xdist>=2.4.0",
   "pytest-mock>=3.6.1",
   "black>=22.1.0",
