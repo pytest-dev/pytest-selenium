@@ -7,8 +7,7 @@ import pytest
 pytestmark = [pytest.mark.nondestructive, pytest.mark.firefox]
 
 
-def test_launch(testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+def test_launch(testdir):
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -20,8 +19,7 @@ def test_launch(testdir, httpserver):
     testdir.quick_qa(file_test, passed=1)
 
 
-def test_launch_case_insensitive(testdir, httpserver):
-    httpserver.serve_content(content="<h1>Success!</h1>")
+def test_launch_case_insensitive(testdir):
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -30,16 +28,15 @@ def test_launch_case_insensitive(testdir, httpserver):
             assert webtext == u'Success!'
     """
     )
-    testdir.quick_qa("--driver", "firefox", file_test, passed=1)
+    testdir.quick_qa(file_test, passed=1)
 
 
-def test_profile(testdir, httpserver):
+def test_profile(testdir):
     """Test that specified profile is used when starting Firefox.
 
     The profile changes the colors in the browser, which are then reflected
     when calling value_of_css_property.
     """
-    httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
     file_test = testdir.makepyfile(
         """
         import pytest
@@ -96,9 +93,8 @@ def test_extension(testdir):
     testdir.quick_qa("--firefox-extension", extension, file_test, passed=1)
 
 
-def test_preferences_marker(testdir, httpserver):
+def test_preferences_marker(testdir):
     """Test that preferences can be specified using the marker."""
-    httpserver.serve_content(content='<h1>Success!</h1><a href="#">Link</a>')
     file_test = testdir.makepyfile(
         """
         import pytest

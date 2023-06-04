@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+
+if [[ "${1}" == "down" ]]; then
+  docker compose --file docker/docker-compose.yml down
+  exit 0
+fi
+
+if [[ $(uname -m) == "arm64" ]]; then
+  docker compose --file docker/docker-compose.yml up -d
+else
+  docker compose --file docker/docker-compose.yml --profile intel up -d
+fi

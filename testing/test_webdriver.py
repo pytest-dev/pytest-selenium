@@ -8,7 +8,7 @@ from selenium.webdriver.support.abstract_event_listener import AbstractEventList
 pytestmark = pytest.mark.nondestructive
 
 
-def test_event_listening_webdriver(testdir, httpserver):
+def test_event_listening_webdriver(testdir):
     file_test = testdir.makepyfile(
         """
         import pytest
