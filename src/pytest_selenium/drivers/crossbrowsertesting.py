@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
-from py.xml import html
+import html
 import pytest
 
 from pytest_selenium.drivers.cloud import Provider
@@ -113,13 +113,9 @@ def driver_kwargs(request, test, capabilities, **kwargs):
 
 
 def _video_html(video):
-    html.__tagspec__.update(dict([(x, 1) for x in ("video", "source")]))
-    video_attrs = {
-        "controls": "",
-        "poster": video.get("image"),
-        "play-pause-on-click": "",
-        "style": "border:1px solid #e6e6e6; float:right; height:240px; "
-        "margin-left:5px; overflow:hidden; width:320px",
-    }
-    source_attrs = {"src": video.get("video"), "type": "video/mp4"}
-    return str(html.video(html.source(**source_attrs), **video_attrs))
+    return (
+        f'<video controls="" play-pause-on-click="" poster="{html.escape(video.get("image"))}"'
+        'style="border:1px solid #e6e6e6; float:right; height:240px; margin-left:5px; overflow:hidden; width:320px">'
+        f'<source src="{html.escape(video.get("video"))}" type="video/mp4"></source>'
+        "</video>"
+    )
