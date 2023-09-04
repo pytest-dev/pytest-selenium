@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+4.0.2 (2023-09-13)
+------------------
+
+* Remove py dependency
+
+  * Thanks to `@treiher <https://github.com/treiher>`_ for reporting the issue.
+
+  * Thanks to `@sandre35 <https://github.com/sandre35>`_ for the PR.
+
 4.0.1 (2023-05-28)
 ------------------
 
