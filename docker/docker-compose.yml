@@ -67,7 +67,7 @@ services:
   webserver:
     container_name: webserver
     build:
-      context: docker
+      context: .
     environment:
       - PYTHONDONTWRITEBYTECODE=1
     networks:
