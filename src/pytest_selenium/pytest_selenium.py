@@ -302,7 +302,7 @@ def pytest_runtest_makereport(item, call):
         )
     if summary:
         report.sections.append(("pytest-selenium", "\n".join(summary)))
-    report.extra = extra
+    report.extras = extra
 
 
 def _gather_url(item, report, driver, summary, extra):
