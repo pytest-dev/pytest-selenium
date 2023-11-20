@@ -3,24 +3,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import pytest
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.service import Service
 
 
-def driver_kwargs(
-    capabilities, driver_args, driver_log, driver_path, chrome_options, **kwargs
-):
-    kwargs = {
-        "desired_capabilities": capabilities,
-        "service_log_path": driver_log,
-        "options": chrome_options,
-    }
-
-    if driver_args is not None:
-        kwargs["service_args"] = driver_args
-    if driver_path is not None:
-        kwargs["executable_path"] = driver_path
-    return kwargs
+def driver_kwargs(chrome_options, chrome_service, **kwargs):
+    return {"options": chrome_options, "service": chrome_service}
 
 
 @pytest.fixture
 def chrome_options():
     return Options()
+
+
+@pytest.fixture
+def chrome_service(driver_path, driver_args, driver_log):
+    return Service(
+        executable_path=driver_path, service_args=driver_args, log_output=driver_log
+    )

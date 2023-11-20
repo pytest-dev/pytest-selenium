@@ -3,23 +3,20 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 import pytest
 from selenium.webdriver.edge.options import Options
+from selenium.webdriver.edge.service import Service
 
 
-def driver_kwargs(capabilities, driver_log, driver_path, edge_options, **kwargs):
-
-    kwargs = {
-        "service_log_path": driver_log,
-        "options": edge_options,
-    }
-
-    if capabilities:
-        kwargs["capabilities"] = capabilities
-    if driver_path is not None:
-        kwargs["executable_path"] = driver_path
-
-    return kwargs
+def driver_kwargs(edge_options, edge_service, **kwargs):
+    return {"options": edge_options, "service": edge_service}
 
 
 @pytest.fixture
 def edge_options():
     return Options()
+
+
+@pytest.fixture
+def edge_service(driver_path, driver_args, driver_log):
+    return Service(
+        executable_path=driver_path, service_args=driver_args, log_output=driver_log
+    )

@@ -6,6 +6,7 @@ import os
 import json
 
 import pytest
+from selenium.webdriver.common.options import ArgOptions
 
 from pytest_selenium.drivers.cloud import Provider
 from pytest_selenium.exceptions import MissingCloudSettingError
@@ -114,11 +115,10 @@ def driver_kwargs(request, test, capabilities, **kwargs):
     if tags:
         _capabilities["tags"] = tags
 
-    kwargs = {
+    return {
         "command_executor": provider.executor,
-        "desired_capabilities": capabilities,
+        "options": ArgOptions(),
     }
-    return kwargs
 
 
 def _video_html(session):

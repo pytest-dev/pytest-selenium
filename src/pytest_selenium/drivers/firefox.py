@@ -6,6 +6,7 @@ import logging
 import pytest
 
 from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
 
 LOGGER = logging.getLogger(__name__)
 
@@ -26,17 +27,8 @@ def pytest_configure(config):
     )
 
 
-def driver_kwargs(capabilities, driver_log, driver_path, firefox_options, **kwargs):
-    kwargs = {"service_log_path": driver_log}
-
-    if capabilities:
-        kwargs["capabilities"] = capabilities
-    if driver_path is not None:
-        kwargs["executable_path"] = driver_path
-
-    kwargs["options"] = firefox_options
-
-    return kwargs
+def driver_kwargs(firefox_options, firefox_service, **kwargs):
+    return {"options": firefox_options, "service": firefox_service}
 
 
 @pytest.fixture
@@ -50,6 +42,13 @@ def firefox_options(request):
         options.set_preference(name, value)
 
     return options
+
+
+@pytest.fixture
+def firefox_service(driver_path, driver_args, driver_log):
+    return Service(
+        executable_path=driver_path, service_args=driver_args, log_output=driver_log
+    )
 
 
 def get_arguments_from_markers(node):

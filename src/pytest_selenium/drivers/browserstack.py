@@ -3,6 +3,7 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 import pytest
+from selenium.webdriver.common.options import ArgOptions
 
 from pytest_selenium.drivers.cloud import Provider
 from pytest_selenium.exceptions import MissingCloudSettingError
@@ -93,23 +94,22 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
         summary.append("WARNING: Failed to update job status: {0}".format(e))
 
 
-def driver_kwargs(request, test, capabilities, **kwargs):
+def driver_kwargs(test, capabilities, **kwargs):
     provider = BrowserStack()
     assert provider.job_access
-    if (
-        "bstack:options" in capabilities
-        and type(capabilities["bstack:options"]) is dict
-    ):
-        capabilities["bstack:options"].setdefault("sessionName", test)
-        capabilities["bstack:options"].setdefault("userName", provider.username)
-        capabilities["bstack:options"].setdefault("accessKey", provider.key)
+    options = ArgOptions()
+    bstack_options = capabilities.pop("bstack:options", None)
+    if isinstance(bstack_options, dict):
+        bstack_options.setdefault("sessionName", test)
+        bstack_options.setdefault("userName", provider.username)
+        bstack_options.setdefault("accessKey", provider.key)
+        options.set_capability("bstack:options", bstack_options)
     else:
-        capabilities.setdefault("name", test)
-        capabilities.setdefault("browserstack.user", provider.username)
-        capabilities.setdefault("browserstack.key", provider.key)
-    kwargs = {
+        options.set_capability("name", test)
+        options.set_capability("browserstack.user", provider.username)
+        options.set_capability("browserstack.key", provider.key)
+    return {
         "command_executor": provider.executor,
-        "desired_capabilities": capabilities,
         "keep_alive": True,
+        "options": options,
     }
-    return kwargs
