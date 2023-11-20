@@ -78,7 +78,16 @@ def test_extension(testdir):
         import pytest
         from selenium.webdriver.common.by import By
         from selenium.common.exceptions import StaleElementReferenceException
+        from selenium.webdriver.firefox.firefox_profile import FirefoxProfile
         from selenium.webdriver.support.ui import WebDriverWait
+
+        @pytest.fixture
+        def firefox_options(firefox_options):
+            profile = FirefoxProfile()
+            profile.add_extension('{0}')
+            firefox_options.profile = profile
+            return firefox_options
+
         @pytest.mark.nondestructive
         def test_extension(selenium):
             selenium.get('about:support')
@@ -88,9 +97,11 @@ def test_extension(testdir):
                     lambda s: s.find_element(By.ID,
                         'extensions-tbody').text)
             assert 'Test Extension (empty)' in extensions
-    """
+    """.format(
+            extension
+        )
     )
-    testdir.quick_qa("--firefox-extension", extension, file_test, passed=1)
+    testdir.quick_qa(file_test, passed=1)
 
 
 def test_preferences_marker(testdir):

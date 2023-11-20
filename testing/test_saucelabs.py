@@ -92,8 +92,8 @@ def test_credentials_in_capabilities(monkeypatch, testdir):
         import pytest
         @pytest.mark.nondestructive
         def test_sauce_capabilities(driver_kwargs):
-            assert driver_kwargs['desired_capabilities']['username'] == 'foo'
-            assert driver_kwargs['desired_capabilities']['accessKey'] == 'bar'
+            assert driver_kwargs['options'].capabilities['username'] == 'foo'
+            assert driver_kwargs['options'].capabilities['accessKey'] == 'bar'
     """
     )
 
@@ -107,7 +107,7 @@ def test_no_sauce_options(monkeypatch, testdir):
         @pytest.mark.nondestructive
         def test_sauce_capabilities(driver_kwargs):
             try:
-                driver_kwargs['desired_capabilities']['sauce:options']
+                driver_kwargs['options'].capabilities['sauce:options']
                 raise AssertionError('<sauce:options> should not be present!')
             except KeyError:
                 pass
@@ -173,7 +173,7 @@ def run_w3c_sauce_test(capabilities, expected_result, monkeypatch, testdir):
         import pytest
         @pytest.mark.nondestructive
         def test_sauce_capabilities(driver_kwargs):
-            actual = driver_kwargs['desired_capabilities']['sauce:options']
+            actual = driver_kwargs['options'].capabilities['sauce:options']
             assert actual == {}
     """.format(
             expected_result

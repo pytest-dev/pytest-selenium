@@ -112,9 +112,9 @@ def test_default_caps_in_jsonwp(monkeypatch, testdir):
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
-            assert driver_kwargs['desired_capabilities']['browserstack.user'] == 'foo'
-            assert driver_kwargs['desired_capabilities']['browserstack.key'] == 'bar'
-            assert driver_kwargs['desired_capabilities']['name'] == '{0}'
+            assert driver_kwargs['options'].capabilities['browserstack.user'] == 'foo'
+            assert driver_kwargs['options'].capabilities['browserstack.key'] == 'bar'
+            assert driver_kwargs['options'].capabilities['name'] == '{0}'
     """.format(
             test_name
         )
@@ -136,9 +136,9 @@ def test_default_caps_in_jsonwp_with_conflict(monkeypatch, testdir):
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
-            assert driver_kwargs['desired_capabilities']['browserstack.user'] == 'foo'
-            assert driver_kwargs['desired_capabilities']['browserstack.key'] == 'bar'
-            assert driver_kwargs['desired_capabilities']['name'] == 'conflicting_name'
+            assert driver_kwargs['options'].capabilities['browserstack.user'] == 'foo'
+            assert driver_kwargs['options'].capabilities['browserstack.key'] == 'bar'
+            assert driver_kwargs['options'].capabilities['name'] == 'conflicting_name'
     """
     )
     testdir.quick_qa(
@@ -158,7 +158,7 @@ def test_default_caps_in_W3C(monkeypatch, testdir):
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
-            assert driver_kwargs['desired_capabilities']['bstack:options'] == {
+            assert driver_kwargs['options'].capabilities['bstack:options'] == {
                 'userName': 'foo',
                 'accessKey': 'bar',
                 'sessionName': 'test_default_caps_in_W3C.test_bstack_capabilities'
@@ -185,7 +185,7 @@ def test_default_caps_in_W3C_with_conflict(monkeypatch, testdir):
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
-            assert driver_kwargs['desired_capabilities']['bstack:options'] == {
+            assert driver_kwargs['options'].capabilities['bstack:options'] == {
                 'userName': 'foo',
                 'accessKey': 'bar',
                 'sessionName': 'conflicting_name'

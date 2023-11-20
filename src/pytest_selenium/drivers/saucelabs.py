@@ -5,8 +5,8 @@
 import os
 import json
 
-from py.xml import html
 import pytest
+from selenium.webdriver.common.options import ArgOptions
 
 from pytest_selenium.drivers.cloud import Provider
 from pytest_selenium.exceptions import MissingCloudSettingError
@@ -115,11 +115,10 @@ def driver_kwargs(request, test, capabilities, **kwargs):
     if tags:
         _capabilities["tags"] = tags
 
-    kwargs = {
+    return {
         "command_executor": provider.executor,
-        "desired_capabilities": capabilities,
+        "options": ArgOptions(),
     }
-    return kwargs
 
 
 def _video_html(session):
@@ -151,26 +150,18 @@ def _video_html(session):
         session=session
     )
 
-    return str(
-        html.div(
-            html.object(
-                html.param(value="true", name="allowfullscreen"),
-                html.param(value="always", name="allowscriptaccess"),
-                html.param(value="high", name="quality"),
-                html.param(value="#000000", name="bgcolor"),
-                html.param(value=flash_vars.replace(" ", ""), name="flashvars"),
-                width="100%",
-                height="100%",
-                type="application/x-shockwave-flash",
-                data="https://cdn1.saucelabs.com/sauce_skin_deprecated/lib/"
-                "flowplayer/flowplayer-3.2.17.swf",
-                name="player_api",
-                id="player_api",
-            ),
-            id="player{session}".format(session=session),
-            style="border:1px solid #e6e6e6; float:right; height:240px;"
-            "margin-left:5px; overflow:hidden; width:320px",
-        )
+    return (
+        f'<div id="player{session}" style="border:1px solid #e6e6e6; float:right; height:240px; margin-left:5px;'
+        'overflow:hidden; width:320px">'
+        '<object data="https://cdn1.saucelabs.com/sauce_skin_deprecated/lib/flowplayer/flowplayer-3.2.17.swf"'
+        'height="100%" id="player_api" name="player_api" type="application/x-shockwave-flash" width="100%">'
+        '<param name="allowfullscreen" value="true"/>'
+        '<param name="allowscriptaccess" value="always"/>'
+        '<param name="quality" value="high"/>'
+        '<param name="bgcolor" value="#000000"/>'
+        f'<param name="flashvars" value="{flash_vars.replace(" ", "")}"/>'
+        "</object>"
+        "</div>"
     )
 
 

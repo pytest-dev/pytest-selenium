@@ -9,7 +9,12 @@ import re
 import pytest
 
 
-pytestmark = pytest.mark.nondestructive
+pytestmark = [
+    pytest.mark.nondestructive,
+    pytest.mark.skip(
+        reason="Grid doesn't support logging, see https://github.com/SeleniumHQ/selenium/issues/10949"
+    ),
+]
 
 URL_LINK = '<a class="url" href="{0}/" target="_blank">URL</a>'
 

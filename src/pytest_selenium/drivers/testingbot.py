@@ -5,7 +5,7 @@
 from hashlib import md5
 
 import pytest
-from py.xml import html
+from selenium.webdriver.common.options import ArgOptions
 
 from pytest_selenium.drivers.cloud import Provider
 
@@ -92,33 +92,28 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
 def driver_kwargs(request, test, capabilities, host, port, **kwargs):
     provider = TestingBot(host, port)
 
-    capabilities.setdefault("name", test)
-    capabilities.setdefault("client_key", provider.key)
-    capabilities.setdefault("client_secret", provider.secret)
+    options = ArgOptions()
+    options.set_capability("name", test)
+    options.set_capability("client_key", provider.key)
+    options.set_capability("client_secret", provider.secret)
     markers = [x.name for x in request.node.iter_markers()]
-    groups = capabilities.get("groups", []) + markers
+    groups = capabilities.pop("groups", []) + markers
     if groups:
-        capabilities["groups"] = groups
-    kwargs = {
+        options.set_capability("groups", groups)
+    return {
         "command_executor": provider.executor,
-        "desired_capabilities": capabilities,
+        "options": options,
     }
-    return kwargs
 
 
 def _video_html(video_url, session):
-    return str(
-        html.div(
-            html.video(
-                html.source(src=video_url, type="video/mp4"),
-                width="100%",
-                height="100%",
-                controls="controls",
-            ),
-            id="mediaplayer{session}".format(session=session),
-            style="border:1px solid #e6e6e6; float:right; height:240px;"
-            "margin-left:5px; overflow:hidden; width:320px",
-        )
+    return (
+        f'<div id="mediaplayer{session}" style="border:1px solid #e6e6e6; float:right;'
+        'height:240px; margin-left:5px; overflow:hidden; width:320px">'
+        '<video controls="controls" height="100%" width="100%">'
+        f'<source src="{video_url}" type="video/mp4"></source>'
+        "</video>"
+        "</div>"
     )
 
 

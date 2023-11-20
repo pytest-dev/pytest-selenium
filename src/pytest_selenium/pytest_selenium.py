@@ -18,7 +18,6 @@ from tenacity import Retrying, stop_after_attempt, wait_exponential
 from .utils import CaseInsensitiveDict
 from . import drivers
 
-
 LOGGER = logging.getLogger(__name__)
 
 SUPPORTED_DRIVERS = CaseInsensitiveDict(
@@ -42,29 +41,6 @@ try:
     SUPPORTED_DRIVERS["Appium"] = appiumdriver.Remote
 except ImportError:
     pass  # Appium is optional.
-
-
-def _merge(a, b):
-    """merges b and a configurations.
-    Based on http://bit.ly/2uFUHgb
-    """
-    for key in b:
-        if key in a:
-            if isinstance(a[key], dict) and isinstance(b[key], dict):
-                _merge(a[key], b[key], [] + [str(key)])
-            elif a[key] == b[key]:
-                pass  # same leaf value
-            elif isinstance(a[key], list):
-                if isinstance(b[key], list):
-                    a[key].extend(b[key])
-                else:
-                    a[key].append(b[key])
-            else:
-                # b wins
-                a[key] = b[key]
-        else:
-            a[key] = b[key]
-    return a
 
 
 def pytest_addhooks(pluginmanager):
@@ -92,29 +68,10 @@ def session_capabilities(pytestconfig):
 def capabilities(
     request,
     driver_class,
-    chrome_options,
-    firefox_options,
-    edge_options,
     session_capabilities,
 ):
     """Returns combined capabilities"""
     capabilities = copy.deepcopy(session_capabilities)  # make a copy
-    if driver_class == webdriver.Remote:
-        browser = capabilities.get("browserName", "").upper()
-        key, options = (None, None)
-        if browser == "CHROME":
-            key = getattr(chrome_options, "KEY", "goog:chromeOptions")
-            options = chrome_options.to_capabilities()
-            if key not in options:
-                key = "chromeOptions"
-        elif browser == "FIREFOX":
-            key = firefox_options.KEY
-            options = firefox_options.to_capabilities()
-        elif browser == "EDGE":
-            key = getattr(edge_options, "KEY", None)
-            options = edge_options.to_capabilities()
-        if all([key, options]):
-            capabilities[key] = _merge(capabilities.get(key, {}), options.get(key, {}))
     capabilities.update(get_capabilities_from_markers(request.node))
     return capabilities
 
@@ -142,12 +99,20 @@ def driver_kwargs(
     request,
     capabilities,
     chrome_options,
+    chrome_service,
     driver_args,
     driver_class,
     driver_log,
     driver_path,
     firefox_options,
+    firefox_service,
+    ie_options,
+    ie_service,
     edge_options,
+    edge_service,
+    safari_options,
+    safari_service,
+    remote_options,
     pytestconfig,
 ):
     kwargs = {}
@@ -156,11 +121,19 @@ def driver_kwargs(
         driver.driver_kwargs(
             capabilities=capabilities,
             chrome_options=chrome_options,
+            chrome_service=chrome_service,
             driver_args=driver_args,
             driver_log=driver_log,
             driver_path=driver_path,
             firefox_options=firefox_options,
+            firefox_service=firefox_service,
+            ie_options=ie_options,
+            ie_service=ie_service,
             edge_options=edge_options,
+            edge_service=edge_service,
+            safari_options=safari_options,
+            safari_service=safari_service,
+            remote_options=remote_options,
             host=pytestconfig.getoption("selenium_host"),
             port=pytestconfig.getoption("selenium_port"),
             service_log_path=None,
@@ -168,6 +141,9 @@ def driver_kwargs(
             test=".".join(split_class_and_test_names(request.node.nodeid)),
         )
     )
+
+    for name, value in capabilities.items():
+        kwargs["options"].set_capability(name, value)
 
     pytestconfig._driver_log = driver_log
     return kwargs
@@ -302,7 +278,7 @@ def pytest_runtest_makereport(item, call):
         )
     if summary:
         report.sections.append(("pytest-selenium", "\n".join(summary)))
-    report.extra = extra
+    report.extras = extra
 
 
 def _gather_url(item, report, driver, summary, extra):

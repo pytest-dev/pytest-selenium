@@ -9,7 +9,7 @@ import pytest
 
 pytestmark = pytest.mark.nondestructive
 
-LOG_REGEX = '<a class="text" href=".*" target="_blank">Driver Log</a>'
+LOG_REGEX = re.compile('<a class="text" href=".*" target="_blank">Driver Log</a>')
 
 
 @pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
@@ -27,7 +27,7 @@ def test_driver_log(testdir):
     with open(str(path)) as f:
         html = f.read()
 
-    assert re.search(LOG_REGEX, html) is not None
+    assert LOG_REGEX.search(html) is not None
     log_path = testdir.tmpdir.dirpath("basetemp", "test_driver_log0", "driver.log")
     assert os.path.exists(str(log_path))
 
@@ -67,6 +67,6 @@ def test_no_driver_log(testdir):
     testdir.runpytestqa("--html", path)
     with open(str(path)) as f:
         html = f.read()
-    assert re.search(LOG_REGEX, html) is None
+    assert LOG_REGEX.search(html) is None
     log_path = testdir.tmpdir.dirpath("basetemp", "test_no_driver_log0", "driver.log")
     assert not os.path.exists(str(log_path))
