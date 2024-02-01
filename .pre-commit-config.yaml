@@ -1,19 +1,19 @@
 repos:
   - repo: https://github.com/psf/black
-    rev: 22.3.0
+    rev: 24.1.1
     hooks:
       - id: black
         args: [--safe, --quiet]
         language_version: python3
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.1.0
+    rev: v4.5.0
     hooks:
       - id: trailing-whitespace
       - id: end-of-file-fixer
 
   - repo: https://github.com/PyCQA/flake8
-    rev: 4.0.1
+    rev: 7.0.0
     hooks:
       - id: flake8
         exclude: docs

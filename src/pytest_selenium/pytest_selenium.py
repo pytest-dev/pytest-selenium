@@ -400,7 +400,7 @@ def pytest_addoption(parser):
     parser.addini(
         "selenium_exclude_debug",
         help="debug to exclude from capture",
-        default=os.getenv("SELENIUM_EXCLUDE_DEBUG"),
+        default=os.getenv("SELENIUM_EXCLUDE_DEBUG", ""),
     )
 
     _auth_choices = ("none", "token", "hour", "day")

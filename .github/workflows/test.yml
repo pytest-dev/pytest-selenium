@@ -5,8 +5,8 @@ on:
     branches:
       - master
 
-#  schedule:
-#    - cron: '0 18 * * *'  # Run daily at 14:00 UTC
+  schedule:
+    - cron: '0 18 * * *'  # Run daily at 18:00 UTC
 
   pull_request:
 
@@ -19,12 +19,12 @@ jobs:
     if: github.event_name != 'schedule' || (github.event_name == 'schedule' && github.repository == 'pytest-dev/pytest-selenium')
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
@@ -35,28 +35,20 @@ jobs:
         run: tox -e linting
 
   test:
-    name: ubuntu-latest - ${{ matrix.tox-env || matrix.python-version }}
+    name: ubuntu-latest - ${{ matrix.tox-env }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
-        include:
-          - os: ubuntu-latest
-            python-version: pypy3.9
-            tox-env: py3.9
-
-          - os: ubuntu-latest
-            python-version: 3.12
-            tox-env: devel
+        tox-env: ["3.8", "3.9", "3.10", "3.11", "3.12", "pypy3.10", "devel"]
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: ${{ matrix.tox-env == 'devel' && 3.12 || matrix.tox-env }} # default is for devel
 
       - name: Install tox
         run: |
@@ -67,43 +59,32 @@ jobs:
         run: docker/start
 
       - name: Cache tox environments
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: .tox
-          key: tox-ubuntu-latest-${{ matrix.python-version }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
+          key: ubuntu-latest-tox-${{ matrix.tox-env }}-${{ hashFiles('pyproject.toml', 'tox.ini') }}
           restore-keys: |
-            tox-ubuntu-latest-${{ matrix.python-version }}-
-
-      - name: Set tox variable
-        shell: bash
-        run: |
-          echo "python-version: ${{ matrix.python-version }}"
-          echo "tox-env: ${{ matrix.tox-env }}"
-          if [[ -n "${{ matrix.tox-env }}" ]]; then
-            echo "tox=${{ matrix.tox-env }}" >> "$GITHUB_ENV"
-          else
-            echo "tox=py${{ matrix.python-version }}" >> "$GITHUB_ENV"
-          fi
+            ubuntu-latest-tox-${{ matrix.tox-env }}-
 
       - name: Test
-        run: tox -e "${{ env.tox }}"
+        run: tox -e ${{ matrix.tox-env }}
 
       - name: Archive report.html
         if: failure()
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
-          name: report.html.${{ matrix.os }}-${{ env.tox }}.zip
-          path: .tox/${{ env.tox }}/log/report.html
+          name: report.html-${{ matrix.tox-env }}.zip
+          path: .tox/${{ matrix.tox-env }}/log/report.html
 
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.10"
+          python-version: "3.12"
 
       - name: Install dependencies
         run: |
