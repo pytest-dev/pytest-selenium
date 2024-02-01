@@ -36,7 +36,7 @@ def pytest_configure(config):
     )
 
 
-def pytest_report_header(config, startdir):
+def pytest_report_header(config, start_path):
     base_url = config.getoption("base_url")
     sensitive_url = config.getoption("sensitive_url")
     msg = "sensitiveurl: {0}".format(sensitive_url)

@@ -235,7 +235,7 @@ def pytest_configure(config):
     config._capabilities = capabilities
 
 
-def pytest_report_header(config, startdir):
+def pytest_report_header(config, start_path):
     driver = config.getoption("driver")
     if driver is not None:
         return "driver: {0}".format(driver)
