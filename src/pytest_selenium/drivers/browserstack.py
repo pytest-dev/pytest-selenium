@@ -23,15 +23,35 @@ class BrowserStack(Provider):
 
     @property
     def username(self):
-        return self.get_credential(
+        user = self.get_credential(
             "username", ["BROWSERSTACK_USERNAME", "BROWSERSTACK_USR"]
         )
+        if user in [
+            "BROWSERSTACK_USERNAME",
+            "YOUR_USERNAME",
+            "BROWSERSTACK_USR",
+        ]:
+            return self.get_credential(
+                "", ["BROWSERSTACK_USERNAME", "BROWSERSTACK_USR"]
+            )
+        else:
+            return user
 
     @property
     def key(self):
-        return self.get_credential(
+        access_key = self.get_credential(
             "key", ["BROWSERSTACK_ACCESS_KEY", "BROWSERSTACK_PSW"]
         )
+        if access_key in [
+            "BROWSERSTACK_ACCESS_KEY",
+            "YOUR_ACCESS_KEY",
+            "BROWSERSTACK_PSW",
+        ]:
+            return self.get_credential(
+                "", ["BROWSERSTACK_ACCESS_KEY", "BROWSERSTACK_PSW"]
+            )
+        else:
+            return access_key
 
     @property
     def job_access(self):
@@ -51,11 +71,22 @@ class BrowserStack(Provider):
 
 @pytest.hookimpl(optionalhook=True)
 def pytest_selenium_runtest_makereport(item, report, summary, extra):
+    if report.when in ["setup", "teardown"]:
+        return
     provider = BrowserStack()
     if not provider.uses_driver(item.config.getoption("driver")):
         return
 
     passed = report.passed or (report.failed and hasattr(report, "wasxfail"))
+    # set test failure reason if available
+    fail_reason = ""
+    if not passed:
+        try:
+            fail_reason = report.longrepr.reprcrash
+        except Exception as e:
+            summary.append(
+                "WARNING: Failed to determine {0} job URL: {1}".format(provider.name, e)
+            )
     session_id = item._driver.session_id
     api_url = provider.API.format(session=session_id)
 
@@ -76,22 +107,52 @@ def pytest_selenium_runtest_makereport(item, report, summary, extra):
         )
 
     try:
-        # Update the job result
+        # Update the session status
         job_status = job_info["automation_session"]["status"]
-        status = "running" if passed else "error"
-        if report.when == "teardown" and passed:
-            status = "completed"
-        if job_status not in ("error", status):
-            # Only update the result if it's not already marked as failed
-            requests.put(
-                api_url,
-                headers={"Content-Type": "application/json"},
-                params={"status": status},
-                auth=provider.auth,
-                timeout=10,
-            )
+        if job_status not in ("failed", "passed"):
+            # Only update the status if it's not already marked (by user via script)
+            if passed:
+                item._driver.execute_script(
+                    'browserstack_executor: { \
+                        "action": "setSessionStatus", \
+                        "arguments": { "status":"passed" } \
+                    }'
+                )
+            else:
+                import json
+
+                if fail_reason:
+                    item._driver.execute_script(
+                        'browserstack_executor: {\
+                            "action": "annotate", \
+                            "arguments": {\
+                                "level": "error", \
+                                "data": '
+                        + json.dumps(str(fail_reason))
+                        + "\
+                            }\
+                        }"
+                    )
+                    item._driver.execute_script(
+                        'browserstack_executor: {\
+                            "action": "setSessionStatus", \
+                            "arguments": {\
+                                "status": "failed", \
+                                "reason": '
+                        + json.dumps(str(fail_reason))
+                        + "\
+                            }\
+                        }"
+                    )
+                else:
+                    item._driver.execute_script(
+                        'browserstack_executor: { \
+                            "action": "setSessionStatus", \
+                            "arguments": { "status":"failed" } \
+                        }'
+                    )
     except Exception as e:
-        summary.append("WARNING: Failed to update job status: {0}".format(e))
+        summary.append("WARNING: Failed to update session status: {0}".format(e))
 
 
 def driver_kwargs(test, capabilities, **kwargs):
