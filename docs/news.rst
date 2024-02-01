@@ -1,6 +1,14 @@
 Release Notes
 =============
 
+4.1.0 (2024-02-01)
+------------------
+
+* Support pytest 8.0
+
+  * Thanks to `@sandre35 <https://github.com/sandre35>`_ for reporting the issue and the PR.
+
+
 4.0.2 (2023-11-20)
 ------------------
 
