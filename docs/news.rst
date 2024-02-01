@@ -1,6 +1,13 @@
 Release Notes
 =============
 
+4.0.3 (pending)
+------------------
+
+* Support pytest 8.0
+
+  * Thanks to `@noamkush <https://github.com/noamkush>`_ for the PR.
+
 4.0.2 (2023-11-20)
 ------------------
 
