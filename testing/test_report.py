@@ -8,7 +8,6 @@ import re
 
 import pytest
 
-
 pytestmark = [
     pytest.mark.nondestructive,
     pytest.mark.skip(
@@ -27,14 +26,12 @@ HTML_REGEX = '<a class="text" href=".*" target="_blank">HTML</a>'
 
 
 def run(testdir, *args):
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_fail(webtext):
             assert False
-    """
-    )
+    """)
     path = testdir.tmpdir.join("report.html")
     result = testdir.runpytestqa("--html", path, *args)
     with open(str(path)) as f:
@@ -45,16 +42,12 @@ def run(testdir, *args):
 @pytest.mark.parametrize("when", ["always", "failure", "never"])
 def test_capture_debug_env(testdir, monkeypatch, when):
     monkeypatch.setenv("SELENIUM_CAPTURE_DEBUG", when)
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_capture_debug(webtext):
             assert {0}
-    """.format(
-            "True" if "always" else "False"
-        )
-    )
+    """.format("True" if "always" else "False"))
     result, html = run(testdir)
     if when in ["always", "failure"]:
         assert URL_LINK.format("http://webserver") in html
@@ -77,20 +70,14 @@ def test_capture_debug_config(testdir, when):
         pytest="""
         [pytest]
         selenium_capture_debug={0}
-    """.format(
-            when
-        ),
+    """.format(when),
     )
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_capture_debug(webtext):
             assert {0}
-    """.format(
-            "True" if "always" else "False"
-        )
-    )
+    """.format("True" if "always" else "False"))
     result, html = run(testdir)
     if when in ["always", "failure"]:
         assert URL_LINK.format("http://webserver") in html
@@ -142,9 +129,7 @@ def test_exclude_debug_config(testdir, exclude):
         pytest="""
         [pytest]
         selenium_exclude_debug={0}
-    """.format(
-            exclude
-        ),
+    """.format(exclude),
     )
     result, html = run(testdir)
     assert result.ret

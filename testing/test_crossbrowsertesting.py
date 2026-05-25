@@ -12,13 +12,11 @@ pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
 @pytest.fixture
 def testfile(testdir):
-    return testdir.makepyfile(
-        """
+    return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """
-    )
+    """)
 
 
 def failure_with_output(testdir, *args, **kwargs):
