@@ -15,13 +15,11 @@ pytestmark = pytest.mark.nondestructive
 
 @pytest.fixture
 def testfile(testdir):
-    return testdir.makepyfile(
-        """
+    return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """
-    )
+    """)
 
 
 def failure_with_output(testdir, *args, **kwargs):
@@ -107,18 +105,14 @@ def test_default_caps_in_jsonwp(monkeypatch, testdir):
     variables = testdir.makefile(
         ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
     )
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
             assert driver_kwargs['options'].capabilities['browserstack.user'] == 'foo'
             assert driver_kwargs['options'].capabilities['browserstack.key'] == 'bar'
             assert driver_kwargs['options'].capabilities['name'] == '{0}'
-    """.format(
-            test_name
-        )
-    )
+    """.format(test_name))
     testdir.quick_qa(
         "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
     )
@@ -131,16 +125,14 @@ def test_default_caps_in_jsonwp_with_conflict(monkeypatch, testdir):
     variables = testdir.makefile(
         ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
     )
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
             assert driver_kwargs['options'].capabilities['browserstack.user'] == 'foo'
             assert driver_kwargs['options'].capabilities['browserstack.key'] == 'bar'
             assert driver_kwargs['options'].capabilities['name'] == 'conflicting_name'
-    """
-    )
+    """)
     testdir.quick_qa(
         "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
     )
@@ -153,8 +145,7 @@ def test_default_caps_in_W3C(monkeypatch, testdir):
     variables = testdir.makefile(
         ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
     )
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
@@ -163,8 +154,7 @@ def test_default_caps_in_W3C(monkeypatch, testdir):
                 'accessKey': 'bar',
                 'sessionName': 'test_default_caps_in_W3C.test_bstack_capabilities'
             }
-    """
-    )
+    """)
     testdir.quick_qa(
         "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
     )
@@ -180,8 +170,7 @@ def test_default_caps_in_W3C_with_conflict(monkeypatch, testdir):
     variables = testdir.makefile(
         ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
     )
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_bstack_capabilities(driver_kwargs):
@@ -190,8 +179,7 @@ def test_default_caps_in_W3C_with_conflict(monkeypatch, testdir):
                 'accessKey': 'bar',
                 'sessionName': 'conflicting_name'
             }
-    """
-    )
+    """)
     testdir.quick_qa(
         "--driver", "BrowserStack", "--variables", variables, file_test, passed=1
     )

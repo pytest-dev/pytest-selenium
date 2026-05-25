@@ -11,14 +11,12 @@ pytestmark = pytest.mark.nondestructive
 
 @pytest.mark.chrome
 def test_launch(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """
-    )
+    """)
     testdir.quick_qa(
         "--driver",
         "Remote",
@@ -32,8 +30,7 @@ def test_launch(testdir):
 
 @pytest.mark.chrome
 def test_options(testdir):
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import pytest
         @pytest.fixture
         def chrome_options(chrome_options):
@@ -42,8 +39,7 @@ def test_options(testdir):
 
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """
-    )
+    """)
     reprec = testdir.inline_run(
         "--driver", "Remote", "--capability", "browserName", "chrome"
     )
@@ -56,8 +52,7 @@ def test_options(testdir):
 @pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 @pytest.mark.chrome
 def test_args(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.fixture
         def driver_log():
@@ -69,8 +64,7 @@ def test_args(testdir):
 
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """
-    )
+    """)
     testdir.quick_qa(
         "--driver",
         "Remote",

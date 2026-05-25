@@ -8,26 +8,22 @@ pytestmark = [pytest.mark.nondestructive, pytest.mark.firefox]
 
 
 def test_launch(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
 
 
 def test_launch_case_insensitive(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
 
 
@@ -37,8 +33,7 @@ def test_profile(testdir):
     The profile changes the colors in the browser, which are then reflected
     when calling value_of_css_property.
     """
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         from selenium.webdriver.common.by import By
 
@@ -60,8 +55,7 @@ def test_profile(testdir):
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
             assert anchor_color == 'rgb(255, 105, 180)'
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
 
 
@@ -72,8 +66,7 @@ def test_extension(testdir):
 
     path = os.path.join(os.path.split(os.path.dirname(__file__))[0], "testing")
     extension = os.path.join(path, "empty.xpi")
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import time
         import pytest
         from selenium.webdriver.common.by import By
@@ -97,17 +90,13 @@ def test_extension(testdir):
                     lambda s: s.find_element(By.ID,
                         'extensions-tbody').text)
             assert 'Test Extension (empty)' in extensions
-    """.format(
-            extension
-        )
-    )
+    """.format(extension))
     testdir.quick_qa(file_test, passed=1)
 
 
 def test_preferences_marker(testdir):
     """Test that preferences can be specified using the marker."""
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         from selenium.webdriver.common.by import By
         @pytest.mark.nondestructive
@@ -123,14 +112,12 @@ def test_preferences_marker(testdir):
             anchor_color = anchor.value_of_css_property('color')
             assert header_color == 'rgb(255, 0, 0)'
             assert anchor_color == 'rgb(255, 105, 180)'
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
 
 
 def test_arguments_marker(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         pytestmark = pytest.mark.firefox_arguments('baz')
         @pytest.mark.nondestructive
@@ -139,6 +126,5 @@ def test_arguments_marker(testdir):
             actual = sorted(firefox_options.arguments)
             expected = sorted(['baz', 'foo', 'bar'])
             assert actual == expected
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
