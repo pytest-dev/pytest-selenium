@@ -14,13 +14,11 @@ pytestmark = pytest.mark.nondestructive
 
 @pytest.fixture
 def testfile(testdir):
-    return testdir.makepyfile(
-        """
+    return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """
-    )
+    """)
 
 
 def failure_with_output(testdir, *args, **kwargs):
@@ -37,14 +35,12 @@ def failure(testdir, testfile, httpserver_base_url):
 
 
 def test_driver_case_insensitive(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(request):
             assert request.config.getoption('driver') == 'SaUcELaBs'
-    """
-    )
+    """)
     testdir.quick_qa("--driver", "SaUcELaBs", file_test, passed=1)
 
 
@@ -54,13 +50,11 @@ def test_missing_driver(failure):
 
 
 def test_invalid_driver(testdir):
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
             import pytest
             @pytest.mark.nondestructive
             def test_pass(): pass
-        """
-    )
+        """)
     invalid_driver = "noop"
     result = testdir.runpytest("--driver", invalid_driver)
     message = "--driver: invalid choice: '{}'".format(invalid_driver)
@@ -68,15 +62,13 @@ def test_invalid_driver(testdir):
 
 
 def test_driver_quit(testdir):
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_driver_quit(selenium):
             selenium.quit()
             selenium.title
-    """
-    )
+    """)
     result = testdir.runpytestqa()
     result.stdout.fnmatch_lines_random(
         [
@@ -93,16 +85,12 @@ def test_driver_quit(testdir):
 def test_default_host_port(testdir):
     host = "localhost"
     port = "4444"
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert driver_kwargs['command_executor'] == 'http://{}:{}/wd/hub'
-    """.format(
-            host, port
-        )
-    )
+    """.format(host, port))
     testdir.quick_qa("--driver", "Remote", file_test, passed=1)
 
 
@@ -115,16 +103,12 @@ def test_default_host_port(testdir):
     ],
 )
 def test_host_protocol(host, expected, testdir):
-    filetest = testdir.makepyfile(
-        """
+    filetest = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert driver_kwargs['command_executor'] == '{}:4444/wd/hub'
-        """.format(
-            expected
-        )
-    )
+        """.format(expected))
     testdir.quick_qa(
         "--driver",
         "Remote",
@@ -140,16 +124,12 @@ def test_host_protocol(host, expected, testdir):
 def test_arguments_order(testdir):
     host = "notlocalhost"
     port = "4441"
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert driver_kwargs['command_executor'] == 'http://{}:{}/wd/hub'
-    """.format(
-            host, port
-        )
-    )
+    """.format(host, port))
 
     testdir.quick_qa(
         "--driver",
@@ -166,16 +146,12 @@ def test_arguments_order(testdir):
 def test_arguments_order_random(testdir):
     host = "notlocalhost"
     port = "4441"
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert driver_kwargs['command_executor'] == 'http://{}:{}/wd/hub'
-    """.format(
-            host, port
-        )
-    )
+    """.format(host, port))
     testdir.quick_qa(
         "--selenium-host",
         host,
@@ -205,21 +181,18 @@ def test_provider_naming(name):
 
 @pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 def test_service_log_path(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert driver_kwargs['service_log_path'] is not None
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
 
 
 @pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 def test_no_service_log_path(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.fixture
         def driver_log():
@@ -228,8 +201,7 @@ def test_no_service_log_path(testdir):
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert driver_kwargs['service_log_path'] is None
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
 
 
@@ -240,15 +212,13 @@ def test_driver_retry_pass(testdir, mocker):
     )
     mock_retrying = mocker.spy(pytest_selenium.pytest_selenium, "Retrying")
 
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
 
         @pytest.mark.nondestructive
         def test_pass(driver):
             assert driver
-    """
-    )
+    """)
 
     testdir.quick_qa(file_test, passed=1)
     assert mock_retrying.spy_return.statistics["attempt_number"] == 1
@@ -266,22 +236,18 @@ def test_driver_retry_fail(testdir, mocker, max_num_attempts):
 
     default_attempts = 3
     if max_num_attempts is not None:
-        testdir.makeini(
-            f"""
+        testdir.makeini(f"""
             [pytest]
             max_driver_init_attempts = {max_num_attempts}
-            """
-        )
+            """)
 
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
 
         @pytest.mark.nondestructive
         def test_pass(driver):
             assert True  # catch if this starts to pass
-        """
-    )
+        """)
 
     testdir.quick_qa("--driver", "Firefox", file_test, failed=1)
     expected_attempts = max_num_attempts or default_attempts
@@ -289,13 +255,11 @@ def test_driver_retry_fail(testdir, mocker, max_num_attempts):
 
 
 def test_xdist(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
 
         @pytest.mark.nondestructive
         def test_xdist(driver):
             pass
-    """
-    )
+    """)
     testdir.quick_qa("-n", "2", file_test, passed=1)
