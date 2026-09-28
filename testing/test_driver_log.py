@@ -14,14 +14,12 @@ LOG_REGEX = re.compile('<a class="text" href=".*" target="_blank">Driver Log</a>
 
 @pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 def test_driver_log(testdir):
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_driver_log(webtext):
             assert False
-    """
-    )
+    """)
     path = testdir.tmpdir.join("report.html")
     testdir.runpytestqa("--html", path)
     with open(str(path)) as f:
@@ -34,8 +32,7 @@ def test_driver_log(testdir):
 
 @pytest.mark.xfail(reason="Remote driver currently doesn't support logs")
 def test_driver_log_fixture(testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.fixture
         def driver_log():
@@ -44,15 +41,13 @@ def test_driver_log_fixture(testdir):
         @pytest.mark.nondestructive
         def test_pass(webtext):
             assert webtext == u'Success!'
-    """
-    )
+    """)
     testdir.quick_qa(file_test, passed=1)
     assert os.path.exists(str(testdir.tmpdir.join("foo.log")))
 
 
 def test_no_driver_log(testdir):
-    testdir.makepyfile(
-        """
+    testdir.makepyfile("""
         import pytest
         @pytest.fixture
         def driver_log():
@@ -61,8 +56,7 @@ def test_no_driver_log(testdir):
         @pytest.mark.nondestructive
         def test_no_driver_log(webtext):
             assert False
-    """
-    )
+    """)
     path = testdir.tmpdir.join("report.html")
     testdir.runpytestqa("--html", path)
     with open(str(path)) as f:
