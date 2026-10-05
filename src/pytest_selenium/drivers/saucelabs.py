@@ -146,9 +146,7 @@ def _video_html(session):
             "url":"https://assets.saucelabs.com/jobs/{session}/video.flv",\
             "provider":"streamer",\
             "autoPlay":false,\
-            "autoBuffering":true}}]}}'.format(
-        session=session
-    )
+            "autoBuffering":true}}]}}'.format(session=session)
 
     return (
         f'<div id="player{session}" style="border:1px solid #e6e6e6; float:right; height:240px; margin-left:5px;'

@@ -15,13 +15,11 @@ pytestmark = [pytest.mark.skip_selenium, pytest.mark.nondestructive]
 
 @pytest.fixture
 def testfile(testdir):
-    return testdir.makepyfile(
-        """
+    return testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(selenium): pass
-    """
-    )
+    """)
 
 
 def failure_with_output(testdir, *args, **kwargs):
@@ -87,22 +85,19 @@ def test_invalid_credentials_file(failure, monkeypatch, tmpdir):
 
 
 def test_credentials_in_capabilities(monkeypatch, testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_sauce_capabilities(driver_kwargs):
             assert driver_kwargs['options'].capabilities['username'] == 'foo'
             assert driver_kwargs['options'].capabilities['accessKey'] == 'bar'
-    """
-    )
+    """)
 
     run_sauce_test(monkeypatch, testdir, file_test)
 
 
 def test_no_sauce_options(monkeypatch, testdir):
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_sauce_capabilities(driver_kwargs):
@@ -111,8 +106,7 @@ def test_no_sauce_options(monkeypatch, testdir):
                 raise AssertionError('<sauce:options> should not be present!')
             except KeyError:
                 pass
-    """
-    )
+    """)
 
     run_sauce_test(monkeypatch, testdir, file_test)
 
@@ -168,17 +162,13 @@ def run_w3c_sauce_test(capabilities, expected_result, monkeypatch, testdir):
         ".json", '{{"capabilities": {}}}'.format(json.dumps(capabilities))
     )
 
-    file_test = testdir.makepyfile(
-        """
+    file_test = testdir.makepyfile("""
         import pytest
         @pytest.mark.nondestructive
         def test_sauce_capabilities(driver_kwargs):
             actual = driver_kwargs['options'].capabilities['sauce:options']
             assert actual == {}
-    """.format(
-            expected_result
-        )
-    )
+    """.format(expected_result))
 
     testdir.quick_qa(
         "--driver", "saucelabs", "--variables", variables, file_test, passed=1
@@ -219,21 +209,17 @@ def test_data_center_option(testdir, monkeypatch):
     monkeypatch.setenv("SAUCELABS_API_KEY", "bar")
 
     expected_data_center = "us-east-1"
-    testdir.makeini(
-        f"""
+    testdir.makeini(f"""
         [pytest]
         saucelabs_data_center = {expected_data_center}
-    """
-    )
+    """)
 
-    file_test = testdir.makepyfile(
-        f"""
+    file_test = testdir.makepyfile(f"""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert "{expected_data_center}" in driver_kwargs['command_executor']
-    """
-    )
+    """)
     testdir.quick_qa("--driver", "SauceLabs", file_test, passed=1)
 
 
@@ -245,14 +231,12 @@ def test_data_center_option_file(testdir, monkeypatch, tmpdir):
     expected_data_center = "us-east-1"
     tmpdir.join(".saucelabs").write(f"[options]\ndata_center={expected_data_center}")
 
-    file_test = testdir.makepyfile(
-        f"""
+    file_test = testdir.makepyfile(f"""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert "{expected_data_center}" in driver_kwargs['command_executor']
-    """
-    )
+    """)
     testdir.quick_qa("--driver", "SauceLabs", file_test, passed=1)
 
 
@@ -264,21 +248,17 @@ def test_data_center_option_precedence(testdir, monkeypatch, tmpdir):
     expected_data_center = "us-east-1"
     tmpdir.join(".saucelabs").write(f"[options]\ndata_center={expected_data_center}")
 
-    testdir.makeini(
-        """
+    testdir.makeini("""
         [pytest]
         saucelabs_data_center = "ap-east-1"
-    """
-    )
+    """)
 
-    file_test = testdir.makepyfile(
-        f"""
+    file_test = testdir.makepyfile(f"""
         import pytest
         @pytest.mark.nondestructive
         def test_pass(driver_kwargs):
             assert "{expected_data_center}" in driver_kwargs['command_executor']
-    """
-    )
+    """)
     testdir.quick_qa("--driver", "SauceLabs", file_test, passed=1)
 
 
