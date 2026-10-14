@@ -321,24 +321,24 @@ def _gather_html(item, report, driver, summary, extra):
 def _gather_logs(item, report, driver, summary, extra):
     pytest_html = item.config.pluginmanager.getplugin("html")
     try:
-        try: 
+        try:
             types = driver.log.get_available_log_types
         except AttributeError:
             types = driver.log_types
-            
+
     except Exception as e:
         # note that some drivers may not implement log types
         summary.append("WARNING: Failed to gather log types: {0}".format(e))
         return
     for name in types:
         try:
-            
-            
-            try: 
+
+
+            try:
                 log = driver.log.get(name)
             except AttributeError:
                 log=driver.get_log(name)
-                        
+
         except Exception as e:
             summary.append("WARNING: Failed to gather {0} log: {1}".format(name, e))
             return
